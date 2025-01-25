@@ -1,0 +1,142 @@
+[
+  {
+    "Letter": "_",
+    "HexString": "00 00 00 00"
+  },
+  {
+    "Letter": "¿",
+    "HexString": "00 00 01 86"
+  },
+  {
+    "Letter": "D",
+    "HexString": "00 00 01 87"
+  },
+  {
+    "Letter": "ó",
+    "HexString": "00 00 01 88"
+  },
+  {
+    "Letter": "n",
+    "HexString": "00 00 01 89"
+  },
+  {
+    "Letter": "d",
+    "HexString": "00 00 01 8A"
+  },
+  {
+    "Letter": "e",
+    "HexString": "00 00 01 8B"
+  },
+  {
+    "Letter": " ",
+    "HexString": "00 00 01 8C"
+  },
+  {
+    "Letter": "s",
+    "HexString": "00 00 01 8D"
+  },
+  {
+    "Letter": "t",
+    "HexString": "00 00 01 8E"
+  },
+  {
+    "Letter": "o",
+    "HexString": "00 00 01 8F"
+  },
+  {
+    "Letter": "y",
+    "HexString": "00 00 01 90"
+  },
+  {
+    "Letter": "?",
+    "HexString": "00 00 01 91"
+  },
+  {
+    "Letter": "¡",
+    "HexString": "00 00 01 92"
+  },
+  {
+    "Letter": "A",
+    "HexString": "00 00 01 93"
+  },
+  {
+    "Letter": "a",
+    "HexString": "00 00 01 94"
+  },
+  {
+    "Letter": "-",
+    "HexString": "00 00 01 95"
+  },
+  {
+    "Letter": "c",
+    "HexString": "00 00 01 96"
+  },
+  {
+    "Letter": "h",
+    "HexString": "00 00 01 97"
+  },
+  {
+    "Letter": "í",
+    "HexString": "00 00 01 98"
+  },
+  {
+    "Letter": "!",
+    "HexString": "00 00 01 99"
+  },
+  {
+    "Letter": ".",
+    "HexString": "00 00 01 9A"
+  },
+  {
+    "Letter": "E",
+    "HexString": "00 00 01 9B"
+  },
+  {
+    "Letter": "r",
+    "HexString": "00 00 01 9C"
+  },
+  {
+    "Letter": "S",
+    "HexString": "00 00 01 9D"
+  },
+  {
+    "Letter": "i",
+    "HexString": "00 00 01 9E"
+  },
+  {
+    "Letter": "l",
+    "HexString": "00 00 01 9F"
+  },
+  {
+    "Letter": "x",
+    "HexString": "00 00 01 A0"
+  },
+  {
+    "Letter": "P",
+    "HexString": "00 00 01 A1"
+  },
+  {
+    "Letter": "p",
+    "HexString": "00 00 01 A2"
+  },
+  {
+    "Letter": "á",
+    "HexString": "00 00 01 A3"
+  },
+  {
+    "Letter": "U",
+    "HexString": "00 00 01 A4"
+  },
+  {
+    "Letter": "g",
+    "HexString": "00 00 01 A5"
+  },
+  {
+    "Letter": "G",
+    "HexString": "00 00 01 A6"
+  },
+  {
+    "Letter": "H",
+    "HexString": "00 00 01 A7"
+  }
+]

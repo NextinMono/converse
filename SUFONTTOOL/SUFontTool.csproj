@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+   <PropertyGroup>
+    <SourceFolder>$(MSBuildProjectDirectory)\tables\</SourceFolder>
+    <DestinationFolder>$(MSBuildProjectDirectory)\bin\$(Configuration)\net8.0\tables\</DestinationFolder>
+  </PropertyGroup>
+
+   <ItemGroup>
+     <PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+   </ItemGroup>
+
+  <Target Name="CopyFiles" AfterTargets="Build">
+    <ItemGroup>
+      <FilesToCopy Include="$(SourceFolder)**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(DestinationFolder)%(RecursiveDir)" />
+  </Target>
+  
+</Project>

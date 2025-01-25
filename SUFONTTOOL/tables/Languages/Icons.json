@@ -1,0 +1,104 @@
+{
+    "ConversionTable": [
+        {
+            "Letter": "{A}",
+            "HexString": "00 00 00 64"
+        },
+        {
+            "Letter": "{B}",
+            "HexString": "00 00 00 65"
+        },
+        {
+            "Letter": "{X}",
+            "HexString": "00 00 00 66"
+        },
+        {
+            "Letter": "{Y}",
+            "HexString": "00 00 00 67"
+        },
+        {
+            "Letter": "{LB}",
+            "HexString": "00 00 00 68"
+        },
+        {
+            "Letter": "{RB}",
+            "HexString": "00 00 00 69"
+        },
+        {
+            "Letter": "{LT}",
+            "HexString": "00 00 00 6A"
+        },
+        {
+            "Letter": "{RT}",
+            "HexString": "00 00 00 6B"
+        },
+        {
+            "Letter": "{LSU}",
+            "HexString": "00 00 00 6C"
+        },
+        {
+            "Letter": "{LSR}",
+            "HexString": "00 00 00 6D"
+        },
+        {
+            "Letter": "{LSD}",
+            "HexString": "00 00 00 6E"
+        },
+        {
+            "Letter": "{LSL}",
+            "HexString": "00 00 00 6F"
+        },
+        {
+            "Letter": "{RSU}",
+            "HexString": "00 00 00 70"
+        },
+        {
+            "Letter": "{RSR}",
+            "HexString": "00 00 00 71"
+        },
+        {
+            "Letter": "{RSD}",
+            "HexString": "00 00 00 72"
+        },
+        {
+            "Letter": "{RSL}",
+            "HexString": "00 00 00 73"
+        },
+        {
+            "Letter": "{UP}",
+            "HexString": "00 00 00 74"
+        },
+        {
+            "Letter": "{RIGHT}",
+            "HexString": "00 00 00 75"
+        },
+        {
+            "Letter": "{DOWN}",
+            "HexString": "00 00 00 76"
+        },
+        {
+            "Letter": "{LEFT}",
+            "HexString": "00 00 00 77"
+        },
+        {
+            "Letter": "{START}",
+            "HexString": "00 00 00 78"
+        },
+        {
+            "Letter": "{SELECT}",
+            "HexString": "00 00 00 79"
+        },
+        {
+            "Letter": "{AUTOSAVE}",
+            "HexString": "00 00 00 7A"
+        },
+		{
+            "Letter": "{ValueP1}",
+            "HexString": "00 00 00 01"
+        },
+		{
+            "Letter": "{ValueP2}",
+            "HexString": "00 00 00 2E"
+        }
+    ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "Letter": "_",
+    "HexString": "00 00 00 00"
+  },
+  {
+    "Letter": "¡",
+    "HexString": "00 00 01 5B"
+  },
+  {
+    "Letter": "V",
+    "HexString": "00 00 01 5C"
+  },
+  {
+    "Letter": "a",
+    "HexString": "00 00 01 5D"
+  },
+  {
+    "Letter": "y",
+    "HexString": "00 00 01 5E"
+  },
+  {
+    "Letter": "!",
+    "HexString": "00 00 01 5F"
+  },
+  {
+    "Letter": "A",
+    "HexString": "00 00 01 60"
+  },
+  {
+    "Letter": "h",
+    "HexString": "00 00 01 61"
+  },
+  {
+    "Letter": "O",
+    "HexString": "00 00 01 62"
+  },
+  {
+    "Letter": "o",
+    "HexString": "00 00 01 63"
+  },
+  {
+    "Letter": ",",
+    "HexString": "00 00 01 64"
+  },
+  {
+    "Letter": " ",
+    "HexString": "00 00 01 65"
+  },
+  {
+    "Letter": "s",
+    "HexString": "00 00 01 66"
+  },
+  {
+    "Letter": "í",
+    "HexString": "00 00 01 67"
+  },
+  {
+    "Letter": "¿",
+    "HexString": "00 00 01 68"
+  },
+  {
+    "Letter": "U",
+    "HexString": "00 00 01 69"
+  },
+  {
+    "Letter": "g",
+    "HexString": "00 00 01 6A"
+  },
+  {
+    "Letter": "?",
+    "HexString": "00 00 01 6B"
+  },
+  {
+    "Letter": "G",
+    "HexString": "00 00 01 6C"
+  },
+  {
+    "Letter": "H",
+    "HexString": "00 00 01 6D"
+  }
+]
