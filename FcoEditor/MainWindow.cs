@@ -17,7 +17,7 @@ namespace FcoEditor
 {
     public class MainWindow : GameWindow
     {
-        public static readonly string applicationName = "Test";
+        public static readonly string applicationName = "SWA fcoEditor";
         private static MemoryStream iconData;
         float test = 1;
         ImGuiController _controller;
