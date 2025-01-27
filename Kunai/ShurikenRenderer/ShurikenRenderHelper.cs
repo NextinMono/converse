@@ -155,7 +155,7 @@ namespace FcoEditor.ShurikenRenderer
         }
         public void SaveCurrentFile(string in_Path)
         {
-
+            fcoFile.Write(in_Path + "test");
         }
 
         internal void RenderWindows()

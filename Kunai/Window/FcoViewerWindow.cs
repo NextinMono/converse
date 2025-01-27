@@ -23,6 +23,7 @@ namespace FcoEditor
         readonly string newLineValue = "00 00 00 00";
         int selectedGroupIndex;
         float averageSize = 50;
+        float fontSizeMultiplier = 1;
         bool expandAllCells = false;
         bool tablePresent = false;
         Random random = new Random();
@@ -82,8 +83,8 @@ namespace FcoEditor
                 sb.End();
                 //Draw sprite
                 ImGui.SameLine(0, 0);
-                ImGui.Image(new ImTextureID(spr.Texture.GlTex.ID), new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y), uvTL, uvBR, in_Color);
-                averageSize = spr.Dimensions.Y;
+                ImGui.Image(new ImTextureID(spr.Texture.GlTex.ID), new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y) * fontSizeMultiplier, uvTL, uvBR, in_Color);
+                averageSize = spr.Dimensions.Y * fontSizeMultiplier;
             }
         }
         void DrawCellFromFTE(SUFcoTool.Cell in_Cell, string[] in_ConverseIDs)
@@ -96,6 +97,8 @@ namespace FcoEditor
                     ImGui.NewLine();
                     continue;
                 }
+                if (converseID == "")
+                    continue;
 
                 Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
                 //In the case that a texture cant be found or if its unregistered through
@@ -130,7 +133,7 @@ namespace FcoEditor
             ImGui.BeginDisabled(!tablePresent);
             string joinedIDs = string.Join("", in_ConverseIDs);
             string cellMessageConverted = translationTableNew == null ? in_Cell.MessageConverseIDs : TranslationService.RawHEXtoTXT(joinedIDs, translationTableNew);
-            if(ImGui.InputText($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 512))
+            if(ImGui.InputTextMultiline($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 512))
             {
                 joinedIDs = TranslationService.RawTXTtoHEX(cellMessageConverted, translationTableNew);
                 in_Cell.MessageConverseIDs = joinedIDs;
@@ -208,14 +211,16 @@ namespace FcoEditor
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(in_Renderer.screenSize.X, in_Renderer.screenSize.Y - MenuBarWindow.menuBarHeight), ImGuiCond.Always);
             if (ImGui.Begin("##FCOViewerWindow", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove))
             {
+                ImGui.Checkbox("Expand all", ref expandAllCells);
+                ImGui.SameLine();
+                ImGui.SliderFloat("Font Size", ref fontSizeMultiplier, 0.5f, 2);
+                ImGui.Separator();
+
                 if (ImGui.BeginTabBar("##tabsfco"))
-                {
+                {                    
                     bool isFcoLoaded = in_Renderer.fcoFile != null;
                     if (ImGui.BeginTabItem("FCO Viewer"))
-                    {
-
-                        ImGui.Checkbox("Expand all", ref expandAllCells);
-                        ImGui.Separator();
+                    {                        
                         DrawGroupSelection(in_Renderer, isFcoLoaded);
                         ImGui.SameLine();
                         DrawCellList(in_Renderer, isFcoLoaded);
@@ -227,7 +232,7 @@ namespace FcoEditor
                         {
                             ImGui.TextWrapped("A translation table is necessary to be able to edit text from FCOs, as they do not store the character used to type out the sentences.");
 
-                            if (ImGui.Button("Import Translation Table"))
+                            if (ImGui.Button("Import Table"))
                             {
                                 var testdial = NativeFileDialogSharp.Dialog.FileOpen("json");
                                 if (testdial.IsOk)
@@ -237,11 +242,24 @@ namespace FcoEditor
                                     AddMissingFteEntriesToTable(translationTableNew);
                                 }
                             }
-                            if (ImGui.Button("Create Translation Table"))
+                            ImGui.SameLine();
+                            if (ImGui.Button("Create Table"))
                             {
                                 translationTableNew = new List<TranslationTable.Entry>();
+                                translationTableNew.Add(new TranslationTable.Entry("{NewLine}", "00 00 00 00"));
                                 AddMissingFteEntriesToTable(translationTableNew);
                                 tablePresent = true;
+                            }
+                            ImGui.SameLine();
+                            if(ImGui.Button("Save Table"))
+                            {
+                                var testdial = NativeFileDialogSharp.Dialog.FileSave("json");
+                                if (testdial.IsOk)
+                                {
+                                    TranslationTable table = new TranslationTable();
+                                    table.Standard = translationTableNew;
+                                    table.Write(@testdial.Path);
+                                }
                             }
 
                             if (tablePresent)

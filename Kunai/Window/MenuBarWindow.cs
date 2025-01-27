@@ -27,19 +27,19 @@ namespace FcoEditor
         }
         public static float menuBarHeight = 32;
         private readonly string fco = "fco";
-        private readonly string fte = "fco";
+        private readonly string fte = "fte";
 
         public string AskForFTE(string in_FcoPath)
         {
             var possibleFtePath = Path.Combine(Directory.GetParent(in_FcoPath).FullName, "fte_ConverseMain.fte");
-            if (!File.Exists(possibleFtePath))
-            {
+            //if (!File.Exists(possibleFtePath))
+            //{
                 var testdial2 = NativeFileDialogSharp.Dialog.FileOpen(fte, Directory.GetParent(in_FcoPath).FullName);
                 if (testdial2.IsOk)
                 {
                     possibleFtePath = testdial2.Path;
                 }
-            }
+            //}
             return possibleFtePath;
         }
         public override void Render(ShurikenRenderHelper in_Renderer)
@@ -60,7 +60,7 @@ namespace FcoEditor
                     }
                     if (ImGui.MenuItem("Save", "Ctrl + S"))
                     {
-                        in_Renderer.SaveCurrentFile(null);
+                        in_Renderer.SaveCurrentFile(in_Renderer.config.WorkFilePath);
                     }
                     ImGui.EndMenu();
                 }
