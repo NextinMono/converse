@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Drawing;
 using System.Windows.Interop;
 using OpenTK.Graphics.OpenGL;
+using System;
 
 namespace Shuriken.Rendering
 {    

@@ -2,13 +2,13 @@
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
-using SharpNeedle.Ninja.Csd;
-using SharpNeedle.Ninja.Csd.Motions;
-using Shuriken.Models;
 using Shuriken.Rendering;
 using SUFcoTool;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using Texture = Shuriken.Rendering.Texture;
 
 namespace FcoEditor.ShurikenRenderer
@@ -134,7 +134,7 @@ namespace FcoEditor.ShurikenRenderer
                     new Vector2(begin.X, begin.Y),
                     new Vector2(begin.X, end.Y),
                     new Vector2(end.X, begin.Y),
-                    new Vector2(end.X, end.Y), pos, 0, new Vector2(1, 1), 16.0f / 9.0f, spr, spr, 0, color, color, color, color, color, 1, 0);
+                    new Vector2(end.X, end.Y), pos, 0, new Vector2(1, 1), 16.0f / 9.0f, spr, spr, 0, color, color, color, color, color, 1);
 
                 idx++;
                 if (idx == 12)

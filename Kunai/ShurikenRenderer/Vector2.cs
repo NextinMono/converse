@@ -1,4 +1,7 @@
-﻿namespace FcoEditor.ShurikenRenderer
+﻿using System;
+using System.Numerics;
+
+namespace FcoEditor.ShurikenRenderer
 {
     public class Vector2
     {

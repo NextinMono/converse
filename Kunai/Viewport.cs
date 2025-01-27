@@ -1,5 +1,6 @@
 ﻿using Hexa.NET.ImGui;
 using FcoEditor.ShurikenRenderer;
+using System;
 
 namespace FcoEditor
 {

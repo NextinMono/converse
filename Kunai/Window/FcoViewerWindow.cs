@@ -4,6 +4,10 @@ using FcoEditor.ShurikenRenderer;
 using Shuriken.Rendering;
 using SUFontTool.FCO;
 using SUFcoTool;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Linq;
 namespace FcoEditor
 {
     public class FcoViewerWindow : Window

@@ -12,6 +12,7 @@ using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
 using System.IO;
 using Hexa.NET.ImPlot;
 using IconFonts;
+using System.Runtime.InteropServices;
 
 namespace FcoEditor
 {

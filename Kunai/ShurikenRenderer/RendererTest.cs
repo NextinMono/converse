@@ -3,6 +3,9 @@ using OpenTK.Graphics.OpenGL;
 using Vector2 = System.Numerics.Vector2;
 using Vector4 = System.Numerics.Vector4;
 using FcoEditor.ShurikenRenderer;
+using System.Collections.Generic;
+using System;
+using System.Runtime.CompilerServices;
 
 
 
@@ -202,7 +205,7 @@ namespace Shuriken.Rendering
             FcoEditor.ShurikenRenderer.Vector2 position, float rotation, FcoEditor.ShurikenRenderer.Vector2 scale, float aspectRatio,
             Sprite sprite, Sprite nextSprite, float spriteFactor, Vector4 color,
             Vector4 gradientTopLeft, Vector4 gradientBottomLeft, Vector4 gradientTopRight, Vector4 gradientBottomRight,
-            int zIndex, ElementMaterialFlags flags)
+            int zIndex)
         {
             var quad = new Quad();
             var aspect = new FcoEditor.ShurikenRenderer.Vector2(aspectRatio, 1.0f);
@@ -249,7 +252,7 @@ namespace Shuriken.Rendering
             quad.BottomRight.Color = color * gradientBottomRight;
             quad.ZIndex = zIndex;
             quad.Additive = true;
-            quad.LinearFiltering = (flags & ElementMaterialFlags.LinearFiltering) != 0;
+            quad.LinearFiltering = true;
 
             quads.Add(quad);
         }

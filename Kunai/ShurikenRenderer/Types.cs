@@ -1,53 +1,11 @@
 ﻿using System.ComponentModel;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using System;
+using System.Numerics;
 
 namespace Shuriken.Rendering
-{public enum DrawType : uint
 {
-    [Description("No Draw")]
-    None,
-
-    [Description("Sprite")]
-    Sprite,
-
-    [Description("Font")]
-    Font
-}
-    [Flags]
-    public enum ElementInheritanceFlags
-    {
-        None = 0,
-        InheritRotation = 0x2,
-        InheritColor = 0x8,
-        InheritXPosition = 0x100,
-        InheritYPosition = 0x200,
-        InheritScaleX = 0x400,
-        InheritScaleY = 0x800,
-    }
-    [Flags]
-    public enum ElementMaterialFlags
-    {
-        None = 0,
-        AdditiveBlending = 0x1,
-        MirrorX = 0x400,
-        MirrorY = 0x800,
-        LinearFiltering = 0x1000
-    }
-    public enum ElementMaterialFiltering
-    {
-        [Description("Nearest")]
-        NearestNeighbor = 0,
-        [Description("Linear")]
-        Linear = 1
-    }
-    public enum ElementMaterialBlend
-    {
-        [Description("Normal")]
-        Normal = 0,
-        [Description("Additive")]
-        Additive = 1
-    }
     public struct Vertex
     {
         public Vector2 Position;

@@ -3,7 +3,6 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using SharpNeedle.Ninja.Csd;
 using FcoEditor.ShurikenRenderer;
 using System.Windows;
 using Hexa.NET.ImPlot;
@@ -12,6 +11,7 @@ using System.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System;
 
 namespace FcoEditor
 {

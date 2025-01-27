@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SharpNeedle\SharpNeedle.csproj" />
     <ProjectReference Include="..\SU-Font-Tool\SUFontTool.csproj" />
   </ItemGroup>
 <ItemGroup>
@@ -49,7 +48,5 @@
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   </None>
 </ItemGroup>
-
-  <Import Project="..\SharpNeedle.Shared\SharpNeedle.Shared.projitems" Label="Shared" />
 
 </Project>
