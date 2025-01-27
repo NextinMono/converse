@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Kunai": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "nativeDebugging": true
     },
     "Kunai Arguments Test": {
       "commandName": "Project",

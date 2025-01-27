@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
-namespace Kunai.ShurikenRenderer
+namespace FcoEditor.ShurikenRenderer
 {
     public class ShaderProgram
     {

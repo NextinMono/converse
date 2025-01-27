@@ -68,8 +68,8 @@ namespace Shuriken.Rendering
     public class Sprite
     {
         public readonly int ID;
-        public Kunai.ShurikenRenderer.Vector2 Start { get; set; }
-        public Kunai.ShurikenRenderer.Vector2 Dimensions { get; set; }
+        public FcoEditor.ShurikenRenderer.Vector2 Start { get; set; }
+        public FcoEditor.ShurikenRenderer.Vector2 Dimensions { get; set; }
         public Texture Texture { get; set; }
 
         // Used for saving to avoid corruption in un-edited values

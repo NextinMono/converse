@@ -2,7 +2,7 @@
 using OpenTK.Graphics.OpenGL;
 using Vector2 = System.Numerics.Vector2;
 using Vector4 = System.Numerics.Vector4;
-using Kunai.ShurikenRenderer;
+using FcoEditor.ShurikenRenderer;
 
 
 
@@ -198,14 +198,14 @@ namespace Shuriken.Rendering
         }
 
         public void DrawSprite(
-            Kunai.ShurikenRenderer.Vector2 topLeft, Kunai.ShurikenRenderer.Vector2 bottomLeft, Kunai.ShurikenRenderer.Vector2 topRight, Kunai.ShurikenRenderer.Vector2 bottomRight,
-            Kunai.ShurikenRenderer.Vector2 position, float rotation, Kunai.ShurikenRenderer.Vector2 scale, float aspectRatio,
+            FcoEditor.ShurikenRenderer.Vector2 topLeft, FcoEditor.ShurikenRenderer.Vector2 bottomLeft, FcoEditor.ShurikenRenderer.Vector2 topRight, FcoEditor.ShurikenRenderer.Vector2 bottomRight,
+            FcoEditor.ShurikenRenderer.Vector2 position, float rotation, FcoEditor.ShurikenRenderer.Vector2 scale, float aspectRatio,
             Sprite sprite, Sprite nextSprite, float spriteFactor, Vector4 color,
             Vector4 gradientTopLeft, Vector4 gradientBottomLeft, Vector4 gradientTopRight, Vector4 gradientBottomRight,
             int zIndex, ElementMaterialFlags flags)
         {
             var quad = new Quad();
-            var aspect = new Kunai.ShurikenRenderer.Vector2(aspectRatio, 1.0f);
+            var aspect = new FcoEditor.ShurikenRenderer.Vector2(aspectRatio, 1.0f);
 
             quad.TopLeft.Position = position + (topLeft * scale * aspect).Rotate(rotation) / aspect;
             quad.BottomLeft.Position = position + (bottomLeft * scale * aspect).Rotate(rotation) / aspect;

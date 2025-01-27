@@ -1,5 +1,4 @@
 ﻿using Hexa.NET.ImGui;
-using Kunai.Window;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
@@ -7,174 +6,13 @@ using SharpNeedle.Ninja.Csd;
 using SharpNeedle.Ninja.Csd.Motions;
 using Shuriken.Models;
 using Shuriken.Rendering;
-using SUFontTool;
+using SUFcoTool;
 using System.Diagnostics;
 using System.IO;
+using Texture = Shuriken.Rendering.Texture;
 
-namespace Kunai.ShurikenRenderer
+namespace FcoEditor.ShurikenRenderer
 {
-    [Flags]
-    public enum AnimationType : uint
-    {
-        None = 0,
-        HideFlag = 1,
-        XPosition = 2,
-        YPosition = 4,
-        Rotation = 8,
-        XScale = 16,
-        YScale = 32,
-        SubImage = 64,
-        Color = 128,
-        GradientTL = 256,
-        GradientBL = 512,
-        GradientTR = 1024,
-        GradientBR = 2048
-    }
-
-    public class SVisibilityData
-    {
-        public class SCast
-        {
-            public Cast Cast;
-            public bool Active = true;
-            public SCast(Cast in_Scene)
-            {
-                Cast = in_Scene;
-            }
-        }
-        public class SAnimation
-        {
-            public KeyValuePair<string, Motion> Motion;
-            public bool Active = true;
-            public SAnimation(KeyValuePair<string, Motion> in_Scene)
-            {
-                Motion = in_Scene;
-
-            }
-            public KeyFrameList GetTrack(Cast layer, AnimationType type)
-            {
-                foreach (SharpNeedle.Ninja.Csd.Motions.FamilyMotion animation in Motion.Value.FamilyMotions)
-                {
-                    foreach (SharpNeedle.Ninja.Csd.Motions.CastMotion animtrack in animation.CastMotions)
-                    {
-                        if (layer == animtrack.Cast)
-                        {
-                            if (animtrack.Capacity != 0)
-                            {
-                                foreach (var track in animtrack)
-                                {
-                                    if (track.Property.ToShurikenAnimationType() == type)
-                                        return track;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return null;
-            }
-        }
-        public class SScene
-        {
-            public List<SAnimation> Animation = new List<SAnimation>();
-            public List<SCast> Casts = new List<SCast>();
-            public KeyValuePair<string, Scene> Scene;
-            public bool Active = true;
-            public SScene(KeyValuePair<string, Scene> in_Scene)
-            {
-                Scene = in_Scene;
-                foreach (var group in Scene.Value.Families)
-                {
-                    foreach (var cast in group.Casts)
-                    {
-                        Casts.Add(new SCast(cast));
-                    }
-                }
-                foreach (var mot in Scene.Value.Motions)
-                {
-                    Animation.Add(new SAnimation(mot));
-                }
-            }
-            public SCast GetVisibility(Cast cast)
-            {
-                return Casts.FirstOrDefault(node => node.Cast == cast);
-            }
-        }
-        public class SNode
-        {
-
-            public List<SScene> Scene = new List<SScene>();
-            public List<SNode> Nodes = new List<SNode>();
-            public KeyValuePair<string, SceneNode> Node;
-            public bool Active = true;
-
-
-            public SNode(KeyValuePair<string, SceneNode> in_Node)
-            {
-                Node = in_Node;
-                foreach (var scene in Node.Value.Scenes)
-                {
-                    Scene.Add(new SScene(scene));
-                }
-                foreach (var scene in in_Node.Value.Children)
-                {
-                    Nodes.Add(new SNode(scene));
-                }
-            }
-            public SScene GetVisibility(Scene scene)
-            {
-                return Scene.FirstOrDefault(node => node.Scene.Value == scene);
-            }
-        }
-
-        public List<SNode> Nodes = new List<SNode>();
-
-        public SVisibilityData(CsdProject in_Proj)
-        {
-            Nodes.Add(new SNode(new KeyValuePair<string, SceneNode>("Root", in_Proj.Project.Root)));
-            
-        }
-        private SNode RecursiveGetNode(SNode in_Node, SceneNode in_SceneNode)
-        {
-            if (in_Node.Node.Value == in_SceneNode)
-                return in_Node;
-            foreach (var node in in_Node.Nodes)
-            {
-                if (node.Node.Value == in_SceneNode)
-                    return node;
-            }
-            return null;
-        }
-        private SScene RecursiveGetScene(SNode in_Node, Scene in_Scene)
-        {
-            foreach(var s in in_Node.Scene)
-            {
-                if (s.Scene.Value == in_Scene)
-                    return s;
-            }
-            foreach (var node in in_Node.Nodes)
-            {
-                return RecursiveGetScene(node, in_Scene);
-            }
-            return null;
-        }
-        public SNode GetVisibility(SceneNode scene)
-        {
-            foreach (var node in Nodes)
-            {                
-                return RecursiveGetNode(node, scene);
-            }
-            return null;
-        }
-        public SScene GetScene(Scene scene)
-        {
-            foreach (var node in Nodes)
-            {
-                return RecursiveGetScene(node, scene);
-            }
-            return null;
-        }
-    }
     public class ShurikenRenderHelper
     {
         public struct SViewportData
@@ -191,20 +29,20 @@ namespace Kunai.ShurikenRenderer
             public bool showQuads;
             public double time;
         }
+        public List<FcoEditor.Window> windowList = new List<FcoEditor.Window>();
         public Renderer renderer;
         public Vector2 viewportSize;
         public Vector2 screenSize;
-        public SVisibilityData visibilityData;
-        public CsdProject WorkProjectCsd;
+        public FCO fcoFile;
+        public FTE fteFile;
         public SProjectConfig config;
         private SViewportData viewportData;
         private GameWindow window;
         private int currentDrawPriority;
+
         public ShurikenRenderHelper(GameWindow window2, Vector2 in_ViewportSize, Vector2 clientSize)
         {
             viewportSize = in_ViewportSize;
-            renderer = new Renderer((int)viewportSize.X, (int)viewportSize.Y);
-            renderer.SetShader(renderer.shaderDictionary["basic"]);
             window = window2;
             viewportData = new SViewportData();
             config = new SProjectConfig();
@@ -218,30 +56,49 @@ namespace Kunai.ShurikenRenderer
                 System.Windows.MessageBox.Show(message, title, System.Windows.MessageBoxButton.OK, isWarning ? System.Windows.MessageBoxImage.Warning : System.Windows.MessageBoxImage.Information);
             }
         }
-        public void LoadFile(string in_Path)
+        public void LoadFile(string in_Path, string in_PathFte)
         {
             config.WorkFilePath = in_Path;
-            SonicUnleashedFCOConv.Program.tableArg = "WorldMap_Small";
-            SonicUnleashedFCOConv.Program.currentDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var pathTable = Path.Combine("tables", "Languages", "English", "Retail", "WorldMap.json");
+            fcoFile = FCO.Read(config.WorkFilePath, pathTable);
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.Elapsed.TotalSeconds}s");
 
-            SonicUnleashedFCOConv.FCO.ReadFCO(config.WorkFilePath);
-            string temp = @"K:\Games\SonicUnleashed\extracted_decompressed\SonicUnleashed\Languages\English\WorldMap\fte_ConverseMain.fte";
-            SonicUnleashedFCOConv.FTE.ReadFTE(temp);
+            fteFile = FTE.Read(in_PathFte);
 
-            string temp2 = Directory.GetParent(temp).FullName;
+            string parentPath = Directory.GetParent(config.WorkFilePath).FullName;
             SpriteHelper.textureList = new("");
-            foreach (var t in SonicUnleashedFCOConv.FTE.textures)
+            List<string> missingTextures = new List<string>();
+            foreach (var texture in fteFile.Textures)
             {
-                string pathtemp = Path.Combine(temp2, t.textureName + ".dds");
+                string pathtemp = Path.Combine(parentPath, texture.Name + ".dds");
                 if (File.Exists(pathtemp))
                     SpriteHelper.textureList.Textures.Add(new Texture(pathtemp, false));
                 else
                 {
-                    SpriteHelper.textureList.Textures.Add(new Texture("", false));
-                    //missingTextures.Add(texture.Name);
+                    var commonPathTexture = Path.Combine(Program.programDir,"Resources","CommonTextures",texture.Name + ".dds");
+                    if (File.Exists(commonPathTexture))
+                    {
+                        SpriteHelper.textureList.Textures.Add(new Texture(commonPathTexture, false));
+                    }
+                    else
+                    {
+                        SpriteHelper.textureList.Textures.Add(new Texture("", false));
+                        missingTextures.Add(texture.Name);
+                    }
                 }
             }
-            SpriteHelper.LoadTextures(SonicUnleashedFCOConv.FTE.characters);
+            if (missingTextures.Count > 0)
+            {
+                string textureNames = "";
+                foreach (string textureName in missingTextures)
+                    textureNames += "-" + textureName + "\n";
+                ShowMessageBoxCross("Warning", $"The file uses textures that could not be found, they will be replaced with squares.\n\nMissing Textures:\n{textureNames}", true);
+            }
+            ResetWindows();
+            SpriteHelper.LoadTextures(fteFile.Characters);
         }
         /// <summary>
         /// Renders contents of a CsdProject to a GL texture for use in ImGui
@@ -249,81 +106,6 @@ namespace Kunai.ShurikenRenderer
         /// <param name="in_CsdProject"></param>
         /// <param name="in_DeltaTime"></param>
         /// <exception cref="Exception"></exception>
-        public void Render(float in_DeltaTime)
-        {
-            // Get the size of the child (i.e. the whole draw size of the windows).
-            System.Numerics.Vector2 wsize = screenSize;
-
-            // make sure the buffers are the currect size
-            Vector2i wsizei = new((int)wsize.X, (int)wsize.Y);
-            if (viewportData.framebufferSize != wsizei)
-            {
-                viewportData.framebufferSize = wsizei;
-
-                // create our frame buffer if needed
-                if (viewportData.framebufferHandle == 0)
-                {
-                    viewportData.framebufferHandle = GL.GenFramebuffer();
-                    // bind our frame buffer
-                    GL.BindFramebuffer(FramebufferTarget.Framebuffer, viewportData.framebufferHandle);
-                    GL.ObjectLabel(ObjectLabelIdentifier.Framebuffer, viewportData.framebufferHandle, 10, "GameWindow");
-                }
-
-                // bind our frame buffer
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, viewportData.framebufferHandle);
-
-                if (viewportData.csdRenderTextureHandle > 0)
-                    GL.DeleteTexture(viewportData.csdRenderTextureHandle);
-
-                viewportData.csdRenderTextureHandle = GL.GenTexture();
-                GL.BindTexture(TextureTarget.Texture2D, viewportData.csdRenderTextureHandle);
-                GL.ObjectLabel(ObjectLabelIdentifier.Texture, viewportData.csdRenderTextureHandle, 16, "GameWindow:Color");
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, wsizei.X, wsizei.Y, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgb, PixelType.UnsignedByte, IntPtr.Zero);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-                GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, viewportData.csdRenderTextureHandle, 0);
-
-                if (viewportData.renderbufferHandle > 0)
-                    GL.DeleteRenderbuffer(viewportData.renderbufferHandle);
-
-                viewportData.renderbufferHandle = GL.GenRenderbuffer();
-                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, viewportData.renderbufferHandle);
-                GL.ObjectLabel(ObjectLabelIdentifier.Renderbuffer, viewportData.renderbufferHandle, 16, "GameWindow:Depth");
-                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent32f, wsizei.X, wsizei.Y);
-                GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, viewportData.renderbufferHandle);
-                //GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
-
-                //texDepth = GL.GenTexture();
-                //GL.BindTexture(TextureTarget.Texture2D, texDepth);
-                //GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32f, 800, 600, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
-                //GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, texDepth, 0);
-
-                // make sure the frame buffer is complete
-                FramebufferErrorCode errorCode = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-                if (errorCode != FramebufferErrorCode.FramebufferComplete)
-                    throw new Exception();
-            }
-            else
-            {
-                // bind our frame and depth buffer
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, viewportData.framebufferHandle);
-                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, viewportData.renderbufferHandle);
-            }
-
-            GL.Viewport(0, 0, wsizei.X, wsizei.Y); // change the viewport to window
-
-            // actually draw the scene
-            {
-                RenderToViewport(in_DeltaTime);
-
-            }
-
-            // unbind our bo so nothing else uses it
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-
-            GL.Viewport(0, 0, window.ClientSize.X, window.ClientSize.Y); // back to full screen size
-
-        }
         private void RenderToViewport(float in_DeltaTime)
         {
             GL.ClearColor(Color4.BlueViolet);
@@ -337,17 +119,8 @@ namespace Kunai.ShurikenRenderer
             int idx2 = 0;
             foreach(var c in ViewportWindow.test)
             {
-                var e = SonicUnleashedFCOConv.Translator.TXTtoHEX(c.ToString());
-                KeyValuePair<Structs.Character, int> chara = new();
-                foreach (var v in SpriteHelper.CharSprites)
-                {
-                    if(v.Key.convID == e)
-                    {
-                        chara = v;
-                        break;
-                    }
-                }
-                var spr = SpriteHelper.TryGetSprite(chara.Value);
+                var e = TranslationService.TXTtoHEX(c.ToString(), fcoFile.TranslationTable);
+                var spr = SpriteHelper.GetSpriteFromConverseID(e);
 
                 float width = (float)spr.Dimensions.X / (float)renderer.Width;
                 float height = (float)spr.Dimensions.Y / (float)renderer.Height;
@@ -382,14 +155,29 @@ namespace Kunai.ShurikenRenderer
         }
         public void SaveCurrentFile(string in_Path)
         {
-            WorkProjectCsd.Write(in_Path == null ? config.WorkFilePath : in_Path);
+
+        }
+
+        internal void RenderWindows()
+        {
+            foreach (var item in windowList)
+            {
+                item.Render(this);
+            }
+        }
+        void ResetWindows()
+        {
+            foreach (var item in windowList)
+            {
+                item.OnReset(this);
+            }
         }
     }
 }
 
 
 //using Hexa.NET.ImGui;
-//using Kunai.Window;
+//using FcoEditor.Window;
 //using OpenTK.Graphics.OpenGL;
 //using OpenTK.Mathematics;
 //using OpenTK.Windowing.Desktop;
@@ -400,7 +188,7 @@ namespace Kunai.ShurikenRenderer
 //using System.Diagnostics;
 //using System.IO;
 
-//namespace Kunai.ShurikenRenderer
+//namespace FcoEditor.ShurikenRenderer
 //{
 //    [Flags]
 //    public enum AnimationType : uint

@@ -1,6 +1,6 @@
 ﻿using Hexa.NET.ImGui;
 
-namespace Kunai
+namespace FcoEditor
 {
     public class TempSearchBox
     {

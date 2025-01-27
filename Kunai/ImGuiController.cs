@@ -13,7 +13,7 @@ using System.IO;
 using Hexa.NET.ImPlot;
 using IconFonts;
 
-namespace Kunai
+namespace FcoEditor
 {
     public class ImGuiController : IDisposable
     {

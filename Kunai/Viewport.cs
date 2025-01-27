@@ -1,7 +1,7 @@
 ﻿using Hexa.NET.ImGui;
-using Kunai.ShurikenRenderer;
+using FcoEditor.ShurikenRenderer;
 
-namespace Kunai.Window
+namespace FcoEditor
 {
     public static class ViewportWindow
     {

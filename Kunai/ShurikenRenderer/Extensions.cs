@@ -1,4 +1,4 @@
-﻿using Kunai.ShurikenRenderer;
+﻿using FcoEditor.ShurikenRenderer;
 
 public static class ExtensionKillMe
 {
@@ -48,16 +48,7 @@ public static class ExtensionKillMe
 }
 public static class AnimationTypeMethods
 {
-    public static bool IsColor(this AnimationType type)
-    {
-        return new AnimationType[] {
-                AnimationType.Color,
-                AnimationType.GradientTL,
-                AnimationType.GradientBL,
-                AnimationType.GradientTR,
-                AnimationType.GradientBR
-            }.Contains(type);
-    }
+   
     public static int FindKeyframe(this SharpNeedle.Ninja.Csd.Motions.KeyFrameList list, float frame)
     {
         int min = 0;
@@ -158,47 +149,5 @@ public static class AnimationTypeMethods
             A = (byte)((1.0f - factor) * swappedCurrent.A + swappedNext.A * factor)
         };
     }
-    public static AnimationType ToShurikenAnimationType(this SharpNeedle.Ninja.Csd.Motions.KeyProperty test)
-    {
-        switch (test)
-        {
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.HideFlag:
-                return AnimationType.HideFlag;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.PositionX:
-                return AnimationType.XPosition;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.PositionY:
-                return AnimationType.YPosition;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.Rotation:
-                return AnimationType.Rotation;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.ScaleX:
-                return AnimationType.XScale;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.ScaleY:
-                return AnimationType.YScale;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.SpriteIndex:
-                return AnimationType.SubImage;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.Color:
-                return AnimationType.Color;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.GradientTopLeft:
-                return AnimationType.GradientTL;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.GradientBottomLeft:
-                return AnimationType.GradientBL;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.GradientTopRight:
-                return AnimationType.GradientTR;
-
-            case SharpNeedle.Ninja.Csd.Motions.KeyProperty.GradientBottomRight:
-                return AnimationType.GradientBR;
-
-        }
-        return AnimationType.None;
-    }
+   
 }

@@ -1,4 +1,4 @@
-﻿namespace Kunai.ShurikenRenderer
+﻿namespace FcoEditor.ShurikenRenderer
 {
     public class Vector2
     {
