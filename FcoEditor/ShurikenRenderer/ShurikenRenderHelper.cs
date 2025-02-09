@@ -62,11 +62,11 @@ namespace FcoEditor.ShurikenRenderer
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             var pathTable = Path.Combine("tables", "Languages", "English", "Retail", "WorldMap.json");
-            fcoFile = FCO.Read(config.WorkFilePath, pathTable);
+            fcoFile = FCO.Read(config.WorkFilePath, pathTable, false);
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.Elapsed.TotalSeconds}s");
 
-            fteFile = FTE.Read(in_PathFte);
+            fteFile = FTE.Read(in_PathFte, false);
 
             string parentPath = Directory.GetParent(config.WorkFilePath).FullName;
             SpriteHelper.textureList = new("");

@@ -43,6 +43,7 @@ namespace FcoEditor
         {
             selectedGroupIndex = 0;
             tablePresent = false;
+            translationTableNew = null;
         }
         void DrawGroupSelection(ShurikenRenderHelper in_Renderer, bool in_FcoFilePresent)
         {
@@ -68,6 +69,14 @@ namespace FcoEditor
         }
         void DrawFTECharacter(Sprite spr, Vector4 in_Color)
         {
+            //TEMPORARY
+            //Since the bg is black, if the text is black, itll be unreadable
+            if (in_Color.X == 0 && in_Color.Y == 0 && in_Color.Z == 0 && in_Color.W != 0)
+            {
+                in_Color.X = 1;
+                in_Color.Y = 1;
+                in_Color.Z = 1;
+            }
             FcoEditor.ShurikenRenderer.Vector2 uvTL = new FcoEditor.ShurikenRenderer.Vector2(
                         spr.Start.X / spr.Texture.Width,
                         -(spr.Start.Y / spr.Texture.Height));
@@ -119,25 +128,20 @@ namespace FcoEditor
                         EmptyButton(converseID);
                         continue;
                     }
-                    var currentHighlight = in_Cell.Highlights.FirstOrDefault(x => i >= x.ColorStart && i <= x.ColorEnd);
-                    var color = currentHighlight == null ? in_Cell.ColorMain : currentHighlight;
-                    if (color.ColorRed == 0 && color.ColorBlue == 0 && color.ColorGreen == 0 && color.ColorAlpha != 0)
-                    {
-                        color.ColorRed = 255;
-                        color.ColorGreen = 255;
-                        color.ColorBlue = 255;
-                    }
-                    DrawFTECharacter(spr, color);
+                    var currentHighlight = in_Cell.Highlights.FirstOrDefault(x => i >= x.Start && i <= x.End);
+                    var color = currentHighlight == null ? in_Cell.MainColor : currentHighlight;
+                    
+                    DrawFTECharacter(spr, color.ArgbColor);
                 }
 
             }
         }
-        void CellInputText(string[] in_ConverseIDs, string in_CellName, ref SUFcoTool.Cell in_Cell, int in_Index)
+        void CellInputText(string[] in_ConverseIDs, string in_CellName, ref SUFcoTool.Cell in_Cell, int in_Index, int in_LineCount)
         {
             ImGui.BeginDisabled(!tablePresent);
             string joinedIDs = string.Join("", in_ConverseIDs);
             string cellMessageConverted = translationTableNew == null ? in_Cell.MessageConverseIDs : TranslationService.RawHEXtoTXT(joinedIDs, translationTableNew);
-            if(ImGui.InputTextMultiline($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 512))
+            if(ImGui.InputTextMultiline($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 512, new System.Numerics.Vector2(-1, ImGui.GetTextLineHeight() * in_LineCount)))
             {
                 joinedIDs = TranslationService.RawTXTtoHEX(cellMessageConverted, translationTableNew);
                 in_Cell.MessageConverseIDs = joinedIDs;
@@ -162,13 +166,19 @@ namespace FcoEditor
             if (ImGui.CollapsingHeader(cellName))
             {
                 ImGui.Indent();
+
+                string[] alignmentOptions = { "Left", "Center", "Right", "Justified" };
+                Vector4 colorMain = in_Cell.MainColor.ArgbColor;
+                Vector4 colorSub1 = in_Cell.ExtraColor1.ArgbColor;
+                Vector4 colorSub2 = in_Cell.ExtraColor2.ArgbColor;
+                int alignmentIdx = (int)in_Cell.Alignment;
                 string[] converseIDs = in_Cell.MessageConverseIDs.Split(", ");
                 int lineCount = 2;
                 foreach (var line in converseIDs)
                     if (line == newLineValue)
                         lineCount++;
 
-                CellInputText(converseIDs, cellName, ref in_Cell, in_Index);
+                CellInputText(converseIDs, cellName, ref in_Cell, in_Index, lineCount);
 
                 ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 1)));
                 if (ImGui.BeginListBox($"##group{in_SelectedGroup.Name}_{in_Cell.Name}", new System.Numerics.Vector2(-1, lineCount * averageSize)))
@@ -176,8 +186,49 @@ namespace FcoEditor
                     DrawCellFromFTE(in_Cell, converseIDs);
                     ImGui.EndListBox();
                 }
+                //    Left = 0,
+                //Center = 1,
+                //Right = 2,
+                //Justified = 3
+                ImGui.Combo("Alignment", ref alignmentIdx, alignmentOptions, 4);
+                ImGui.ColorEdit4("Color", ref colorMain);
+                ImGui.ColorEdit4("Color Sub 1", ref colorSub1);
+                ImGui.ColorEdit4("Color Sub 2", ref colorSub2);
+                ImGui.PushID($"##highlightlist{in_SelectedGroup.Name}_{in_Cell.Name}");
+                if (ImGui.TreeNodeEx("Highlights"))
+                {
+                    for (int i = 0; i < in_Cell.Highlights.Count; i++)
+                    {
+                        ImGui.PushID($"##highlight_{i}_{in_SelectedGroup.Name}_{in_Cell.Name}");
+                        if (ImGui.TreeNodeEx($"Highlight {i}"))
+                        {
+                            //ImGui in c# is ass.
+                            CellColor highlight = in_Cell.Highlights[i];
+                            Vector4 color = highlight.ArgbColor;
+                            int startIdx = highlight.Start;
+                            int endIdx = highlight.End;
+                            ImGui.InputInt("Start", ref startIdx);
+                            ImGui.InputInt("End", ref endIdx);
+                            ImGui.ColorEdit4("Color", ref color);
+                            highlight.Start = startIdx;
+                            highlight.End = endIdx;
+                            highlight.ArgbColor = color;
+                            in_Cell.Highlights[i] = highlight;
+
+                            ImGui.TreePop();
+
+                        }
+                        ImGui.PopID();
+                    }
+                    ImGui.TreePop();
+                }
+                ImGui.PopID();
                 ImGui.PopStyleColor();
                 ImGui.Unindent();
+                in_Cell.Alignment = (Cell.TextAlign)alignmentIdx;
+                in_Cell.MainColor.ArgbColor = colorMain;
+                in_Cell.ExtraColor1.ArgbColor = colorSub1;
+                in_Cell.ExtraColor2.ArgbColor = colorSub2;
             }
             ImGui.PopID();
         }
@@ -288,7 +339,12 @@ namespace FcoEditor
                                         ImGui.SetNextItemWidth(-1);
                                         ImGui.InputText($"##input{letter.HexString}", ref letter.Letter, 256);
                                         ImGui.TableSetColumnIndex(1);
-                                        DrawFTECharacter(spr, new Vector4(1, 1, 1, 1));
+                                        if (spr.Texture.GlTex != null)
+                                            DrawFTECharacter(spr, new Vector4(1, 1, 1, 1));
+                                        else
+                                        {
+                                            ImGui.Text("[Missing Texture]");
+                                        }
                                         ImGui.TableNextRow();
                                         translationTableNew[i] = letter;
                                     }
