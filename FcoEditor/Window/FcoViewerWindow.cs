@@ -32,6 +32,18 @@ namespace FcoEditor
         bool tablePresent = false;
         Random random = new Random();
         List<TranslationTable.Entry> translationTableNew = null;
+        List<SLineInfo> lineWidth = new List<SLineInfo>();
+        class SLineInfo
+        {
+            public float width;
+            public int amount;
+
+            public SLineInfo(float in_Width, int in_Amount)
+            {
+                this.width = in_Width;
+                this.amount = in_Amount;
+            }
+        }
 
         static void EmptyButton(string in_ConvID)
         {
@@ -67,7 +79,7 @@ namespace FcoEditor
             }
             ImGui.EndGroup();
         }
-        void DrawFTECharacter(Sprite spr, Vector4 in_Color)
+        void DrawFTECharacter(Sprite spr, Vector4 in_Color, float in_OffsetX)
         {
             //TEMPORARY
             //Since the bg is black, if the text is black, itll be unreadable
@@ -95,27 +107,91 @@ namespace FcoEditor
                 sb.Append($"##pattern{random.Next(0, 500)}");
                 sb.End();
                 //Draw sprite
-                ImGui.SameLine(0, 0);
+                ImGui.SameLine(0, in_OffsetX);
+
                 ImGui.Image(new ImTextureID(spr.Texture.GlTex.ID), new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y) * fontSizeMultiplier, uvTL, uvBR, in_Color);
                 averageSize = spr.Dimensions.Y * fontSizeMultiplier;
             }
         }
+        float GetOffsetFromAlignment(Cell in_Cell)
+        {
+            switch (in_Cell.Alignment)
+            {
+                case Cell.TextAlign.Justified:
+                case Cell.TextAlign.Left:
+                    return 0;
+                case Cell.TextAlign.Center:
+                    return 0.5f;
+                case Cell.TextAlign.Right:
+                    return 1;
+            }
+            return 0;
+        }
+        void AlignForWidth(float width, float alignment = 0.5f)
+        {
+            float avail = ImGui.GetContentRegionAvail().X;
+            float off = (avail - width) * alignment;
+            if (off > 0.0f)
+            {
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + off);
+                ImGui.PushStyleColor(ImGuiCol.Button, 0);
+                var clicked = ImGui.Button("##invis", new System.Numerics.Vector2(1,0));
+                ImGui.PopStyleColor();
+            }
+        }
+        void CalculateAlignmentSpacing(Cell in_Cell, string[] in_ConverseIDs)
+        {
+            //Calculate the width and the amount of characters per line
+            if (in_Cell.Alignment != Cell.TextAlign.Left)
+            {
+                int lineIndex = 0;
+                lineWidth.Clear();
+                foreach (var converseID in in_ConverseIDs)
+                {
+                    if (converseID == newLineValue)
+                    {
+                        lineIndex++;
+                        continue;
+                    }
+                    if (string.IsNullOrEmpty(converseID)) continue;
+
+                    Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
+                    if (lineWidth.Count - 1 < lineIndex)
+                        lineWidth.Add(new SLineInfo(0,0));
+                    lineWidth[lineIndex].width += spr.Width * fontSizeMultiplier;
+                    lineWidth[lineIndex].amount++;
+                }
+                //Set the first line to be aligned
+                AlignForWidth(lineWidth[0].width, GetOffsetFromAlignment(in_Cell));
+            }
+            else
+                lineWidth.Clear();
+        }
         void DrawCellFromFTE(SUFcoTool.Cell in_Cell, string[] in_ConverseIDs)
         {
+            CalculateAlignmentSpacing(in_Cell, in_ConverseIDs);
+            int lineIdx = 0;
             for (int i = 0; i < in_ConverseIDs.Length; i++)
             {
                 string converseID = in_ConverseIDs[i];
+                if (string.IsNullOrEmpty(converseID)) continue;
                 if (converseID == newLineValue)
                 {
-                    ImGui.NewLine();
+                    lineIdx++;
+                    if (lineWidth.Count > lineIdx && in_Cell.Alignment != Cell.TextAlign.Justified)
+                    {
+                        AlignForWidth(lineWidth[lineIdx].width, GetOffsetFromAlignment(in_Cell));
+                    }
+                    else
+                    {
+                        ImGui.NewLine();
+                    }
                     continue;
                 }
-                if (converseID == "")
-                    continue;
 
-                Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
                 //In the case that a texture cant be found or if its unregistered through
                 //SpriteHelper, print the converse id and skip
+                Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
                 if (spr == null)
                 {
                     EmptyButton(converseID);
@@ -128,12 +204,17 @@ namespace FcoEditor
                         EmptyButton(converseID);
                         continue;
                     }
-                    var currentHighlight = in_Cell.Highlights.FirstOrDefault(x => i >= x.Start && i <= x.End);
-                    var color = currentHighlight == null ? in_Cell.MainColor : currentHighlight;
-                    
-                    DrawFTECharacter(spr, color.ArgbColor);
+                    //Get the color to render the text with
+                    CellColor currentHighlight = in_Cell.Highlights.FirstOrDefault(x => i >= x.Start && i <= x.End);
+                    CellColor color = currentHighlight == null ? in_Cell.MainColor : currentHighlight;
+                    //Calc spacing for justified text
+                    float offset = 0;
+                    if(in_Cell.Alignment == Cell.TextAlign.Justified)
+                    {
+                        offset = ((ImGui.GetContentRegionAvail().X - 50) - ((spr.Dimensions.X * fontSizeMultiplier) * lineWidth[lineIdx].amount)) / (lineWidth[lineIdx].amount - 1);
+                    }
+                    DrawFTECharacter(spr, color.ArgbColor, offset);
                 }
-
             }
         }
         void CellInputText(string[] in_ConverseIDs, string in_CellName, ref SUFcoTool.Cell in_Cell, int in_Index, int in_LineCount)
@@ -340,7 +421,7 @@ namespace FcoEditor
                                         ImGui.InputText($"##input{letter.HexString}", ref letter.Letter, 256);
                                         ImGui.TableSetColumnIndex(1);
                                         if (spr.Texture.GlTex != null)
-                                            DrawFTECharacter(spr, new Vector4(1, 1, 1, 1));
+                                            DrawFTECharacter(spr, new Vector4(1, 1, 1, 1), 0);
                                         else
                                         {
                                             ImGui.Text("[Missing Texture]");
