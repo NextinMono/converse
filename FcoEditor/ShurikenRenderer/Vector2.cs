@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace FcoEditor.ShurikenRenderer
+namespace ConverseEditor.ShurikenRenderer
 {
     public class Vector2
     {

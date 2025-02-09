@@ -14,7 +14,7 @@ using Hexa.NET.ImPlot;
 using IconFonts;
 using System.Runtime.InteropServices;
 
-namespace FcoEditor
+namespace ConverseEditor
 {
     public class ImGuiController : IDisposable
     {

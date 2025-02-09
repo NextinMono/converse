@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace FcoEditor
+namespace ConverseEditor
 {
     class Program
     {

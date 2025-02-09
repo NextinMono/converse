@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Windows.Media;
 using Sprite = Shuriken.Rendering.Sprite;
 using Texture = Shuriken.Rendering.Texture;
-namespace FcoEditor.ShurikenRenderer
+namespace ConverseEditor.ShurikenRenderer
 {
     public struct Crop
     {

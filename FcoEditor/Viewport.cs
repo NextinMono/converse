@@ -1,14 +1,14 @@
 ﻿using Hexa.NET.ImGui;
-using FcoEditor.ShurikenRenderer;
+using ConverseEditor.ShurikenRenderer;
 using System;
 
-namespace FcoEditor
+namespace ConverseEditor
 {
     public static class ViewportWindow
     {
         public static float zoomFactor = 1;
         public static string test = "";
-        public static void Render(ShurikenRenderHelper in_Renderer)
+        public static void Render(ConverseProject in_Renderer)
         {
             var size1 = ImGui.GetWindowViewport().Size.X / 4.5f;
             ImGui.SetNextWindowPos(new System.Numerics.Vector2(size1, MenuBarWindow.menuBarHeight), ImGuiCond.Always);

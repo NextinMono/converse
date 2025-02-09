@@ -2,7 +2,7 @@
 using OpenTK.Graphics.OpenGL;
 using Vector2 = System.Numerics.Vector2;
 using Vector4 = System.Numerics.Vector4;
-using FcoEditor.ShurikenRenderer;
+using ConverseEditor.ShurikenRenderer;
 using System.Collections.Generic;
 using System;
 using System.Runtime.CompilerServices;

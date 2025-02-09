@@ -3,25 +3,19 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-using FcoEditor.ShurikenRenderer;
-using System.Windows;
-using Hexa.NET.ImPlot;
-using OpenTK.Windowing.Common.Input;
-using System.Configuration;
-using System.Drawing;
+using ConverseEditor.ShurikenRenderer;
 using System.IO;
-using System.Reflection;
 using System;
 
-namespace FcoEditor
+namespace ConverseEditor
 {
     public class MainWindow : GameWindow
     {
-        public static readonly string applicationName = "SWA fcoEditor";
+        public static readonly string applicationName = "Converse";
         private static MemoryStream iconData;
         float test = 1;
         ImGuiController _controller;
-        public static ShurikenRenderHelper renderer;
+        public static ConverseProject renderer;
         public static uint viewportDock;
         public static ImGuiWindowFlags flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse;
         public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings(){ Size = new Vector2i(800, 1000), APIVersion = new Version(3, 3) })
@@ -29,7 +23,7 @@ namespace FcoEditor
         protected override void OnLoad()
         {
             base.OnLoad();
-            renderer = new ShurikenRenderHelper(this, new ShurikenRenderer.Vector2(1280, 720), new ShurikenRenderer.Vector2(ClientSize.X, ClientSize.Y));
+            renderer = new ConverseProject(this, new ShurikenRenderer.Vector2(1280, 720), new ShurikenRenderer.Vector2(ClientSize.X, ClientSize.Y));
 
             Title = applicationName;
             _controller = new ImGuiController(ClientSize.X, ClientSize.Y);
@@ -65,7 +59,14 @@ namespace FcoEditor
             // Enable Docking
             viewportDock = ImGui.DockSpaceOverViewport();
 
-
+            if(renderer.isFileLoaded)
+            {
+                Title = $"{applicationName} - [{renderer.config.WorkFilePath}]";
+            }
+            else
+            {
+                Title = applicationName;
+            }
             renderer.RenderWindows();
             _controller.Render();
 

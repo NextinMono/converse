@@ -1,15 +1,9 @@
 ﻿using Hexa.NET.ImGui;
-using IconFonts;
-using FcoEditor.ShurikenRenderer;
-using Shuriken.Rendering;
+using ConverseEditor.ShurikenRenderer;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace FcoEditor
+namespace ConverseEditor
 {
     public class MenuBarWindow : Window
     {
@@ -32,24 +26,22 @@ namespace FcoEditor
         public string AskForFTE(string in_FcoPath)
         {
             var possibleFtePath = Path.Combine(Directory.GetParent(in_FcoPath).FullName, "fte_ConverseMain.fte");
-            //if (!File.Exists(possibleFtePath))
-            //{
-                var testdial2 = NativeFileDialogSharp.Dialog.FileOpen(fte, Directory.GetParent(in_FcoPath).FullName);
-                if (testdial2.IsOk)
-                {
-                    possibleFtePath = testdial2.Path;
-                }
-            //}
+
+            var testdial2 = NativeFileDialogSharp.Dialog.FileOpen(fte, Directory.GetParent(in_FcoPath).FullName);
+            if (testdial2.IsOk)
+            {
+                possibleFtePath = testdial2.Path;
+            }
             return possibleFtePath;
         }
-        public override void Render(ShurikenRenderHelper in_Renderer)
+        public override void Render(ConverseProject in_Renderer)
         {
             if (ImGui.BeginMainMenuBar())
             {
                 menuBarHeight = ImGui.GetWindowSize().Y;
                 if (ImGui.BeginMenu($"File"))
                 {
-                    if (ImGui.MenuItem("Open File..."))
+                    if (ImGui.MenuItem("Open"))
                     {
                         var testdial = NativeFileDialogSharp.Dialog.FileOpen(fco);
                         if (testdial.IsOk)
@@ -61,6 +53,21 @@ namespace FcoEditor
                     if (ImGui.MenuItem("Save", "Ctrl + S"))
                     {
                         in_Renderer.SaveCurrentFile(in_Renderer.config.WorkFilePath);
+                    }
+                    if (ImGui.MenuItem("Save As...", "Ctrl + S"))
+                    {
+                        var testdial = NativeFileDialogSharp.Dialog.FileSave(fco);
+                        if (testdial.IsOk)
+                        {
+                            string path = testdial.Path;
+                            if (!Path.HasExtension(path))
+                                path += ".fco";
+                            in_Renderer.SaveCurrentFile(path);
+                        }
+                    }
+                    if (ImGui.MenuItem("Exit"))
+                    {
+                        Environment.Exit(0);
                     }
                     ImGui.EndMenu();
                 }

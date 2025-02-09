@@ -1,4 +1,4 @@
-﻿using FcoEditor.ShurikenRenderer;
+﻿using ConverseEditor.ShurikenRenderer;
 using System;
 using System.Text;
 

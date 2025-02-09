@@ -1,6 +1,6 @@
 ﻿using Hexa.NET.ImGui;
 
-namespace FcoEditor
+namespace ConverseEditor
 {
     public class TempSearchBox
     {

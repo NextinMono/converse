@@ -1,11 +1,11 @@
-﻿using FcoEditor.ShurikenRenderer;
-using FcoEditor.ShurikenRenderer;
+﻿using ConverseEditor.ShurikenRenderer;
+using ConverseEditor.ShurikenRenderer;
 
-namespace FcoEditor
+namespace ConverseEditor
 {
     public class Window
     {
-        public virtual void OnReset(ShurikenRenderHelper in_Renderer) { }
-        public virtual void Render(ShurikenRenderHelper in_Renderer) { }
+        public virtual void OnReset(ConverseProject in_Renderer) { }
+        public virtual void Render(ConverseProject in_Renderer) { }
     }
 }

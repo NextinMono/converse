@@ -1,6 +1,6 @@
 ﻿using Hexa.NET.ImGui;
 using Hexa.NET.Utilities.Text;
-using FcoEditor.ShurikenRenderer;
+using ConverseEditor.ShurikenRenderer;
 using Shuriken.Rendering;
 using SUFontTool.FCO;
 using SUFcoTool;
@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Linq;
-namespace FcoEditor
+namespace ConverseEditor
 {
     public class FcoViewerWindow : Window
     {
@@ -51,13 +51,13 @@ namespace FcoEditor
             ImGui.SetNextItemWidth(50);
             ImGui.Button(string.IsNullOrEmpty(in_ConvID) ? "null" : in_ConvID);
         }
-        public override void OnReset(ShurikenRenderHelper in_Renderer)
+        public override void OnReset(ConverseProject in_Renderer)
         {
             selectedGroupIndex = 0;
             tablePresent = false;
             translationTableNew = null;
         }
-        void DrawGroupSelection(ShurikenRenderHelper in_Renderer, bool in_FcoFilePresent)
+        void DrawGroupSelection(ConverseProject in_Renderer, bool in_FcoFilePresent)
         {
             ImGui.BeginGroup();
             ImGui.Text("Groups");
@@ -65,10 +65,32 @@ namespace FcoEditor
             {
                 if (in_FcoFilePresent)
                 {
+                    bool addNewGroup = false;
                     for (int i = 0; i < in_Renderer.fcoFile.Groups.Count; i++)
                     {
+                        int selectedGroup = selectedGroupIndex;
+                        if (selectedGroup == i)
+                        {
+                            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0,1,0,1));
+                        }
                         if (ImGui.Selectable(string.IsNullOrEmpty(in_Renderer.fcoFile.Groups[i].Name) ? $"Empty{i}" : in_Renderer.fcoFile.Groups[i].Name))
                             selectedGroupIndex = i;
+                        if (selectedGroup == i)
+                        {
+                            ImGui.PopStyleColor(1);
+                        }
+                        if (ImGui.BeginPopupContextItem())
+                        {
+                            if (ImGui.Selectable("New Group"))
+                            {
+                                addNewGroup = true;
+                            }
+                            ImGui.EndPopup();
+                        }
+                    }                    
+                    if(addNewGroup)
+                    {
+                        in_Renderer.fcoFile.Groups.Add(new Group($"New_Group_{in_Renderer.fcoFile.Groups.Count}"));
                     }
                 }
                 else
@@ -77,6 +99,7 @@ namespace FcoEditor
                 }
                 ImGui.EndListBox();
             }
+            
             ImGui.EndGroup();
         }
         void DrawFTECharacter(Sprite spr, Vector4 in_Color, float in_OffsetX)
@@ -241,13 +264,15 @@ namespace FcoEditor
         }
         void DrawCellHeader(SUFcoTool.Group in_SelectedGroup, SUFcoTool.Cell in_Cell, int in_Index)
         {
-            ImGui.PushID($"cell_{in_Index}");
             string cellName = string.IsNullOrEmpty(in_Cell.Name) ? $"Empty Cell ({in_Index})" : in_Cell.Name;
             if (expandAllCells) ImGui.SetNextItemOpen(expandAllCells);
+            
+            ImGui.PushID($"cell_{in_Index}");
+            ImGui.BeginGroup();
             if (ImGui.CollapsingHeader(cellName))
             {
                 ImGui.Indent();
-
+                string name = in_Cell.Name;
                 string[] alignmentOptions = { "Left", "Center", "Right", "Justified" };
                 Vector4 colorMain = in_Cell.MainColor.ArgbColor;
                 Vector4 colorSub1 = in_Cell.ExtraColor1.ArgbColor;
@@ -259,6 +284,7 @@ namespace FcoEditor
                     if (line == newLineValue)
                         lineCount++;
 
+                ImGui.InputText("Name", ref name, 256);
                 CellInputText(converseIDs, cellName, ref in_Cell, in_Index, lineCount);
 
                 ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 1)));
@@ -267,10 +293,6 @@ namespace FcoEditor
                     DrawCellFromFTE(in_Cell, converseIDs);
                     ImGui.EndListBox();
                 }
-                //    Left = 0,
-                //Center = 1,
-                //Right = 2,
-                //Justified = 3
                 ImGui.Combo("Alignment", ref alignmentIdx, alignmentOptions, 4);
                 ImGui.ColorEdit4("Color", ref colorMain);
                 ImGui.ColorEdit4("Color Sub 1", ref colorSub1);
@@ -306,29 +328,40 @@ namespace FcoEditor
                 ImGui.PopID();
                 ImGui.PopStyleColor();
                 ImGui.Unindent();
+                in_Cell.Name = name;
                 in_Cell.Alignment = (Cell.TextAlign)alignmentIdx;
                 in_Cell.MainColor.ArgbColor = colorMain;
                 in_Cell.ExtraColor1.ArgbColor = colorSub1;
                 in_Cell.ExtraColor2.ArgbColor = colorSub2;
             }
+            ImGui.EndGroup();            
             ImGui.PopID();
         }
-        void DrawCellList(ShurikenRenderHelper in_Renderer, bool in_FcoFilePresent)
+        void DrawCellList(ConverseProject in_Renderer, bool in_FcoFilePresent)
         {
             ImGui.BeginGroup();
             ImGui.Text("Cells");
-            if (ImGui.BeginListBox("##listcells", new System.Numerics.Vector2(-1, -1)))
+            if (ImGui.BeginListBox("##listcells", new System.Numerics.Vector2(-1, ImGui.GetContentRegionAvail().Y - 32)))
             {
                 if (in_FcoFilePresent)
                 {
                     SUFcoTool.Group selectedGroup = in_Renderer.fcoFile.Groups[selectedGroupIndex];
-                    for (int x = 0; x < selectedGroup.CellList.Count; x++)
+                    if(selectedGroup.CellList.Count != 0)
                     {
-                        DrawCellHeader(selectedGroup, selectedGroup.CellList[x], x);
+                        for (int x = 0; x < selectedGroup.CellList.Count; x++)
+                        {
+                            DrawCellHeader(selectedGroup, selectedGroup.CellList[x], x);
+                        }
                     }
                 }
             }
             ImGui.EndListBox();
+            float sizeX = (ImGui.GetContentRegionAvail().X - ImGui.GetStyle().ItemSpacing.X) / 2;
+            ImGui.SetNextItemWidth(sizeX);
+            ImGui.Button("Add Cell", new System.Numerics.Vector2(sizeX, 25));
+            ImGui.SameLine();
+            ImGui.SetNextItemWidth(sizeX);
+            ImGui.Button("Remove Cell", new System.Numerics.Vector2(sizeX, 25));
             ImGui.EndGroup();
         }
         void AddMissingFteEntriesToTable(List<TranslationTable.Entry> in_Entries)
@@ -341,7 +374,7 @@ namespace FcoEditor
                 }
             }
         }
-        public override void Render(ShurikenRenderHelper in_Renderer)
+        public override void Render(ConverseProject in_Renderer)
         {
             ImGui.SetNextWindowPos(new System.Numerics.Vector2(0, MenuBarWindow.menuBarHeight), ImGuiCond.Always);
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(in_Renderer.screenSize.X, in_Renderer.screenSize.Y - MenuBarWindow.menuBarHeight), ImGuiCond.Always);
