@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SUFontTool", "SU-Font-Tool\SUFontTool.csproj", "{D7B699BC-E687-47F6-A60D-860BBF603490}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FcoEditor", "FcoEditor\FcoEditor.csproj", "{0DC3121C-495A-4BF0-959E-8EE839642923}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConverseEditor", "FcoEditor\ConverseEditor.csproj", "{0DC3121C-495A-4BF0-959E-8EE839642923}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

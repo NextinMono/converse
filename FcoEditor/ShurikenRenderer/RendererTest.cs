@@ -201,14 +201,14 @@ namespace Shuriken.Rendering
         }
 
         public void DrawSprite(
-            FcoEditor.ShurikenRenderer.Vector2 topLeft, FcoEditor.ShurikenRenderer.Vector2 bottomLeft, FcoEditor.ShurikenRenderer.Vector2 topRight, FcoEditor.ShurikenRenderer.Vector2 bottomRight,
-            FcoEditor.ShurikenRenderer.Vector2 position, float rotation, FcoEditor.ShurikenRenderer.Vector2 scale, float aspectRatio,
+            ConverseEditor.ShurikenRenderer.Vector2 topLeft, ConverseEditor.ShurikenRenderer.Vector2 bottomLeft, ConverseEditor.ShurikenRenderer.Vector2 topRight, ConverseEditor.ShurikenRenderer.Vector2 bottomRight,
+            ConverseEditor.ShurikenRenderer.Vector2 position, float rotation, ConverseEditor.ShurikenRenderer.Vector2 scale, float aspectRatio,
             Sprite sprite, Sprite nextSprite, float spriteFactor, Vector4 color,
             Vector4 gradientTopLeft, Vector4 gradientBottomLeft, Vector4 gradientTopRight, Vector4 gradientBottomRight,
             int zIndex)
         {
             var quad = new Quad();
-            var aspect = new FcoEditor.ShurikenRenderer.Vector2(aspectRatio, 1.0f);
+            var aspect = new ConverseEditor.ShurikenRenderer.Vector2(aspectRatio, 1.0f);
 
             quad.TopLeft.Position = position + (topLeft * scale * aspect).Rotate(rotation) / aspect;
             quad.BottomLeft.Position = position + (bottomLeft * scale * aspect).Rotate(rotation) / aspect;

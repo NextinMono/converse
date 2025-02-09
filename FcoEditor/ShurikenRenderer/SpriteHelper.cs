@@ -158,7 +158,7 @@ namespace ConverseEditor.ShurikenRenderer
             //    GetSubImages(child.Value);
             //}
         }
-        private static void LoadSubimages(FcoEditor.ShurikenRenderer.TextureList texList, List<Crop> subimages)
+        private static void LoadSubimages(ConverseEditor.ShurikenRenderer.TextureList texList, List<Crop> subimages)
         {
             foreach (var image in subimages)
             {

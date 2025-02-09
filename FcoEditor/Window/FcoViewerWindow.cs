@@ -112,12 +112,12 @@ namespace ConverseEditor
                 in_Color.Y = 1;
                 in_Color.Z = 1;
             }
-            FcoEditor.ShurikenRenderer.Vector2 uvTL = new FcoEditor.ShurikenRenderer.Vector2(
+            ConverseEditor.ShurikenRenderer.Vector2 uvTL = new ConverseEditor.ShurikenRenderer.Vector2(
                         spr.Start.X / spr.Texture.Width,
                         -(spr.Start.Y / spr.Texture.Height));
 
 
-            FcoEditor.ShurikenRenderer.Vector2 uvBR = uvTL + new FcoEditor.ShurikenRenderer.Vector2(
+            ConverseEditor.ShurikenRenderer.Vector2 uvBR = uvTL + new ConverseEditor.ShurikenRenderer.Vector2(
             spr.Dimensions.X / spr.Texture.Width,
             -(spr.Dimensions.Y / spr.Texture.Height));
 

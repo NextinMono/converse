@@ -27,7 +27,7 @@ namespace ConverseEditor.ShurikenRenderer
             public bool showQuads;
             public double time;
         }
-        public List<FcoEditor.Window> windowList = new List<FcoEditor.Window>();
+        public List<Window> windowList = new List<Window>();
         public Renderer renderer;
         public Vector2 viewportSize;
         public Vector2 screenSize;
