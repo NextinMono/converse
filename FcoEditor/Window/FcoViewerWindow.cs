@@ -1,8 +1,8 @@
 ﻿using Hexa.NET.ImGui;
 using Hexa.NET.Utilities.Text;
 using ConverseEditor.ShurikenRenderer;
-using Shuriken.Rendering;
-using SUFontTool.FCO;
+using ConverseEditor.Utility;
+using Converse.Rendering;
 using SUFcoTool;
 using System;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace ConverseEditor
                 return instance;
             }
         }
-        readonly string newLineValue = "00 00 00 00";
+        readonly int newLineValue = 0;
         int selectedGroupIndex;
         float averageSize = 50;
         float fontSizeMultiplier = 1;
@@ -45,11 +45,11 @@ namespace ConverseEditor
             }
         }
 
-        static void EmptyButton(string in_ConvID)
+        static void EmptyButton(int in_ConvID)
         {
             ImGui.SameLine(0);
             ImGui.SetNextItemWidth(50);
-            ImGui.Button(string.IsNullOrEmpty(in_ConvID) ? "null" : in_ConvID);
+            ImGui.Button(in_ConvID.ToString());
         }
         public override void OnReset(ConverseProject in_Renderer)
         {
@@ -162,7 +162,7 @@ namespace ConverseEditor
                 ImGui.PopStyleColor();
             }
         }
-        void CalculateAlignmentSpacing(Cell in_Cell, string[] in_ConverseIDs)
+        void CalculateAlignmentSpacing(Cell in_Cell, int[] in_ConverseIDs)
         {
             //Calculate the width and the amount of characters per line
             if (in_Cell.Alignment != Cell.TextAlign.Left)
@@ -176,7 +176,6 @@ namespace ConverseEditor
                         lineIndex++;
                         continue;
                     }
-                    if (string.IsNullOrEmpty(converseID)) continue;
 
                     Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
                     if (lineWidth.Count - 1 < lineIndex)
@@ -190,14 +189,13 @@ namespace ConverseEditor
             else
                 lineWidth.Clear();
         }
-        void DrawCellFromFTE(SUFcoTool.Cell in_Cell, string[] in_ConverseIDs)
+        void DrawCellFromFTE(SUFcoTool.Cell in_Cell, int[] in_ConverseIDs)
         {
             CalculateAlignmentSpacing(in_Cell, in_ConverseIDs);
             int lineIdx = 0;
             for (int i = 0; i < in_ConverseIDs.Length; i++)
             {
-                string converseID = in_ConverseIDs[i];
-                if (string.IsNullOrEmpty(converseID)) continue;
+                int converseID = in_ConverseIDs[i];
                 if (converseID == newLineValue)
                 {
                     lineIdx++;
@@ -240,15 +238,29 @@ namespace ConverseEditor
                 }
             }
         }
-        void CellInputText(string[] in_ConverseIDs, string in_CellName, ref SUFcoTool.Cell in_Cell, int in_Index, int in_LineCount)
+        string GetMessageAsString(int[] in_IDs)
+        {
+            return string.Join(", ", in_IDs);
+        }
+        int[] GetStringAsMessage(string in_String)
+        {
+            return in_String.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(int.Parse)
+                            .ToArray();
+        }
+
+        void CellInputText(int[] in_ConverseIDs, string in_CellName, ref SUFcoTool.Cell in_Cell, int in_Index, int in_LineCount)
         {
             ImGui.BeginDisabled(!tablePresent);
-            string joinedIDs = string.Join("", in_ConverseIDs);
-            string cellMessageConverted = translationTableNew == null ? in_Cell.MessageConverseIDs : TranslationService.RawHEXtoTXT(joinedIDs, translationTableNew);
-            if(ImGui.InputTextMultiline($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 512, new System.Numerics.Vector2(-1, ImGui.GetTextLineHeight() * in_LineCount)))
+            string cellMessageConverted = 
+                translationTableNew == null 
+                ? GetMessageAsString(in_Cell.Message)
+                : TranslationService.RawHEXtoTXT(in_ConverseIDs, translationTableNew);
+            cellMessageConverted = cellMessageConverted.Replace("@@", "");
+            if (ImGui.InputTextMultiline($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 512, new System.Numerics.Vector2(-1, ImGui.GetTextLineHeight() * in_LineCount)))
             {
-                joinedIDs = TranslationService.RawTXTtoHEX(cellMessageConverted, translationTableNew);
-                in_Cell.MessageConverseIDs = joinedIDs;
+                var joinedIDs2 = TranslationService.RawTXTtoHEX(cellMessageConverted, translationTableNew);
+                in_Cell.Message = joinedIDs2;
             }
             
             ImGui.EndDisabled();
@@ -278,19 +290,18 @@ namespace ConverseEditor
                 Vector4 colorSub1 = in_Cell.ExtraColor1.ArgbColor;
                 Vector4 colorSub2 = in_Cell.ExtraColor2.ArgbColor;
                 int alignmentIdx = (int)in_Cell.Alignment;
-                string[] converseIDs = in_Cell.MessageConverseIDs.Split(", ");
                 int lineCount = 2;
-                foreach (var line in converseIDs)
+                foreach (var line in in_Cell.Message)
                     if (line == newLineValue)
                         lineCount++;
 
                 ImGui.InputText("Name", ref name, 256);
-                CellInputText(converseIDs, cellName, ref in_Cell, in_Index, lineCount);
+                CellInputText(in_Cell.Message, cellName, ref in_Cell, in_Index, lineCount);
 
                 ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 1)));
                 if (ImGui.BeginListBox($"##group{in_SelectedGroup.Name}_{in_Cell.Name}", new System.Numerics.Vector2(-1, lineCount * averageSize)))
                 {
-                    DrawCellFromFTE(in_Cell, converseIDs);
+                    DrawCellFromFTE(in_Cell, in_Cell.Message);
                     ImGui.EndListBox();
                 }
                 ImGui.Combo("Alignment", ref alignmentIdx, alignmentOptions, 4);
@@ -366,11 +377,21 @@ namespace ConverseEditor
         }
         void AddMissingFteEntriesToTable(List<TranslationTable.Entry> in_Entries)
         {
+            for (int i = 0; i < in_Entries.Count; i++)
+            {
+                //Replace legacy newline with new style
+                if (in_Entries[i].Letter == "{NewLine}")
+                {
+                    var entry2 = in_Entries[i];
+                    entry2.Letter = "\n";
+                    in_Entries[i] = entry2;
+                }
+            }
             foreach (var spr in SpriteHelper.CharSprites)
             {
-                if (in_Entries.FindAll(x => x.HexString == spr.Key.FcoCharacterID).Count == 0)
+                if (in_Entries.FindAll(x => x.ConverseID == spr.Key.CharacterID).Count == 0)
                 {
-                    in_Entries.Add(new TranslationTable.Entry("", spr.Key.FcoCharacterID));
+                    in_Entries.Add(new TranslationTable.Entry("", spr.Key.CharacterID));
                 }
             }
         }
@@ -415,7 +436,7 @@ namespace ConverseEditor
                             if (ImGui.Button("Create Table"))
                             {
                                 translationTableNew = new List<TranslationTable.Entry>();
-                                translationTableNew.Add(new TranslationTable.Entry("{NewLine}", "00 00 00 00"));
+                                translationTableNew.Add(new TranslationTable.Entry("\\n", 0));
                                 AddMissingFteEntriesToTable(translationTableNew);
                                 tablePresent = true;
                             }
@@ -444,14 +465,14 @@ namespace ConverseEditor
 
                                     for (int i = 0; i < translationTableNew.Count; i++)
                                     {
-                                        Sprite spr = SpriteHelper.GetSpriteFromConverseID(translationTableNew[i].HexString);
+                                        Sprite spr = SpriteHelper.GetSpriteFromConverseID(translationTableNew[i].ConverseID);
                                         if (spr == null)
                                             continue;
                                         var letter = translationTableNew[i];
 
                                         ImGui.TableSetColumnIndex(0);
                                         ImGui.SetNextItemWidth(-1);
-                                        ImGui.InputText($"##input{letter.HexString}", ref letter.Letter, 256);
+                                        ImGui.InputText($"##input{letter.ConverseID}", ref letter.Letter, 256);
                                         ImGui.TableSetColumnIndex(1);
                                         if (spr.Texture.GlTex != null)
                                             DrawFTECharacter(spr, new Vector4(1, 1, 1, 1), 0);

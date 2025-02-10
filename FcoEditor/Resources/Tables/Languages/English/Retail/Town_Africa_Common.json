@@ -1,0 +1,702 @@
+[
+  {
+    "Letter": "{NewLine}",
+    "HexString": "00 00 00 00"
+  },
+  {
+    "Letter": "01",
+    "HexString": "00 00 00 F6"
+  },
+  {
+    "Letter": "1",
+    "HexString": "00 00 00 F7"
+  },
+  {
+    "Letter": "2",
+    "HexString": "00 00 00 F8"
+  },
+  {
+    "Letter": "3",
+    "HexString": "00 00 00 F9"
+  },
+  {
+    "Letter": "4",
+    "HexString": "00 00 00 FA"
+  },
+  {
+    "Letter": "5",
+    "HexString": "00 00 00 FB"
+  },
+  {
+    "Letter": "6",
+    "HexString": "00 00 00 FC"
+  },
+  {
+    "Letter": "7",
+    "HexString": "00 00 00 FD"
+  },
+  {
+    "Letter": "8",
+    "HexString": "00 00 00 FE"
+  },
+  {
+    "Letter": "9",
+    "HexString": "00 00 00 FF"
+  },
+  {
+    "Letter": "-",
+    "HexString": "00 00 01 00"
+  },
+  {
+    "Letter": "Y",
+    "HexString": "00 00 01 01"
+  },
+  {
+    "Letter": "e",
+    "HexString": "00 00 01 02"
+  },
+  {
+    "Letter": "s",
+    "HexString": "00 00 01 03"
+  },
+  {
+    "Letter": "N",
+    "HexString": "00 00 01 04"
+  },
+  {
+    "Letter": "o",
+    "HexString": "00 00 01 05"
+  },
+  {
+    "Letter": "[",
+    "HexString": "00 00 01 06"
+  },
+  {
+    "Letter": "C",
+    "HexString": "00 00 01 07"
+  },
+  {
+    "Letter": "h",
+    "HexString": "00 00 01 08"
+  },
+  {
+    "Letter": "a",
+    "HexString": "00 00 01 09"
+  },
+  {
+    "Letter": "n",
+    "HexString": "00 00 01 0A"
+  },
+  {
+    "Letter": "g",
+    "HexString": "00 00 01 0B"
+  },
+  {
+    "Letter": " ",
+    "HexString": "00 00 01 0C"
+  },
+  {
+    "Letter": "D",
+    "HexString": "00 00 01 0D"
+  },
+  {
+    "Letter": "i",
+    "HexString": "00 00 01 0E"
+  },
+  {
+    "Letter": "c",
+    "HexString": "00 00 01 0F"
+  },
+  {
+    "Letter": "]",
+    "HexString": "00 00 01 10"
+  },
+  {
+    "Letter": "P",
+    "HexString": "00 00 01 11"
+  },
+  {
+    "Letter": "l",
+    "HexString": "00 00 01 12"
+  },
+  {
+    "Letter": "r",
+    "HexString": "00 00 01 13"
+  },
+  {
+    "Letter": "t",
+    "HexString": "00 00 01 14"
+  },
+  {
+    "Letter": "G",
+    "HexString": "00 00 01 15"
+  },
+  {
+    "Letter": "W",
+    "HexString": "00 00 01 16"
+  },
+  {
+    "Letter": "d",
+    "HexString": "00 00 01 17"
+  },
+  {
+    "Letter": "M",
+    "HexString": "00 00 01 18"
+  },
+  {
+    "Letter": "p",
+    "HexString": "00 00 01 19"
+  },
+  {
+    "Letter": "?",
+    "HexString": "00 00 01 1A"
+  },
+  {
+    "Letter": "E",
+    "HexString": "00 00 01 1B"
+  },
+  {
+    "Letter": "v",
+    "HexString": "00 00 01 1C"
+  },
+  {
+    "Letter": "L",
+    "HexString": "00 00 01 1D"
+  },
+  {
+    "Letter": "b",
+    "HexString": "00 00 01 1E"
+  },
+  {
+    "Letter": "(",
+    "HexString": "00 00 01 1F"
+  },
+  {
+    "Letter": "S",
+    "HexString": "00 00 01 20"
+  },
+  {
+    "Letter": ")",
+    "HexString": "00 00 01 21"
+  },
+  {
+    "Letter": "m",
+    "HexString": "00 00 01 22"
+  },
+  {
+    "Letter": "x",
+    "HexString": "00 00 01 23"
+  },
+  {
+    "Letter": "{EmptyCircle}",
+    "HexString": "00 00 01 24"
+  },
+  {
+    "Letter": "!",
+    "HexString": "00 00 01 25"
+  },
+  {
+    "Letter": "u",
+    "HexString": "00 00 01 26"
+  },
+  {
+    "Letter": "k",
+    "HexString": "00 00 01 27"
+  },
+  {
+    "Letter": ".",
+    "HexString": "00 00 01 28"
+  },
+  {
+    "Letter": "w",
+    "HexString": "00 00 01 29"
+  },
+  {
+    "Letter": "A",
+    "HexString": "00 00 01 2A"
+  },
+  {
+    "Letter": "j",
+    "HexString": "00 00 01 2B"
+  },
+  {
+    "Letter": "\u0027",
+    "HexString": "00 00 01 2C"
+  },
+  {
+    "Letter": "T",
+    "HexString": "00 00 01 2D"
+  },
+  {
+    "Letter": "{Quote}",
+    "HexString": "00 00 01 2E"
+  },
+  {
+    "Letter": "B",
+    "HexString": "00 00 01 2F"
+  },
+  {
+    "Letter": "q",
+    "HexString": "00 00 01 30"
+  },
+  {
+    "Letter": "F",
+    "HexString": "00 00 01 31"
+  },
+  {
+    "Letter": "K",
+    "HexString": "00 00 01 32"
+  },
+  {
+    "Letter": "f",
+    "HexString": "00 00 01 33"
+  },
+  {
+    "Letter": "R",
+    "HexString": "00 00 01 34"
+  },
+  {
+    "Letter": "y",
+    "HexString": "00 00 01 35"
+  },
+  {
+    "Letter": "H",
+    "HexString": "00 00 01 36"
+  },
+  {
+    "Letter": "V",
+    "HexString": "00 00 01 37"
+  },
+  {
+    "Letter": "I",
+    "HexString": "00 00 01 38"
+  },
+  {
+    "Letter": "J",
+    "HexString": "00 00 01 39"
+  },
+  {
+    "Letter": "U",
+    "HexString": "00 00 01 3A"
+  },
+  {
+    "Letter": "Q",
+    "HexString": "00 00 01 3B"
+  },
+  {
+    "Letter": "O",
+    "HexString": "00 00 01 3C"
+  },
+  {
+    "Letter": "Z",
+    "HexString": "00 00 01 3D"
+  },
+  {
+    "Letter": "z",
+    "HexString": "00 00 01 3E"
+  },
+  {
+    "Letter": ",",
+    "HexString": "00 00 01 3F"
+  },
+  {
+    "Letter": "*",
+    "HexString": "00 00 01 40"
+  },
+  {
+    "Letter": "#",
+    "HexString": "00 00 01 41"
+  },
+  {
+    "Letter": "{Null}",
+    "HexString": "00 00 01 42"
+  },
+  {
+    "Letter": ":",
+    "HexString": "00 00 01 43"
+  },
+  {
+    "Letter": "\u0026",
+    "HexString": "00 00 01 44"
+  },
+  {
+    "Letter": "{FullCircle}",
+    "HexString": "00 00 01 45"
+  },
+  {
+    "Letter": "X",
+    "HexString": "00 00 01 46"
+  },
+  {
+    "Letter": "%",
+    "HexString": "00 00 01 47"
+  },
+  {
+    "Letter": "@",
+    "HexString": "00 00 01 48"
+  },
+  {
+    "Letter": "$",
+    "HexString": "00 00 01 49"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 4A"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 4B"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 4C"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 4D"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 4E"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 4F"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 50"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 51"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 52"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 53"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 54"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 55"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 56"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 57"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 58"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 59"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 5A"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 5B"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 5C"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 5D"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 5E"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 5F"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 60"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 61"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 62"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 63"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 64"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 65"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 66"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 67"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 68"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 69"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 6A"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 6B"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 6C"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 6D"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 6E"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 6F"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 70"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 71"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 72"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 73"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 74"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 75"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 76"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 77"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 78"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 79"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 7A"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 7B"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 7C"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 7D"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 7E"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 7F"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 80"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 81"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 82"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 83"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 84"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 85"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 86"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 87"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 88"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 89"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 8A"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 8B"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 8C"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 8D"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 8E"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 8F"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 90"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 91"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 92"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 93"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 94"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 95"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 96"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 97"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 98"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 99"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 9A"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 9B"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 9C"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 9D"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 9E"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 9F"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 A0"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 A1"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 A2"
+  },
+  {
+    "Letter": "",
+    "HexString": "00 00 01 A3"
+  }
+]

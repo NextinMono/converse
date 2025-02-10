@@ -19,6 +19,65 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 </ItemGroup>
+<ItemGroup>
+  <Content Remove="Resources\Tables\Icons.json" />
+  <Content Remove="Resources\Tables\Languages\English\DLC\Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Preview\Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Preview\In-Stage.json" />
+  <Content Remove="Resources\Tables\Languages\English\Preview\Tornado.json" />
+  <Content Remove="Resources\Tables\Languages\English\Preview\WorldMap.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\EvilActionCommon.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\ExStageTails_Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Install.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\SonicActionCommon.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Town_Africa_Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Town_Mykonos_Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Town_Mykonos_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Town_Mykonos_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\WorldMap.json" />
+  <Content Remove="Resources\Tables\Languages\Icons.json" />
+  <Content Remove="Resources\Tables\Languages\Italian\Retail\WorldMap.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\EvilActionCommon.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\ExStageTails_Common (fte_ConverseMain).json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\SonicActionCommon.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\S_Town_Africa_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\S_Town_Africa_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\S_Town_Africa_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Africa_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Africa_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Africa_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_China_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_China_Common2.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_China_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_China_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EggManBase_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EggManBase_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EggManBase_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EULabo_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EuropeanCity_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EuropeanCity_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EuropeanCity_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Mykonos_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Mykonos_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Mykonos_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_NYCity_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_NYCity_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_NYCity_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_PetraCapital_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_PetraCapital_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_PetraCapital_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Snow_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Snow_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Snow_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_SouthEastAsia_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_SouthEastAsia_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_SouthEastAsia_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\WorldMap.json" />
+  <Content Remove="Resources\Tables\Subtitle\Icons.json" />
+  <Content Remove="Resources\Tables\Subtitle\Spanish\Retail\evrt_m0_01_05.json" />
+  <Content Remove="Resources\Tables\Subtitle\Spanish\Retail\evrt_m0_06.json" />
+  <Content Remove="Resources\Tables\Subtitle\Spanish\Retail\evrt_m1_01.json" />
+</ItemGroup>
   <ItemGroup>
     <PackageReference Include="DirectXTexNet" Version="1.0.7" />
     <PackageReference Include="Hexa.NET.ImGui" Version="2.2.3" />
