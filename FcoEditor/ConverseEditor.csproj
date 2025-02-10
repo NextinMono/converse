@@ -90,7 +90,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\libfco\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj" />
-    <ProjectReference Include="..\libfco\Source\SUFontTool.csproj" />
+    <ProjectReference Include="..\libfco\Source\libfco.csproj" />
     <ProjectReference Include="..\libfco\src\SUFontTool.csproj" />
   </ItemGroup>
 <ItemGroup>

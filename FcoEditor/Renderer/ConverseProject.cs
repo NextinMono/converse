@@ -34,7 +34,7 @@ namespace ConverseEditor.ShurikenRenderer
         public Vector2 viewportSize;
         public Vector2 screenSize;
         public FontConverse fcoFile;
-        public FontTableEntries fteFile;
+        public FontTexture fteFile;
         public SProjectConfig config;
         private SViewportData viewportData;
         public bool isFileLoaded = false;
@@ -88,7 +88,7 @@ namespace ConverseEditor.ShurikenRenderer
             BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
             try
             {
-                fteFile = reader.ReadObject<FontTableEntries>();
+                fteFile = reader.ReadObject<FontTexture>();
             }
             catch (Exception ex)
             {
@@ -139,7 +139,7 @@ namespace ConverseEditor.ShurikenRenderer
             isFileLoaded = true;
 
             //Gens FCO, load All table automatically since it only uses that
-            if (fcoFile.Header.Field04 != 0)
+            if (fcoFile.Header.Version != 0)
             {
                 string path = Path.Combine(Program.ResourcesDirectory, "Tables", "bb", "All.json");
                 FcoViewerWindow.Instance.LoadTranslationTable(path);

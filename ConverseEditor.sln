@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConverseEditor", "FcoEditor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amicitia.IO", "libfco\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj", "{869379D1-7806-4BC4-A9B7-76DF1CDA5E58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SUFontTool", "libfco\Source\SUFontTool.csproj", "{2739FDEE-7259-4662-A274-2DCE54C3A673}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libfco", "libfco\Source\libfco.csproj", "{2739FDEE-7259-4662-A274-2DCE54C3A673}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
