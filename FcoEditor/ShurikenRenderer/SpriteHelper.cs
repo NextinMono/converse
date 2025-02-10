@@ -144,8 +144,8 @@ namespace ConverseEditor.ShurikenRenderer
                 var i = new Crop();
                 i.Character = item;
                 i.TextureIndex = (uint)item.TextureIndex;
-                i.TopLeft = new Vector2(item.TopLeft.X / textureList.Textures[item.TextureIndex].Width, item.TopLeft.Y / textureList.Textures[item.TextureIndex].Height);
-                i.BottomRight = new Vector2(item.BottomRight.X / textureList.Textures[item.TextureIndex].Width, item.BottomRight.Y / textureList.Textures[item.TextureIndex].Height);
+                i.TopLeft = new Vector2(item.TopLeft.X, item.TopLeft.Y);
+                i.BottomRight = new Vector2(item.BottomRight.X, item.BottomRight.Y);
                 ncpSubimages.Add(i);
             }
             //}

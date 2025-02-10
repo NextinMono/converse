@@ -1,3 +1,6 @@
 [submodule "SU-Font-Tool"]
 	path = SU-Font-Tool
 	url = https://github.com/NextinMono/SU-Font-Tool
+[submodule "Amicitia.IO"]
+	path = Amicitia.IO
+	url = https://github.com/tge-was-taken/Amicitia.IO

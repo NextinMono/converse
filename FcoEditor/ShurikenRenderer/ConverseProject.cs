@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using Amicitia.IO.Binary;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using Shuriken.Rendering;
 using SUFcoTool;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using Texture = Shuriken.Rendering.Texture;
 
 namespace ConverseEditor.ShurikenRenderer
@@ -70,10 +72,12 @@ namespace ConverseEditor.ShurikenRenderer
             config.WorkFilePath = in_Path;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+            BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
+            BinaryObjectReader reader2 = new BinaryObjectReader(in_PathFte, Endianness.Big, Encoding.GetEncoding("UTF-8"));
             var pathTable = Path.Combine("tables", "Languages", "English", "Retail", "WorldMap.json");
             try
             {
-                fcoFile = FCO.Read(config.WorkFilePath, pathTable, false);
+                fcoFile = reader.ReadObject<FCO>();
             }
             catch (Exception ex)
             {
@@ -87,7 +91,7 @@ namespace ConverseEditor.ShurikenRenderer
             Console.WriteLine($"{stopwatch.Elapsed.TotalSeconds}s");
             try
             {
-                fteFile = FTE.Read(in_PathFte);
+                fteFile = reader2.ReadObject<FTE>();
             }
             catch (Exception ex)
             {
@@ -137,8 +141,10 @@ namespace ConverseEditor.ShurikenRenderer
         }
         public void SaveCurrentFile(string in_Path)
         {
-            if(fcoFile != null)
-                fcoFile.Write(in_Path);
+            BinaryObjectWriter writer = new BinaryObjectWriter(in_Path, Endianness.Big, Encoding.UTF8);
+            writer.WriteObject(fcoFile);
+            //if(fcoFile != null)
+            //    fcoFile.Write(in_Path);
         }
         internal void RenderWindows()
         {
