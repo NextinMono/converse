@@ -427,9 +427,7 @@ namespace ConverseEditor
                                 var testdial = NativeFileDialogSharp.Dialog.FileOpen("json");
                                 if (testdial.IsOk)
                                 {
-                                    translationTableNew = TranslationTable.Read(@testdial.Path).Tables["Standard"];
-                                    tablePresent = true;
-                                    AddMissingFteEntriesToTable(translationTableNew);
+                                    LoadTranslationTable(@testdial.Path);
                                 }
                             }
                             ImGui.SameLine();
@@ -500,6 +498,13 @@ namespace ConverseEditor
                 }
             }
             ImGui.End();
+        }
+
+        public void LoadTranslationTable(string @in_Path)
+        {
+            translationTableNew = TranslationTable.Read(@in_Path).Tables["Standard"];
+            tablePresent = true;
+            AddMissingFteEntriesToTable(translationTableNew);
         }
     }
 

@@ -12,8 +12,6 @@ namespace ConverseEditor
     public class MainWindow : GameWindow
     {
         public static readonly string applicationName = "Converse";
-        private static MemoryStream iconData;
-        float test = 1;
         ImGuiController _controller;
         public static ConverseProject renderer;
         public static uint viewportDock;

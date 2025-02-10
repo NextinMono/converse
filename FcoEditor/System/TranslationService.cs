@@ -39,8 +39,11 @@ namespace ConverseEditor.Utility
                 return key;
             });
             return result.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse)
-                    .ToArray();
+        .Select(s => int.TryParse(s, out int num) ? (int?)num : null) // Try to parse, otherwise return null
+        .Where(num => num.HasValue) // Remove null values (invalid numbers)
+        .Select(num => num.Value)   // Extract valid integers
+        .ToArray();
+
         }
         public static string RawHEXtoTXT(int[] hex, List<TranslationTable.Entry> entries)
         {

@@ -67,14 +67,9 @@ namespace ConverseEditor.ShurikenRenderer
                 System.Windows.MessageBox.Show(message, title, System.Windows.MessageBoxButton.OK, image);
             }
         }
-        public void LoadFile(string in_Path, string in_PathFte)
+        private void LoadFCO(string in_Path)
         {
-            config.WorkFilePath = in_Path;
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
             BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
-            BinaryObjectReader reader2 = new BinaryObjectReader(in_PathFte, Endianness.Big, Encoding.GetEncoding("UTF-8"));
-            var pathTable = Path.Combine("tables", "Languages", "English", "Retail", "WorldMap.json");
             try
             {
                 fcoFile = reader.ReadObject<FontConverse>();
@@ -87,23 +82,31 @@ namespace ConverseEditor.ShurikenRenderer
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FCO file.\n{ex.Message}", 2);
                 return;
             }
-            stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.Elapsed.TotalSeconds}s");
+        }
+        private void LoadFTE(string in_Path)
+        {
+            BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
             try
             {
-                fteFile = reader2.ReadObject<FontTableEntries>();
+                fteFile = reader.ReadObject<FontTableEntries>();
             }
             catch (Exception ex)
             {
                 isFileLoaded = false;
                 fcoFile = null;
                 fteFile = null;
-                ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FTE file.\n{ex.Message}", 2);
+                ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FCO file.\n{ex.Message}", 2);
                 return;
             }
-
+        }
+        public void LoadFile(string in_Path, string in_PathFte)
+        {
+            config.WorkFilePath = in_Path;
+            LoadFCO(in_Path);
+            LoadFTE(in_PathFte);           
             string parentPath = Directory.GetParent(config.WorkFilePath).FullName;
             SpriteHelper.textureList = new("");
+
             List<string> missingTextures = new List<string>();
             foreach (var texture in fteFile.Textures)
             {
@@ -112,7 +115,7 @@ namespace ConverseEditor.ShurikenRenderer
                     SpriteHelper.textureList.Textures.Add(new Texture(pathtemp, false));
                 else
                 {
-                    var commonPathTexture = Path.Combine(Program.programDir,"Resources","CommonTextures",texture.Name + ".dds");
+                    var commonPathTexture = Path.Combine(Program.Directory,"Resources","CommonTextures",texture.Name + ".dds");
                     if (File.Exists(commonPathTexture))
                     {
                         SpriteHelper.textureList.Textures.Add(new Texture(commonPathTexture, false));
@@ -134,6 +137,13 @@ namespace ConverseEditor.ShurikenRenderer
             ResetWindows();
             SpriteHelper.LoadTextures(fteFile.Characters);
             isFileLoaded = true;
+
+            //Gens FCO, load All table automatically since it only uses that
+            if (fcoFile.Header.Field04 != 0)
+            {
+                string path = Path.Combine(Program.ResourcesDirectory, "Tables", "bb", "All.json");
+                FcoViewerWindow.Instance.LoadTranslationTable(path);
+            }
         }
         public int GetViewportImageHandle()
         {
