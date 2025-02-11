@@ -39,6 +39,7 @@ namespace ConverseEditor
             if (ImGui.BeginMainMenuBar())
             {
                 menuBarHeight = ImGui.GetWindowSize().Y;
+
                 if (ImGui.BeginMenu($"File"))
                 {
                     if (ImGui.MenuItem("Open"))
@@ -52,7 +53,7 @@ namespace ConverseEditor
                     }
                     if (ImGui.MenuItem("Save", "Ctrl + S"))
                     {
-                        in_Renderer.SaveCurrentFile(in_Renderer.config.WorkFilePath);
+                        in_Renderer.SaveCurrentFile(ConverseProject.config.WorkFilePath);
                     }
                     if (ImGui.MenuItem("Save As...", "Ctrl + S"))
                     {
@@ -64,6 +65,11 @@ namespace ConverseEditor
                                 path += ".fco";
                             in_Renderer.SaveCurrentFile(path);
                         }
+                    }
+                    if (ImGui.MenuItem("Create texture"))
+                    {
+                        var entries = FcoViewerWindow.Instance.GetTranslationTableEntries();
+                        FontAtlasGenerator.TryCreateFteTexture(new System.Numerics.Vector2(2048,2048), entries, in_Renderer.fteFile);
                     }
                     if (ImGui.MenuItem("Exit"))
                     {

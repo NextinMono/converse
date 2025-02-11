@@ -1,3 +1,6 @@
 [submodule "libfco"]
 	path = libfco
 	url = https://github.com/NextinMono/libfco
+[submodule "StbTrueTypeSharp"]
+	path = StbTrueTypeSharp
+	url = https://github.com/StbSharp/StbTrueTypeSharp.git

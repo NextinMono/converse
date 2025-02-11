@@ -59,7 +59,7 @@ namespace ConverseEditor
 
             if(renderer.isFileLoaded)
             {
-                Title = $"{applicationName} - [{renderer.config.WorkFilePath}]";
+                Title = $"{applicationName} - [{ConverseProject.config.WorkFilePath}]";
             }
             else
             {

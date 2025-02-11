@@ -92,6 +92,7 @@
     <ProjectReference Include="..\libfco\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj" />
     <ProjectReference Include="..\libfco\Source\libfco.csproj" />
     <ProjectReference Include="..\libfco\src\SUFontTool.csproj" />
+    <ProjectReference Include="..\StbTrueTypeSharp\src\StbTrueTypeSharp.csproj" />
   </ItemGroup>
 <ItemGroup>
    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />

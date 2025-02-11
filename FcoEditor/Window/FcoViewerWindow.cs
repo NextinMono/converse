@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Linq;
+using StbTrueTypeSharp;
+using System.IO;
 namespace ConverseEditor
 {
     public class FcoViewerWindow : Window
@@ -71,7 +73,7 @@ namespace ConverseEditor
                         int selectedGroup = selectedGroupIndex;
                         if (selectedGroup == i)
                         {
-                            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0,1,0,1));
+                            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 1, 0, 1));
                         }
                         if (ImGui.Selectable(string.IsNullOrEmpty(in_Renderer.fcoFile.Groups[i].Name) ? $"Empty{i}" : in_Renderer.fcoFile.Groups[i].Name))
                             selectedGroupIndex = i;
@@ -87,8 +89,8 @@ namespace ConverseEditor
                             }
                             ImGui.EndPopup();
                         }
-                    }                    
-                    if(addNewGroup)
+                    }
+                    if (addNewGroup)
                     {
                         in_Renderer.fcoFile.Groups.Add(new Group($"New_Group_{in_Renderer.fcoFile.Groups.Count}"));
                     }
@@ -99,7 +101,7 @@ namespace ConverseEditor
                 }
                 ImGui.EndListBox();
             }
-            
+
             ImGui.EndGroup();
         }
         void DrawFTECharacter(Sprite spr, Vector4 in_Color, float in_OffsetX)
@@ -158,7 +160,7 @@ namespace ConverseEditor
             {
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + off);
                 ImGui.PushStyleColor(ImGuiCol.Button, 0);
-                var clicked = ImGui.Button("##invis", new System.Numerics.Vector2(1,0));
+                var clicked = ImGui.Button("##invis", new System.Numerics.Vector2(1, 0));
                 ImGui.PopStyleColor();
             }
         }
@@ -179,7 +181,7 @@ namespace ConverseEditor
 
                     Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
                     if (lineWidth.Count - 1 < lineIndex)
-                        lineWidth.Add(new SLineInfo(0,0));
+                        lineWidth.Add(new SLineInfo(0, 0));
                     lineWidth[lineIndex].width += spr.Width * fontSizeMultiplier;
                     lineWidth[lineIndex].amount++;
                 }
@@ -230,7 +232,7 @@ namespace ConverseEditor
                     CellColor color = currentHighlight == null ? in_Cell.MainColor : currentHighlight;
                     //Calc spacing for justified text
                     float offset = 0;
-                    if(in_Cell.Alignment == Cell.TextAlign.Justified)
+                    if (in_Cell.Alignment == Cell.TextAlign.Justified)
                     {
                         offset = ((ImGui.GetContentRegionAvail().X - 50) - ((spr.Dimensions.X * fontSizeMultiplier) * lineWidth[lineIdx].amount)) / (lineWidth[lineIdx].amount - 1);
                     }
@@ -252,8 +254,8 @@ namespace ConverseEditor
         void CellInputText(int[] in_ConverseIDs, string in_CellName, ref SUFcoTool.Cell in_Cell, int in_Index, int in_LineCount)
         {
             ImGui.BeginDisabled(!tablePresent);
-            string cellMessageConverted = 
-                translationTableNew == null 
+            string cellMessageConverted =
+                translationTableNew == null
                 ? GetMessageAsString(in_Cell.Message)
                 : TranslationService.RawHEXtoTXT(in_ConverseIDs, translationTableNew);
             cellMessageConverted = cellMessageConverted.Replace("@@", "");
@@ -262,7 +264,7 @@ namespace ConverseEditor
                 var joinedIDs2 = TranslationService.RawTXTtoHEX(cellMessageConverted, translationTableNew);
                 in_Cell.Message = joinedIDs2;
             }
-            
+
             ImGui.EndDisabled();
             if (!tablePresent)
             {
@@ -278,7 +280,7 @@ namespace ConverseEditor
         {
             string cellName = string.IsNullOrEmpty(in_Cell.Name) ? $"Empty Cell ({in_Index})" : in_Cell.Name;
             if (expandAllCells) ImGui.SetNextItemOpen(expandAllCells);
-            
+
             ImGui.PushID($"cell_{in_Index}");
             ImGui.BeginGroup();
             if (ImGui.CollapsingHeader(cellName))
@@ -345,7 +347,7 @@ namespace ConverseEditor
                 in_Cell.ExtraColor1.ArgbColor = colorSub1;
                 in_Cell.ExtraColor2.ArgbColor = colorSub2;
             }
-            ImGui.EndGroup();            
+            ImGui.EndGroup();
             ImGui.PopID();
         }
         void DrawCellList(ConverseProject in_Renderer, bool in_FcoFilePresent)
@@ -357,7 +359,7 @@ namespace ConverseEditor
                 if (in_FcoFilePresent)
                 {
                     SUFcoTool.Group selectedGroup = in_Renderer.fcoFile.Groups[selectedGroupIndex];
-                    if(selectedGroup.CellList.Count != 0)
+                    if (selectedGroup.CellList.Count != 0)
                     {
                         for (int x = 0; x < selectedGroup.CellList.Count; x++)
                         {
@@ -407,10 +409,10 @@ namespace ConverseEditor
                 ImGui.Separator();
 
                 if (ImGui.BeginTabBar("##tabsfco"))
-                {                    
+                {
                     bool isFcoLoaded = in_Renderer.fcoFile != null;
                     if (ImGui.BeginTabItem("FCO Viewer"))
-                    {                        
+                    {
                         DrawGroupSelection(in_Renderer, isFcoLoaded);
                         ImGui.SameLine();
                         DrawCellList(in_Renderer, isFcoLoaded);
@@ -439,7 +441,7 @@ namespace ConverseEditor
                                 tablePresent = true;
                             }
                             ImGui.SameLine();
-                            if(ImGui.Button("Save Table"))
+                            if (ImGui.Button("Save Table"))
                             {
                                 var testdial = NativeFileDialogSharp.Dialog.FileSave("json");
                                 if (testdial.IsOk)
@@ -506,7 +508,9 @@ namespace ConverseEditor
             tablePresent = true;
             AddMissingFteEntriesToTable(translationTableNew);
         }
+        public List<TranslationTable.Entry> GetTranslationTableEntries() => translationTableNew;
+
+
+
     }
-
-
 }

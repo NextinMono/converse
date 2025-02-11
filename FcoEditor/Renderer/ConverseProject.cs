@@ -35,7 +35,7 @@ namespace ConverseEditor.ShurikenRenderer
         public Vector2 screenSize;
         public FontConverse fcoFile;
         public FontTexture fteFile;
-        public SProjectConfig config;
+        public static SProjectConfig config;
         private SViewportData viewportData;
         public bool isFileLoaded = false;
 
