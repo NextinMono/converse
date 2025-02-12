@@ -28,8 +28,9 @@ namespace ConverseEditor.ShurikenRenderer
             public bool playingAnimations;
             public bool showQuads;
             public double time;
+            public string WorkFilePathFTE;
         }
-        public List<Window> windowList = new List<Window>();
+        public List<ConverseEditor.Window> windowList = new List<ConverseEditor.Window>();
         public Renderer renderer;
         public Vector2 viewportSize;
         public Vector2 screenSize;
@@ -102,6 +103,7 @@ namespace ConverseEditor.ShurikenRenderer
         public void LoadFile(string in_Path, string in_PathFte)
         {
             config.WorkFilePath = in_Path;
+            config.WorkFilePathFTE = in_PathFte;
             LoadFCO(in_Path);
             LoadFTE(in_PathFte);           
             string parentPath = Directory.GetParent(config.WorkFilePath).FullName;

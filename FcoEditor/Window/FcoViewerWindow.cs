@@ -31,7 +31,7 @@ namespace ConverseEditor
         float averageSize = 50;
         float fontSizeMultiplier = 1;
         bool expandAllCells = false;
-        bool tablePresent = false;
+        public bool tablePresent = false;
         Random random = new Random();
         List<TranslationTable.Entry> translationTableNew = null;
         List<SLineInfo> lineWidth = new List<SLineInfo>();
@@ -494,6 +494,11 @@ namespace ConverseEditor
                         {
                             ImGui.Text("Open an FCO file to make a translation table for it.");
                         }
+                        ImGui.EndTabItem();
+                    }
+                    if (ImGui.BeginTabItem("FTE Generator"))
+                    {
+                        FteTextureGenerator.Draw(in_Renderer);
                         ImGui.EndTabItem();
                     }
                     ImGui.EndTabBar();

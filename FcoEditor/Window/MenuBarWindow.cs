@@ -66,11 +66,6 @@ namespace ConverseEditor
                             in_Renderer.SaveCurrentFile(path);
                         }
                     }
-                    if (ImGui.MenuItem("Create texture"))
-                    {
-                        var entries = FcoViewerWindow.Instance.GetTranslationTableEntries();
-                        FontAtlasGenerator.TryCreateFteTexture(new System.Numerics.Vector2(2048,2048), entries, in_Renderer.fteFile);
-                    }
                     if (ImGui.MenuItem("Exit"))
                     {
                         Environment.Exit(0);

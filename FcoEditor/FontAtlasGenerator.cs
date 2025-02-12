@@ -23,27 +23,25 @@ namespace ConverseEditor
         public System.Numerics.Vector2 Size;
 
     }
+    public class FontAtlasSettings
+    {
+        public System.Numerics.Vector2 FontAtlasSize = new System.Numerics.Vector2(2048, 2048);
+        public string FontPath = "";
+        public string FtePath = "";
+        public float FontSize = 32f;
+        public float Kerning = 0.005f;
+        public System.Numerics.Vector2 InterCharacterSpacing = new System.Numerics.Vector2(7, 4);
+    }
     public class FontAtlasGenerator
     {
-        public static unsafe void TryCreateFteTexture(System.Numerics.Vector2 in_Size, List<TranslationTable.Entry> in_Entries, FontTexture in_FTE)
+        public static unsafe void TryCreateFteTexture(FontAtlasSettings in_Settings, List<TranslationTable.Entry> in_Entries, FontTexture in_FTE)
         {
             List<List<CharacterBitmapInfo>> lines = new List<List<CharacterBitmapInfo>>();
-            var dialog1 = NativeFileDialogSharp.Dialog.FileOpen("otf, ttf");
-            string fontPath = "";
-            string ftePathNew = "";
-
-            if (dialog1.IsOk)
-                fontPath = dialog1.Path;
-            else
+            string fontPath = in_Settings.FontPath;
+            string ftePathNew = in_Settings.FtePath;
+            if (string.IsNullOrEmpty(fontPath))
                 return;
-
-            var dialog2 = NativeFileDialogSharp.Dialog.FileSave("fte", ConverseProject.config.WorkFilePath);
-            if (dialog2.IsOk)
-                ftePathNew = dialog2.Path;
-            else
-                return;
-
-            int kerning = (int)(0.005f * in_Size.X);
+            int kerning = (int)(in_Settings.Kerning * in_Settings.FontAtlasSize.X);
             var texturePath = Path.Combine(Directory.GetParent(ftePathNew).FullName, in_FTE.Textures[2].Name + ".png");
 
             StbTrueType.stbtt_fontinfo font = null;
@@ -55,11 +53,10 @@ namespace ConverseEditor
             {
                 StbTrueType.stbtt_InitFont(font, fontPtr, 0);
             }
-            float fontSize = 32f;
 
-            float fontSizeNormal = (fontSize / 512f) * in_Size.X;
+            float fontSizeNormal = (in_Settings.FontSize / 512f) * in_Settings.FontAtlasSize.X;
             float scale = StbTrueType.stbtt_ScaleForPixelHeight(font, fontSizeNormal);
-            Vector2i spacing = new Vector2i((int)((7.0f / 512.0f) * in_Size.X), (int)((4.0f / 512.0f) * in_Size.Y));
+            Vector2i spacing = new Vector2i((int)((in_Settings.InterCharacterSpacing.X / 512.0f) * in_Settings.FontAtlasSize.X), (int)((in_Settings.InterCharacterSpacing.Y / 512.0f) * in_Settings.FontAtlasSize.Y));
 
             // Get some stats from the font
             // Ascent is the distance between the baseline and the top of the font
@@ -73,7 +70,7 @@ namespace ConverseEditor
             int x = 0, y = 0, maxRowHeight = 0;
 
             lines.Add(new List<CharacterBitmapInfo>());
-            using (Bitmap atlas = new Bitmap((int)in_Size.X, (int)in_Size.Y, PixelFormat.Format32bppArgb))
+            using (Bitmap atlas = new Bitmap((int)in_Settings.FontAtlasSize.X, (int)in_Settings.FontAtlasSize.Y, PixelFormat.Format32bppArgb))
             {
                 using (Graphics g = Graphics.FromImage(atlas))
                 {
@@ -108,7 +105,7 @@ namespace ConverseEditor
                         }
 
                         // Move to next row if necessary
-                        if (x + size.X > in_Size.X)
+                        if (x + size.X > in_Settings.FontAtlasSize.X)
                         {
                             x = 0;
                             y += maxRowHeight + (spacing.Y * 2);
@@ -163,8 +160,8 @@ namespace ConverseEditor
                                     if (in_FTE.Characters[i].CharacterID == sizeList[j].Letter)
                                     {
                                         var charaInfo = in_FTE.Characters[i];
-                                        charaInfo.TopLeft = sizeList[j].Position / in_Size;
-                                        charaInfo.BottomRight = sizeList[j].Size / in_Size;
+                                        charaInfo.TopLeft = sizeList[j].Position / in_Settings.FontAtlasSize;
+                                        charaInfo.BottomRight = sizeList[j].Size / in_Settings.FontAtlasSize;
                                         in_FTE.Characters[i] = charaInfo;
                                     }
                                 }

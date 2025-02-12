@@ -1,5 +1,4 @@
 ﻿using ConverseEditor.ShurikenRenderer;
-using ConverseEditor.ShurikenRenderer;
 
 namespace ConverseEditor
 {
