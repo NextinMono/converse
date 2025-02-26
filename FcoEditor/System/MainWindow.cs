@@ -16,7 +16,7 @@ namespace ConverseEditor
         public static ConverseProject renderer;
         public static uint viewportDock;
         public static ImGuiWindowFlags flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse;
-        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings(){ Size = new Vector2i(800, 1000), APIVersion = new Version(3, 3) })
+        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Size = new Vector2i(800, 1000), APIVersion = new Version(3, 3) })
         { }
         protected override void OnLoad()
         {
@@ -81,15 +81,15 @@ namespace ConverseEditor
         protected override void OnTextInput(TextInputEventArgs e)
         {
             base.OnTextInput(e);
-            
-            
+
+
             _controller.PressChar((char)e.Unicode);
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
             base.OnMouseWheel(e);
-            
+
             _controller.MouseScroll(e.Offset);
         }
     }
