@@ -46,30 +46,36 @@ namespace ConverseEditor
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            base.OnRenderFrame(e);
-            _controller.Update(this, (float)e.Time);
-
-            GL.ClearColor(new Color4(0, 0, 0, 255));
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            GL.Enable(EnableCap.Blend);
-            GL.Disable(EnableCap.CullFace);
-            GL.BlendEquation(BlendEquationMode.FuncAdd);
-            // Enable Docking
-            viewportDock = ImGui.DockSpaceOverViewport();
-
-            if(renderer.isFileLoaded)
+            if (renderer.screenSize.X != 0 && renderer.screenSize.Y != 0)
             {
-                Title = $"{applicationName} - [{ConverseProject.config.WorkFilePath}]";
-            }
-            else
-            {
-                Title = applicationName;
-            }
-            renderer.RenderWindows();
-            _controller.Render();
+                if (IsFocused)
+                {
+                    base.OnRenderFrame(e);
+                    _controller.Update(this, (float)e.Time);
 
-            ImGuiController.CheckGLError("End of frame");
+                    GL.ClearColor(new Color4(0, 0, 0, 255));
+                    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+                    GL.Enable(EnableCap.Blend);
+                    GL.Disable(EnableCap.CullFace);
+                    GL.BlendEquation(BlendEquationMode.FuncAdd);
+                    // Enable Docking
+                    viewportDock = ImGui.DockSpaceOverViewport();
 
+                    if (renderer.isFileLoaded)
+                    {
+                        Title = $"{applicationName} - [{ConverseProject.config.WorkFilePath}]";
+                    }
+                    else
+                    {
+                        Title = applicationName;
+                    }
+                    renderer.RenderWindows();
+                    _controller.Render();
+
+                    ImGuiController.CheckGLError("End of frame");
+
+                }
+            }
             SwapBuffers();
         }
         protected override void OnTextInput(TextInputEventArgs e)
