@@ -2,6 +2,8 @@
 using ConverseEditor.ShurikenRenderer;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace ConverseEditor
 {
@@ -22,7 +24,34 @@ namespace ConverseEditor
         public static float menuBarHeight = 32;
         private readonly string fco = "fco";
         private readonly string fte = "fte";
-
+        //https://stackoverflow.com/questions/4580263/how-to-open-in-default-browser-in-c-sharp
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
         public string AskForFTE(string in_FcoPath)
         {
             var possibleFtePath = Path.Combine(Directory.GetParent(in_FcoPath).FullName, "fte_ConverseMain.fte");
@@ -74,6 +103,17 @@ namespace ConverseEditor
                 }
 
 
+            }
+            if (UpdateChecker.UpdateAvailable)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32(new System.Numerics.Vector4(0, 0.7f, 1, 1)));
+                var size = ImGui.CalcTextSize("Update Available!").X;
+                ImGui.SetCursorPosX(ImGui.GetWindowSize().X - size - ImGui.GetStyle().ItemSpacing.X * 2);
+                if (ImGui.Selectable("Update Available!"))
+                {
+                    OpenUrl("https://github.com/NextinMono/converse/releases/latest");
+                }
+                ImGui.PopStyleColor();
             }
             ImGui.EndMainMenuBar();
         }

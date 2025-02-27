@@ -68,7 +68,7 @@ namespace ConverseEditor.ShurikenRenderer
                 System.Windows.MessageBox.Show(message, title, System.Windows.MessageBoxButton.OK, image);
             }
         }
-        private void LoadFCO(string in_Path)
+        private bool LoadFCO(string in_Path)
         {
             BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
             try
@@ -81,10 +81,11 @@ namespace ConverseEditor.ShurikenRenderer
                 fcoFile = null;
                 fteFile = null;
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FCO file.\n{ex.Message}", 2);
-                return;
+                return false;
             }
+            return true;
         }
-        private void LoadFTE(string in_Path)
+        private bool LoadFTE(string in_Path)
         {
             BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
             try
@@ -97,15 +98,16 @@ namespace ConverseEditor.ShurikenRenderer
                 fcoFile = null;
                 fteFile = null;
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FCO file.\n{ex.Message}", 2);
-                return;
+                return false;
             }
+            return true;
         }
         public void LoadFile(string in_Path, string in_PathFte)
         {
             config.WorkFilePath = in_Path;
             config.WorkFilePathFTE = in_PathFte;
-            LoadFCO(in_Path);
-            LoadFTE(in_PathFte);           
+            if (!LoadFCO(in_Path) || !LoadFTE(in_PathFte))
+                return;
             string parentPath = Directory.GetParent(config.WorkFilePath).FullName;
             SpriteHelper.textureList = new("");
 

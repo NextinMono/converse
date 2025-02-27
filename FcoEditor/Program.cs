@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 namespace ConverseEditor
 {
     class Program
@@ -23,6 +24,7 @@ namespace ConverseEditor
             MainWindow wnd = new MainWindow();
             wnd.Title = MainWindow.applicationName;
             arguments = args;
+            Task.Run(UpdateChecker.CheckUpdate);
             wnd.Run();
         }
     }

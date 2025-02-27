@@ -354,7 +354,8 @@ namespace ConverseEditor
         {
             ImGui.BeginGroup();
             ImGui.Text("Cells");
-            if (ImGui.BeginListBox("##listcells", new System.Numerics.Vector2(-1, ImGui.GetContentRegionAvail().Y - 32)))
+            float spacingButtons = 0; //32
+            if (ImGui.BeginListBox("##listcells", new System.Numerics.Vector2(-1, ImGui.GetContentRegionAvail().Y - spacingButtons)))
             {
                 if (in_FcoFilePresent)
                 {
@@ -370,11 +371,11 @@ namespace ConverseEditor
             }
             ImGui.EndListBox();
             float sizeX = (ImGui.GetContentRegionAvail().X - ImGui.GetStyle().ItemSpacing.X) / 2;
-            ImGui.SetNextItemWidth(sizeX);
-            ImGui.Button("Add Cell", new System.Numerics.Vector2(sizeX, 25));
-            ImGui.SameLine();
-            ImGui.SetNextItemWidth(sizeX);
-            ImGui.Button("Remove Cell", new System.Numerics.Vector2(sizeX, 25));
+            //ImGui.SetNextItemWidth(sizeX);
+            //ImGui.Button("Add Cell", new System.Numerics.Vector2(sizeX, 25));
+            //ImGui.SameLine();
+            //ImGui.SetNextItemWidth(sizeX);
+            //ImGui.Button("Remove Cell", new System.Numerics.Vector2(sizeX, 25));
             ImGui.EndGroup();
         }
         void AddMissingFteEntriesToTable(List<TranslationTable.Entry> in_Entries)
@@ -420,11 +421,15 @@ namespace ConverseEditor
                     }
                     if (ImGui.BeginTabItem("Table Generator"))
                     {
+                        //TODO: split into new class
                         if (isFcoLoaded)
                         {
+                            ImGui.PushStyleColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0.7f, 1, 1)));
                             ImGui.TextWrapped("A translation table is necessary to be able to edit text from FCOs, as they do not store the character used to type out the sentences.");
-
-                            if (ImGui.Button("Import Table"))
+                            ImGui.PopStyleColor();
+                            var size = (ImGui.GetContentRegionAvail().X / 3) - (ImGui.GetStyle().ItemSpacing.X);
+                            ImGui.SetCursorPosX(ImGui.GetStyle().ItemSpacing.X + 4);
+                            if (ImGui.Button("Import Table", new System.Numerics.Vector2(size, 32)))
                             {
                                 var testdial = NativeFileDialogSharp.Dialog.FileOpen("json");
                                 if (testdial.IsOk)
@@ -433,7 +438,7 @@ namespace ConverseEditor
                                 }
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("Create Table"))
+                            if (ImGui.Button("Create Table", new System.Numerics.Vector2(size, 32)))
                             {
                                 translationTableNew = new List<TranslationTable.Entry>();
                                 translationTableNew.Add(new TranslationTable.Entry("\\n", 0));
@@ -441,7 +446,7 @@ namespace ConverseEditor
                                 tablePresent = true;
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("Save Table"))
+                            if (ImGui.Button("Save Table", new System.Numerics.Vector2(size, 32)))
                             {
                                 var testdial = NativeFileDialogSharp.Dialog.FileSave("json");
                                 if (testdial.IsOk)
@@ -454,6 +459,7 @@ namespace ConverseEditor
 
                             if (tablePresent)
                             {
+                                ImGui.SeparatorText("Table");
                                 if (ImGui.BeginTable("table2", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.BordersOuterH | ImGuiTableFlags.BordersOuterV | ImGuiTableFlags.ScrollY, new System.Numerics.Vector2(-1, -1)))
                                 {
                                     ImGui.TableSetupColumn("Key", ImGuiTableColumnFlags.None, 0);

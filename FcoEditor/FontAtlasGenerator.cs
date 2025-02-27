@@ -34,13 +34,13 @@ namespace ConverseEditor
     }
     public class FontAtlasGenerator
     {
-        public static unsafe void TryCreateFteTexture(FontAtlasSettings in_Settings, List<TranslationTable.Entry> in_Entries, FontTexture in_FTE)
+        public static unsafe MemoryStream TryCreateFteTexture(FontAtlasSettings in_Settings, List<TranslationTable.Entry> in_Entries, FontTexture in_FTE)
         {
             List<List<CharacterBitmapInfo>> lines = new List<List<CharacterBitmapInfo>>();
             string fontPath = in_Settings.FontPath;
-            string ftePathNew = in_Settings.FtePath;
+            string ftePathNew = Path.Combine(Directory.GetParent(in_Settings.FtePath).FullName, "fte_ConverseMain_Generated.fte");
             if (string.IsNullOrEmpty(fontPath))
-                return;
+                return null;
             int kerning = (int)(in_Settings.Kerning * in_Settings.FontAtlasSize.X);
             var texturePath = Path.Combine(Directory.GetParent(ftePathNew).FullName, in_FTE.Textures[2].Name + ".png");
 
@@ -69,6 +69,7 @@ namespace ConverseEditor
             // Character metrics
             int x = 0, y = 0, maxRowHeight = 0;
 
+            MemoryStream stream = new MemoryStream();
             lines.Add(new List<CharacterBitmapInfo>());
             using (Bitmap atlas = new Bitmap((int)in_Settings.FontAtlasSize.X, (int)in_Settings.FontAtlasSize.Y, PixelFormat.Format32bppArgb))
             {
@@ -140,7 +141,7 @@ namespace ConverseEditor
                         x += size.X + spacing.X + (kerning);
                         StbTrueType.stbtt_FreeBitmap(bitmap, null);
                     }
-                    atlas.Save(@texturePath, ImageFormat.Png);
+                    atlas.Save(stream, ImageFormat.Png);
                     foreach (var sizeList in lines)
                     {
                         var highestLetter = sizeList.OrderByDescending(x => x.Size.Y).ToList()[0].Size.Y;
@@ -177,6 +178,7 @@ namespace ConverseEditor
             in_FTE.Textures[2] = tex;
             BinaryObjectWriter writer = new BinaryObjectWriter(ftePathNew, Endianness.Big, Encoding.UTF8);
             writer.WriteObject(in_FTE);
+            return stream;
         }
     }
 }
