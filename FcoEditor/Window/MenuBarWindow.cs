@@ -84,7 +84,7 @@ namespace ConverseEditor
                     {
                         in_Renderer.SaveCurrentFile(ConverseProject.config.WorkFilePath);
                     }
-                    if (ImGui.MenuItem("Save As...", "Ctrl + S"))
+                    if (ImGui.MenuItem("Save As...", "Ctrl + Alt + S"))
                     {
                         var testdial = NativeFileDialogSharp.Dialog.FileSave(fco);
                         if (testdial.IsOk)
@@ -99,6 +99,19 @@ namespace ConverseEditor
                     {
                         Environment.Exit(0);
                     }
+                    ImGui.EndMenu();
+                }
+                if (ImGui.BeginMenu("Help"))
+                {
+                    if (ImGui.MenuItem("How to use Converse"))
+                    {
+                        OpenUrl("https://wiki.hedgedocs.com/index.php/How_to_use_Converse");
+                    }
+                    if (ImGui.MenuItem("Report a bug"))
+                    {
+                        OpenUrl("https://github.com/NextinMono/converse/issues/new");
+                    }
+
                     ImGui.EndMenu();
                 }
 
