@@ -4,3 +4,6 @@
 [submodule "StbTrueTypeSharp"]
 	path = StbTrueTypeSharp
 	url = https://github.com/StbSharp/StbTrueTypeSharp.git
+[submodule "settings-system"]
+	path = settings-system
+	url = https://github.com/teamspettrogames/settings-system

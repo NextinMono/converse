@@ -73,7 +73,7 @@ namespace ConverseEditor
                         int selectedGroup = selectedGroupIndex;
                         if (selectedGroup == i)
                         {
-                            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 1, 0, 1));
+                            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 0.6f, 0, 1));
                         }
                         if (ImGui.Selectable(string.IsNullOrEmpty(in_Renderer.fcoFile.Groups[i].Name) ? $"Empty{i}" : in_Renderer.fcoFile.Groups[i].Name))
                             selectedGroupIndex = i;
@@ -306,6 +306,7 @@ namespace ConverseEditor
                     DrawCellFromFTE(in_Cell, in_Cell.Message);
                     ImGui.EndListBox();
                 }
+                ImGui.PopStyleColor();
                 ImGui.Combo("Alignment", ref alignmentIdx, alignmentOptions, 4);
                 ImGui.ColorEdit4("Color", ref colorMain);
                 ImGui.ColorEdit4("Color Sub 1", ref colorSub1);
@@ -339,7 +340,6 @@ namespace ConverseEditor
                     ImGui.TreePop();
                 }
                 ImGui.PopID();
-                ImGui.PopStyleColor();
                 ImGui.Unindent();
                 in_Cell.Name = name;
                 in_Cell.Alignment = (Cell.TextAlign)alignmentIdx;

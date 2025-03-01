@@ -101,6 +101,19 @@ namespace ConverseEditor
                     }
                     ImGui.EndMenu();
                 }
+                if (ImGui.BeginMenu("Edit"))
+                {
+                    if (ImGui.MenuItem("Associate extensions"))
+                    {
+                        ExecuteAsAdmin(@Path.Combine(@Program.Directory, "FileTypeRegisterService.exe"));
+                    }
+                    if (ImGui.MenuItem("Preferences", SettingsWindow.Enabled))
+                    {
+                        SettingsWindow.Enabled = !SettingsWindow.Enabled;
+                    }
+                    ImGui.EndMenu();
+                }
+
                 if (ImGui.BeginMenu("Help"))
                 {
                     if (ImGui.MenuItem("How to use Converse"))
@@ -129,6 +142,23 @@ namespace ConverseEditor
                 ImGui.PopStyleColor();
             }
             ImGui.EndMainMenuBar();
+        }
+        public static string AddQuotesIfRequired(string in_Path)
+        {
+            return !string.IsNullOrWhiteSpace(in_Path) ?
+                in_Path.Contains(" ") && (!in_Path.StartsWith("\"") && !in_Path.EndsWith("\"")) ?
+                    "\"" + in_Path + "\"" : in_Path :
+                    string.Empty;
+        }
+        public static void ExecuteAsAdmin(string in_FileName)
+        {
+
+            in_FileName = AddQuotesIfRequired(in_FileName);
+            Process proc = new Process();
+            proc.StartInfo.FileName = in_FileName;
+            proc.StartInfo.UseShellExecute = true;
+            proc.StartInfo.Verb = "runas";
+            proc.Start();
         }
     }
 }

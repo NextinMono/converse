@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <StartupObject>ConverseEditor.Program</StartupObject>
-    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Icons\fco.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -92,9 +92,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\kunai\FileTypeRegisterService\FileTypeRegisterService.csproj" />
     <ProjectReference Include="..\libfco\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj" />
     <ProjectReference Include="..\libfco\Source\libfco.csproj" />
-    <ProjectReference Include="..\libfco\src\SUFontTool.csproj" />
+    <ProjectReference Include="..\settings-system\SpettroSettings.csproj" />
     <ProjectReference Include="..\StbTrueTypeSharp\src\StbTrueTypeSharp.csproj" />
   </ItemGroup>
 <ItemGroup>

@@ -212,7 +212,6 @@ namespace ConverseEditor
 
             SetPerFrameImGuiData(1f / 60f);
 
-            SetupImGuiStyle();
             ImGui.NewFrame();
             _frameBegun = true;
         }
