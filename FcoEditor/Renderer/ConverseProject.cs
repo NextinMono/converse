@@ -97,7 +97,7 @@ namespace ConverseEditor.ShurikenRenderer
                 isFileLoaded = false;
                 fcoFile = null;
                 fteFile = null;
-                ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FCO file.\n{ex.Message}", 2);
+                ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FTE file.\n{ex.Message}", 2);
                 return false;
             }
             return true;
