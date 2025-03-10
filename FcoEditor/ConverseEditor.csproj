@@ -92,6 +92,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FileTypeRegisterService\FileTypeRegisterService.csproj" />
     <ProjectReference Include="..\libfco\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj" />
     <ProjectReference Include="..\libfco\Source\libfco.csproj" />
     <ProjectReference Include="..\settings-system\SpettroSettings.csproj" />

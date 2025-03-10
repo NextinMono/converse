@@ -156,13 +156,22 @@ namespace ConverseEditor
         }
         public static void ExecuteAsAdmin(string in_FileName)
         {
+            //Reason for this try-catch statement is because
+            //if the user cancels the UAC prompt,
+            //an exception will be thrown
+            try
+            {
+                in_FileName = AddQuotesIfRequired(in_FileName);
+                Process proc = new Process();
+                proc.StartInfo.FileName = in_FileName;
+                proc.StartInfo.UseShellExecute = true;
+                proc.StartInfo.Verb = "runas";
+                proc.Start();
+            }
+            catch(Exception e)
+            {
 
-            in_FileName = AddQuotesIfRequired(in_FileName);
-            Process proc = new Process();
-            proc.StartInfo.FileName = in_FileName;
-            proc.StartInfo.UseShellExecute = true;
-            proc.StartInfo.Verb = "runas";
-            proc.Start();
+            }
         }
     }
 }
