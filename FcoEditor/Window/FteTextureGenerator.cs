@@ -43,7 +43,6 @@ namespace ConverseEditor
                 {
                     var atlasStream = FontAtlasGenerator.TryCreateFteTexture(Settings, FcoViewerWindow.Instance.GetTranslationTableEntries(), in_Renderer.fteFile);
 
-
                     var texturePath = Path.Combine(Directory.GetParent(Settings.FtePath).FullName, in_Renderer.fteFile.Textures[2].Name + ".dds");
                     if(File.Exists(texturePath))
                     {

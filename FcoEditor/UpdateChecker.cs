@@ -38,7 +38,7 @@ namespace ConverseEditor
                 GitHubClient client = new GitHubClient(new Octokit.ProductHeaderValue("kunai-update-checker"));
                 var latestRelease = client.Repository.Release.GetLatest("NextinMono", "converse");
                 latestRelease.Wait();
-                if (latestRelease.Result.CreatedAt > GetBuildDate())
+                if (latestRelease.Result.PublishedAt > GetBuildDate())
                 {
                     UpdateAvailable = true;
                 }

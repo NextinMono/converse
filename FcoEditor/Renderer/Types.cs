@@ -6,6 +6,17 @@ using System.Numerics;
 
 namespace Converse.Rendering
 {
+    public class SLineInfo
+    {
+        public float width;
+        public int amount;
+
+        public SLineInfo(float in_Width, int in_Amount)
+        {
+            this.width = in_Width;
+            this.amount = in_Amount;
+        }
+    }
     public struct Vertex
     {
         public Vector2 Position;
