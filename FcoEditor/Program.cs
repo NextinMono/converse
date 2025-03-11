@@ -19,8 +19,10 @@ namespace ConverseEditor
                 return Path.Combine(Directory, "Resources");
             }
         }
+
         static void Main(string[] args)
         {
+
             MainWindow wnd = new MainWindow();
             wnd.Title = MainWindow.applicationName;
             arguments = args;

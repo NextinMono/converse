@@ -294,7 +294,7 @@ namespace ConverseEditor
                         DrawCellList(in_Renderer, isFcoLoaded);
                         ImGui.EndTabItem();
                     }
-                    if (ImGui.BeginTabItem("Table Generator"))
+                    if (ImGui.BeginTabItem("Translation Table"))
                     {
                         //TODO: split into new class
                         if (isFcoLoaded)
@@ -343,8 +343,8 @@ namespace ConverseEditor
                                     ImGui.TableNextRow(0, 0);
                                     ImGui.TableSetColumnIndex(0);
                                     /// @separator
-
-                                    for (int i = 0; i < translationTableNew.Count; i++)
+                                    int maxAmount = Math.Clamp(translationTableNew.Count, 0, 1000);
+                                    for (int i = 0; i < maxAmount; i++)
                                     {
                                         Sprite spr = SpriteHelper.GetSpriteFromConverseID(translationTableNew[i].ConverseID);
                                         if (spr == null)
@@ -364,6 +364,8 @@ namespace ConverseEditor
                                         ImGui.TableNextRow();
                                         translationTableNew[i] = letter;
                                     }
+                                    if (translationTableNew.Count >= maxAmount)
+                                        ImGui.Text("There were too many entries to display, the rest have been cut off.");
                                     /// @separator
                                     ImGui.EndTable();
                                 }

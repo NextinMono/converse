@@ -14,11 +14,22 @@ namespace ConverseEditor
         public static string replaceString = "";
         public static void Render(ConverseProject in_Renderer)
         {
+
             ImGui.BeginDisabled(!FcoViewerWindow.Instance.tablePresent);
             ImGui.InputTextMultiline("Find", ref findString, 1024);
             ImGui.InputTextMultiline("Replace", ref replaceString, 1024);
-            if (ImGui.Button("Replace2"))
+            if (ImGui.Button("Execute"))
                 ReplaceText(in_Renderer);
+
+            if (!FcoViewerWindow.Instance.tablePresent)
+            {
+                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                {
+                    ImGui.BeginTooltip();
+                    ImGui.Text("You cannot edit text unless you have a Translation Table open.");
+                    ImGui.EndTooltip();
+                }
+            }
             ImGui.Separator();
             ImGui.EndDisabled();
         }

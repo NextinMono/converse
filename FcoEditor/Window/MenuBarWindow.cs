@@ -111,7 +111,7 @@ namespace ConverseEditor
                     {
                         SettingsWindow.Enabled = !SettingsWindow.Enabled;
                     }
-                    if (ImGui.MenuItem("Render", FindReplaceTool.Enabled))
+                    if (ImGui.MenuItem("Replace", FindReplaceTool.Enabled))
                     {
                         FindReplaceTool.Enabled = !FindReplaceTool.Enabled;
                     }
