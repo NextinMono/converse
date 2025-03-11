@@ -22,7 +22,6 @@ namespace ConverseEditor
 
         static void Main(string[] args)
         {
-
             MainWindow wnd = new MainWindow();
             wnd.Title = MainWindow.applicationName;
             arguments = args;

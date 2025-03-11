@@ -149,8 +149,8 @@ namespace ConverseEditor.Settings
             style.Colors[(int)ImGuiCol.ScrollbarGrab] = new Vector4(0.686274528503418f, 0.686274528503418f, 0.686274528503418f, 0.800000011920929f);
             style.Colors[(int)ImGuiCol.ScrollbarGrabHovered] = new Vector4(0.4862745106220245f, 0.4862745106220245f, 0.4862745106220245f, 0.800000011920929f);
             style.Colors[(int)ImGuiCol.ScrollbarGrabActive] = new Vector4(0.4862745106220245f, 0.4862745106220245f, 0.4862745106220245f, 1.0f);
-            style.Colors[(int)ImGuiCol.CheckMark] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 1.0f);
-            style.Colors[(int)ImGuiCol.SliderGrab] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.7799999713897705f);
+            style.Colors[(int)ImGuiCol.CheckMark] = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
+            style.Colors[(int)ImGuiCol.SliderGrab] = new Vector4(0.3f, 0.3f, 0.3f, 0.7799999713897705f);
             style.Colors[(int)ImGuiCol.SliderGrabActive] = new Vector4(0.4588235318660736f, 0.5372549295425415f, 0.800000011920929f, 0.6000000238418579f);
             style.Colors[(int)ImGuiCol.Button] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.4000000059604645f);
             style.Colors[(int)ImGuiCol.ButtonHovered] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 1.0f);
