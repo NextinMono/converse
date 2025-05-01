@@ -30,6 +30,7 @@ namespace ConverseEditor
         float averageSize = 50;
         float fontSizeMultiplier = 1;
         bool expandAllCells = false;
+        bool renamingGroup;
         public bool tablePresent = false;
         Random random = new Random();
         public List<TranslationTable.Entry> translationTableNew = null;
@@ -61,6 +62,7 @@ namespace ConverseEditor
                         if (ImGui.Selectable(string.IsNullOrEmpty(in_Renderer.fcoFile.Groups[i].Name) ? $"Empty{i}" : in_Renderer.fcoFile.Groups[i].Name))
                             selectedGroupIndex = i;
 
+                        
                         if (selectedGroup == i)                        
                             ImGui.PopStyleColor(1);
                         
@@ -70,8 +72,14 @@ namespace ConverseEditor
                             {
                                 addNewGroup = true;
                             }
+                            if (ImGui.Selectable("Rename"))
+                            {
+                                renamingGroup = true;
+                                selectedGroupIndex = i;
+                            }
                             ImGui.EndPopup();
                         }
+                       
                     }
                     if (addNewGroup)
                     {
@@ -85,6 +93,31 @@ namespace ConverseEditor
                 ImGui.EndListBox();
             }
             ImGui.EndGroup();
+            if (renamingGroup)
+            {
+                ImGui.OpenPopup("Rename");
+            }
+
+            System.Numerics.Vector2 modalSize = new System.Numerics.Vector2(350, 100);
+            
+            // Calculate centered position
+            var viewport = ImGui.GetMainViewport();
+            System.Numerics.Vector2 centerPos = new System.Numerics.Vector2(
+                viewport.WorkPos.X + (viewport.WorkSize.X - modalSize.X) * 0.5f,
+                viewport.WorkPos.Y + (viewport.WorkSize.Y - modalSize.Y) * 0.5f
+            );
+            ImGui.SetNextWindowPos(centerPos);
+            ImGui.SetNextWindowSize(modalSize);
+            if (ImGui.BeginPopupModal("Rename", ref renamingGroup, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove))
+            {
+                string newName = in_Renderer.fcoFile.Groups[selectedGroupIndex].Name;
+                ImGui.InputText("New Name", ref newName, 256);
+                in_Renderer.fcoFile.Groups[selectedGroupIndex].Name = newName;
+                ImGui.Separator();
+                if(ImGui.Button("OK"))
+                    ImGui.CloseCurrentPopup();
+                ImGui.EndPopup();
+            }
         }
 
         
@@ -144,7 +177,7 @@ namespace ConverseEditor
                     {
                         if(ImGui.Button("Add"))
                         {
-                            in_Cell.Highlights.Add(new CellColor());
+                            in_Cell.Highlights.Add(new CellColor(2));
                         }
                         for (int i = 0; i < in_Cell.Highlights.Count; i++)
                         {
@@ -235,18 +268,13 @@ namespace ConverseEditor
                     "{A}", "{B}", "{X}", "{Y}", "{LB}", "{RB}", "{LT}", "{RT}",
                     "{LSUP}", "{LSRIGHT}", "{LSDOWN}", "{LSLEFT}", "{RSUP}", "{RSRIGHT}",
                     "{RSDOWN}", "{RSLEFT}", "{DPADUP}", "{DPADRIGHT}", "{DPADDOWN}",
-                    "{DPADLEFT}", "{START}", "{SELECT}", "{SAVE}"
+                    "{DPADLEFT}", "{START}", "{SELECT}"
                 };
-                //Add first set of keys unaltered, then do it again but with a _2 suffix
+                //Add first set of keys unaltered
                 int index = 100;
                 foreach (string key in keys)
                 {
                     in_Entries.Add(new TranslationTable.Entry(key, index));
-                    index++;
-                }
-                foreach (string key in keys)
-                {
-                    in_Entries.Add(new TranslationTable.Entry(key.Insert(key.Length - 1, "_2"), index));
                     index++;
                 }
 

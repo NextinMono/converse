@@ -2,6 +2,9 @@
 using ConverseEditor.ShurikenRenderer;
 using ConverseEditor.Utility;
 using OpenTK.Mathematics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using StbTrueTypeSharp;
 using SUFcoTool;
 using System;
@@ -14,6 +17,8 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
+using SixLabors.ImageSharp.Drawing.Processing;
+using System.Runtime.CompilerServices;
 namespace ConverseEditor
 {
     class CharacterBitmapInfo
@@ -34,8 +39,9 @@ namespace ConverseEditor
     }
     public class FontAtlasGenerator
     {
-        public static unsafe MemoryStream TryCreateFteTexture(FontAtlasSettings in_Settings, List<TranslationTable.Entry> in_Entries, FontTexture in_FTE)
+        public static unsafe byte[] TryCreateFteTexture(FontAtlasSettings in_Settings, List<TranslationTable.Entry> in_Entries, FontTexture in_FTE)
         {
+
             List<List<CharacterBitmapInfo>> lines = new List<List<CharacterBitmapInfo>>();
             string fontPath = in_Settings.FontPath;
             string ftePathNew = Path.Combine(Directory.GetParent(in_Settings.FtePath).FullName, "fte_ConverseMain_Generated.fte");
@@ -69,109 +75,101 @@ namespace ConverseEditor
             // Character metrics
             int x = 0, y = 0, maxRowHeight = 0;
 
-            MemoryStream stream = new MemoryStream();
+            byte[] stream = new byte[(int)(in_Settings.FontAtlasSize.X * in_Settings.FontAtlasSize.Y * Unsafe.SizeOf<Rgba32>())];
             lines.Add(new List<CharacterBitmapInfo>());
-            using (Bitmap atlas = new Bitmap((int)in_Settings.FontAtlasSize.X, (int)in_Settings.FontAtlasSize.Y, PixelFormat.Format32bppArgb))
+            using (var atlas = new Image<Rgba32>((int)in_Settings.FontAtlasSize.X, (int)in_Settings.FontAtlasSize.Y))
             {
-                using (Graphics g = Graphics.FromImage(atlas))
+                atlas.Mutate(ctx => ctx.Fill(SixLabors.ImageSharp.Color.Black));
+
+                foreach (var c in in_Entries)
                 {
-                    g.Clear(Color.Black);
-                    foreach (var c in in_Entries)
+                    if (c.Letter.Length > 1 || c.Letter.Length == 0 || c.Letter == "\n")
+                        continue;
+
+                    var character = c.Letter[0];
+                    Vector2i charaBmpTopLeft = Vector2i.Zero;
+                    Vector2i charaBmpBottomRight = Vector2i.Zero;
+
+                    // Get character dimensions
+                    Vector2i size, offset;
+                    byte* bitmap = StbTrueType.stbtt_GetCodepointBitmap(font, 0, scale, character, &size.X, &size.Y, &offset.X, &offset.Y);
+
+                    if (bitmap == null)
                     {
-                        if (c.Letter.Length > 1 || c.Letter.Length == 0 || c.Letter == "\n")
+                        if (character == ' ')
+                        {
+                            StbTrueType.stbtt_GetCodepointBitmap(font, 0, scale, '0', &size.X, &size.Y, &offset.X, &offset.Y);
+                            size.Y = 1;
+                        }
+                        else
                             continue;
-                        var character = c.Letter[0];
-                        Vector2i charaBmpTopLeft, charaBmpBottomRight;
-
-                        //GetCodepointBitmapBox = how big the bitmap must be
-                        StbTrueType.stbtt_GetCodepointBitmapBox(font, character, scale, scale, &charaBmpTopLeft.X, &charaBmpTopLeft.Y, &charaBmpBottomRight.X, &charaBmpBottomRight.Y);
-
-                        // Get character dimensions
-                        Vector2i size, offset;
-                        byte* bitmap = StbTrueType.stbtt_GetCodepointBitmap(font, 0, scale, character, &size.X, &size.Y, &offset.X, &offset.Y);
-
-                        if (bitmap == null)
-                        {
-                            //Space will always have a null bitmap, but we have to account for it
-                            //cause otherwise text will have no spaces
-                            if (character == ' ')
-                            {
-                                Console.Write("");
-                                StbTrueType.stbtt_GetCodepointBitmap(font, 0, scale, '0', &size.X, &size.Y, &offset.X, &offset.Y);
-                                //Make it 1 pixel high
-                                size.Y = 1;
-                            }
-                            else
-                                continue;
-                        }
-
-                        // Move to next row if necessary
-                        if (x + size.X > in_Settings.FontAtlasSize.X)
-                        {
-                            x = 0;
-                            y += maxRowHeight + (spacing.Y * 2);
-                            maxRowHeight = 0;
-                            lines.Add(new List<CharacterBitmapInfo>());
-                        }
-                        //Start of the glyph itself
-                        int glyphY = y + fontBaseline + charaBmpTopLeft.Y;
-                        maxRowHeight = Math.Max(maxRowHeight, size.Y);
-
-                        // Copy glyph data into the bitmap
-                        for (int j = 0; j < size.Y; j++)
-                        {
-                            for (int i = 0; i < size.X; i++)
-                            {
-                                byte alpha = bitmap != null ? bitmap[j * size.X + i] : (byte)0;
-                                if (alpha != 0)
-                                    atlas.SetPixel(x + i, glyphY + j, Color.FromArgb(alpha, 255, 255, 255));
-                                else
-                                    atlas.SetPixel(x + i, glyphY + j, Color.FromArgb(255, 0, 0, 0));
-                            }
-                        }
-                        var newChara = new CharacterBitmapInfo
-                        {
-                            Letter = c.ConverseID,
-                            Position = new System.Numerics.Vector2(x, y),
-                            Size = new System.Numerics.Vector2(x + size.X + kerning, glyphY + size.Y)
-                        };
-                        lines[^1].Add(newChara);
-
-                        // Add spacing
-                        x += size.X + spacing.X + (kerning);
-                        StbTrueType.stbtt_FreeBitmap(bitmap, null);
                     }
-                    atlas.Save(stream, ImageFormat.Png);
-                    foreach (var sizeList in lines)
+
+                    if (x + size.X > in_Settings.FontAtlasSize.X)
                     {
-                        var highestLetter = sizeList.OrderByDescending(x => x.Size.Y).ToList()[0].Size.Y;
-                        for (int j = 0; j < sizeList.Count; j++)
-                        {
-                            sizeList[j].Size.Y = highestLetter;
-                        }
+                        x = 0;
+                        y += maxRowHeight + (spacing.Y * 2);
+                        maxRowHeight = 0;
+                        lines.Add(new List<CharacterBitmapInfo>());
                     }
-                    for (int i = 0; i < in_FTE.Characters.Count; i++)
-                    {
-                        if (in_FTE.Characters[i].TextureIndex == 2)
-                        {
-                            foreach (var sizeList in lines)
-                            {
-                                for (int j = 0; j < sizeList.Count; j++)
-                                {
-                                    if (in_FTE.Characters[i].CharacterID == sizeList[j].Letter)
-                                    {
-                                        var charaInfo = in_FTE.Characters[i];
-                                        charaInfo.TopLeft = sizeList[j].Position / in_Settings.FontAtlasSize;
-                                        charaInfo.BottomRight = sizeList[j].Size / in_Settings.FontAtlasSize;
-                                        in_FTE.Characters[i] = charaInfo;
-                                    }
-                                }
-                            }
 
+                    int glyphY = y + fontBaseline + charaBmpTopLeft.Y;
+                    maxRowHeight = Math.Max(maxRowHeight, size.Y);
+
+                    // Copy glyph data into the bitmap
+                    for (int j = 0; j < size.Y; j++)
+                    {
+                        for (int i = 0; i < size.X; i++)
+                        {
+                            byte alpha = bitmap != null ? bitmap[j * size.X + i] : (byte)0;
+                            var color = alpha != 0 ? new Rgba32(255, 255, 255, alpha) : new Rgba32(0, 0, 0, 255);
+                            atlas[x + i, glyphY + j] = color;
                         }
                     }
-                    // Save the texture atlas
+
+                    var newChara = new CharacterBitmapInfo
+                    {
+                        Letter = c.ConverseID,
+                        Position = new System.Numerics.Vector2(x, y),
+                        Size = new System.Numerics.Vector2(x + size.X + kerning, glyphY + size.Y)
+                    };
+                    lines[^1].Add(newChara);
+
+                    x += size.X + spacing.X + (kerning);
+                    StbTrueType.stbtt_FreeBitmap(bitmap, null);
                 }
+
+                foreach (var sizeList in lines)
+                {
+                    var highestLetter = sizeList.Max(x => x.Size.Y);
+                    foreach (var chara in sizeList)
+                    {
+                        chara.Size.Y = highestLetter;
+                    }
+                }
+
+                for(int a = 0; a < in_FTE.Characters.Count; a++)
+                {
+                    if (in_FTE.Characters[a].TextureIndex >= 2)
+                        continue;
+                    for (int b = 0; b < lines.Count; b++)
+                    {
+                        List<CharacterBitmapInfo> sizeList = lines[b];
+                        for (int c = 0; c < sizeList.Count; c++)
+                        {
+                            CharacterBitmapInfo sizeItem = sizeList[c];
+                            if (in_FTE.Characters[a].CharacterID == sizeItem.Letter)
+                            {
+                                var crop = in_FTE.Characters[a];
+                                crop.TopLeft = sizeItem.Position / in_Settings.FontAtlasSize;
+                                crop.BottomRight = sizeItem.Size / in_Settings.FontAtlasSize;
+                                in_FTE.Characters[a] = crop;
+                            }
+                        }
+                    }
+                }
+
+                atlas.CopyPixelDataTo(stream);
             }
 
             var tex = in_FTE.Textures[2];

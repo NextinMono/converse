@@ -48,7 +48,7 @@ namespace ConverseEditor
                     {
                         File.Move(texturePath, Path.ChangeExtension(texturePath, ".old.dds"));
                     }
-                    using Image<Rgba32> newDDS = Image.Load<Rgba32>(atlasStream.ToArray());
+                    using Image<Rgba32> newDDS = Image.Load<Rgba32>(atlasStream);
 
                     BcEncoder encoder = new BcEncoder();
 
