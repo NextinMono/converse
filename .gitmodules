@@ -7,3 +7,6 @@
 [submodule "settings-system"]
 	path = settings-system
 	url = https://github.com/teamspettrogames/settings-system
+[submodule "hkrybase"]
+	path = hkrybase
+	url = https://github.com/NextinMono/hkrybase
