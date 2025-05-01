@@ -3,29 +3,19 @@ using Hexa.NET.Utilities.Text;
 using ConverseEditor.ShurikenRenderer;
 using ConverseEditor.Utility;
 using Converse.Rendering;
-using SUFcoTool;
+using libfco;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Linq;
 using StbTrueTypeSharp;
 using System.IO;
+using HekonrayBase.Base;
+using HekonrayBase;
 namespace ConverseEditor
 {
-    public class FcoViewerWindow : Window
-    {
-        internal static FcoViewerWindow instance;
-        public static FcoViewerWindow Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new FcoViewerWindow();
-                }
-                return instance;
-            }
-        }
+    public class FcoViewerWindow : Singleton<FcoViewerWindow>, IWindow
+    {       
         int selectedGroupIndex;
         float averageSize = 50;
         float fontSizeMultiplier = 1;
@@ -37,12 +27,6 @@ namespace ConverseEditor
         List<SLineInfo> lineWidth = new List<SLineInfo>();
         
 
-        public override void OnReset(ConverseProject in_Renderer)
-        {
-            selectedGroupIndex = 0;
-            tablePresent = false;
-            translationTableNew = null;
-        }
         void DrawGroupSelection(ConverseProject in_Renderer, bool in_FcoFilePresent)
         {
             ImGui.BeginGroup();
@@ -121,7 +105,7 @@ namespace ConverseEditor
         }
 
         
-        void DrawCellHeader(SUFcoTool.Group in_SelectedGroup, SUFcoTool.Cell in_Cell, int in_Index)
+        void DrawCellHeader(libfco.Group in_SelectedGroup, libfco.Cell in_Cell, int in_Index)
         {
             string cellName = string.IsNullOrEmpty(in_Cell.Name) ? $"Empty Cell ({in_Index})" : in_Cell.Name;
             if (expandAllCells) ImGui.SetNextItemOpen(expandAllCells);
@@ -239,7 +223,7 @@ namespace ConverseEditor
             {
                 if (in_FcoFilePresent)
                 {
-                    SUFcoTool.Group selectedGroup = in_Renderer.fcoFile.Groups[selectedGroupIndex];
+                    libfco.Group selectedGroup = in_Renderer.fcoFile.Groups[selectedGroupIndex];
                     if (selectedGroup.CellList.Count != 0)
                     {
                         for (int x = 0; x < selectedGroup.CellList.Count; x++)
@@ -297,15 +281,32 @@ namespace ConverseEditor
                 }
             }
         }
-        public override void Render(ConverseProject in_Renderer)
+
+        public void LoadTranslationTable(string @in_Path)
         {
+            translationTableNew = TranslationTable.Read(@in_Path).Tables["Standard"];
+            tablePresent = true;
+            AddMissingFteEntriesToTable(translationTableNew, true);
+        }
+        public List<TranslationTable.Entry> GetTranslationTableEntries() => translationTableNew;
+
+        public void OnReset(IProgramProject in_Renderer)
+        {
+            selectedGroupIndex = 0;
+            tablePresent = false;
+            translationTableNew = null;
+        }
+
+        public void Render(IProgramProject in_Renderer)
+        {
+            var renderer = (ConverseProject)in_Renderer;
             ImGui.SetNextWindowPos(new System.Numerics.Vector2(0, MenuBarWindow.menuBarHeight), ImGuiCond.Always);
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(in_Renderer.screenSize.X, in_Renderer.screenSize.Y - MenuBarWindow.menuBarHeight), ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(renderer.screenSize.X, renderer.screenSize.Y - MenuBarWindow.menuBarHeight), ImGuiCond.Always);
             if (ImGui.Begin("##FCOViewerWindow", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove))
             {
-                if(FindReplaceTool.Enabled)
+                if (FindReplaceTool.Enabled)
                 {
-                    FindReplaceTool.Render(in_Renderer);
+                    FindReplaceTool.Render(renderer);
                 }
                 ImGui.Checkbox("Expand all", ref expandAllCells);
                 ImGui.SameLine();
@@ -314,12 +315,12 @@ namespace ConverseEditor
 
                 if (ImGui.BeginTabBar("##tabsfco"))
                 {
-                    bool isFcoLoaded = in_Renderer.fcoFile != null;
+                    bool isFcoLoaded = renderer.fcoFile != null;
                     if (ImGui.BeginTabItem("FCO Viewer"))
                     {
-                        DrawGroupSelection(in_Renderer, isFcoLoaded);
+                        DrawGroupSelection(renderer, isFcoLoaded);
                         ImGui.SameLine();
-                        DrawCellList(in_Renderer, isFcoLoaded);
+                        DrawCellList(renderer, isFcoLoaded);
                         ImGui.EndTabItem();
                     }
                     if (ImGui.BeginTabItem("Translation Table"))
@@ -345,7 +346,7 @@ namespace ConverseEditor
                             {
                                 translationTableNew = new List<TranslationTable.Entry>();
                                 translationTableNew.Add(new TranslationTable.Entry("\\n", 0));
-                                AddMissingFteEntriesToTable(translationTableNew, in_Renderer.fcoFile.Header.Version == 0);
+                                AddMissingFteEntriesToTable(translationTableNew, renderer.fcoFile.Header.Version == 0);
                                 tablePresent = true;
                             }
                             ImGui.SameLine();
@@ -409,7 +410,7 @@ namespace ConverseEditor
                     }
                     if (ImGui.BeginTabItem("FTE Generator"))
                     {
-                        FteTextureGenerator.Draw(in_Renderer);
+                        FteTextureGenerator.Draw(renderer);
                         ImGui.EndTabItem();
                     }
                     ImGui.EndTabBar();
@@ -417,16 +418,5 @@ namespace ConverseEditor
             }
             ImGui.End();
         }
-
-        public void LoadTranslationTable(string @in_Path)
-        {
-            translationTableNew = TranslationTable.Read(@in_Path).Tables["Standard"];
-            tablePresent = true;
-            AddMissingFteEntriesToTable(translationTableNew, true);
-        }
-        public List<TranslationTable.Entry> GetTranslationTableEntries() => translationTableNew;
-
-
-
     }
 }

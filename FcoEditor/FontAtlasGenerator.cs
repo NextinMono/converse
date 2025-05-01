@@ -1,12 +1,11 @@
 ﻿using Amicitia.IO.Binary;
 using ConverseEditor.ShurikenRenderer;
 using ConverseEditor.Utility;
-using OpenTK.Mathematics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using StbTrueTypeSharp;
-using SUFcoTool;
+using libfco;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -19,6 +18,7 @@ using System.Threading.Tasks;
 
 using SixLabors.ImageSharp.Drawing.Processing;
 using System.Runtime.CompilerServices;
+using HekonrayBase;
 namespace ConverseEditor
 {
     class CharacterBitmapInfo
@@ -62,7 +62,7 @@ namespace ConverseEditor
 
             float fontSizeNormal = (in_Settings.FontSize / 512f) * in_Settings.FontAtlasSize.X;
             float scale = StbTrueType.stbtt_ScaleForPixelHeight(font, fontSizeNormal);
-            Vector2i spacing = new Vector2i((int)((in_Settings.InterCharacterSpacing.X / 512.0f) * in_Settings.FontAtlasSize.X), (int)((in_Settings.InterCharacterSpacing.Y / 512.0f) * in_Settings.FontAtlasSize.Y));
+            Vector2Int spacing = new Vector2Int((int)((in_Settings.InterCharacterSpacing.X / 512.0f) * in_Settings.FontAtlasSize.X), (int)((in_Settings.InterCharacterSpacing.Y / 512.0f) * in_Settings.FontAtlasSize.Y));
 
             // Get some stats from the font
             // Ascent is the distance between the baseline and the top of the font
@@ -87,11 +87,11 @@ namespace ConverseEditor
                         continue;
 
                     var character = c.Letter[0];
-                    Vector2i charaBmpTopLeft = Vector2i.Zero;
-                    Vector2i charaBmpBottomRight = Vector2i.Zero;
+                    Vector2Int charaBmpTopLeft = new();
+                    Vector2Int charaBmpBottomRight = new();
 
                     // Get character dimensions
-                    Vector2i size, offset;
+                    Vector2Int size, offset;
                     byte* bitmap = StbTrueType.stbtt_GetCodepointBitmap(font, 0, scale, character, &size.X, &size.Y, &offset.X, &offset.Y);
 
                     if (bitmap == null)

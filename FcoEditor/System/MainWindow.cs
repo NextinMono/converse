@@ -1,8 +1,4 @@
 ﻿using Hexa.NET.ImGui;
-using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
 using ConverseEditor.ShurikenRenderer;
 using System.IO;
 using System;
@@ -10,111 +6,97 @@ using SixLabors.ImageSharp.PixelFormats;
 using System.Runtime.CompilerServices;
 using ConverseEditor.Settings;
 using TeamSpettro.SettingsSystem;
+using HekonrayBase;
+using System.Runtime.InteropServices;
+using System.Numerics;
 
 namespace ConverseEditor
 {
-    public class MainWindow : GameWindow
+    public class MainWindow : HekonrayMainWindow
     {
-        public static readonly string applicationName = "Converse";
-        ImGuiController _controller;
-        public static ConverseProject renderer;
-        public byte[] IconData;
-        public static uint viewportDock;
-        public static ImGuiWindowFlags flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse;
-       
-        public MainWindow() : base(GameWindowSettings.Default, new NativeWindowSettings() { Size = new Vector2i(800, 1000), APIVersion = new Version(3, 3) })
+        private IntPtr m_IniName;
+        private string m_AppName = "Kunai";
+        public ConverseProject ConverseProject => (ConverseProject)Project;
+        public static ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse;
+
+        public MainWindow(Version in_OpenGlVersion, Vector2Int in_WindowSize) : base(in_OpenGlVersion, in_WindowSize)
         {
-            MemoryStream ms = new MemoryStream();
-            Title = applicationName;
-            GetIcon();
+            Title = m_AppName;
         }
 
-        void GetIcon()
+        public override void OnLoad()
         {
-            // TODO: eventually replace with program's own embedded icon?
-            using SixLabors.ImageSharp.Image<Rgba32> newDds = SixLabors.ImageSharp.Image.Load<Rgba32>(Path.Combine(Program.Directory, "Resources", "Icons", "ico.png"));
-            IconData = new byte[newDds.Width * newDds.Height * Unsafe.SizeOf<Rgba32>()];
-            newDds.CopyPixelDataTo(IconData);
-
-            OpenTK.Windowing.Common.Input.Image windowIcon = new OpenTK.Windowing.Common.Input.Image(newDds.Width, newDds.Height, IconData);
-            Icon = new OpenTK.Windowing.Common.Input.WindowIcon(windowIcon);
-        }
-        protected override void OnLoad()
-        {
+            OnActionWithArgs = LoadFromArgs;
+            TeamSpettro.Resources.Initialize(Path.Combine(Program.Path, "config.json"));
+            Project = new ConverseProject(this);
             base.OnLoad();
-            TeamSpettro.Resources.Initialize(Path.Combine(Program.Directory, "config.json"));
-            renderer = new ConverseProject(this, new ShurikenRenderer.Vector2(1280, 720), new ShurikenRenderer.Vector2(ClientSize.X, ClientSize.Y));
 
-            Title = applicationName;
-            _controller = new ImGuiController(ClientSize.X, ClientSize.Y);
             ImGuiThemeManager.SetTheme(SettingsManager.GetBool("IsDarkThemeEnabled", false));
-            renderer.windowList.Add(MenuBarWindow.Instance);
-            renderer.windowList.Add(FcoViewerWindow.Instance);
-            renderer.windowList.Add(SettingsWindow.Instance);
-            if (Program.arguments.Length > 0)
+            // Example #10000 for why ImGui.NET is kinda bad
+            // This is to avoid having imgui.ini files in every folder that the program accesses
+            unsafe
             {
-                string pathFTE = MenuBarWindow.Instance.AskForFTE(Program.arguments[0]);
-                renderer.LoadFile(Program.arguments[0], pathFTE);
+                m_IniName = Marshal.StringToHGlobalAnsi(Path.Combine(Program.Path, "imgui.ini"));
+                ImGuiIOPtr io = ImGui.GetIO();
+                io.IniFilename = (byte*)m_IniName;
             }
-
+            //    converseProject.windowList.Add(MenuBarWindow.Instance);
+            //    converseProject.windowList.Add(FcoViewerWindow.Instance);
+            //    converseProject.windowList.Add(SettingsWindow.Instance);
+            Windows.Add(ModalHandler.Instance);
+            Windows.Add(new MenuBarWindow());
+            Windows.Add(new FcoViewerWindow());
+            Windows.Add(new SettingsWindow());
+            SettingsWindow.Instance.OnReset(null);
         }
-        protected override void OnResize(ResizeEventArgs e)
-        {
-            base.OnResize(e);
 
-            // Update the opengl viewport
-            GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
-            renderer.screenSize = new ShurikenRenderer.Vector2(ClientSize.X, ClientSize.Y);
-            // Tell ImGui of the new size
-            _controller.WindowResized(ClientSize.X, ClientSize.Y);
-        }
-        protected override void OnRenderFrame(FrameEventArgs e)
+        private void LoadFromArgs(string[] in_Args)
         {
-            if (renderer.screenSize.X != 0 && renderer.screenSize.Y != 0)
+            string pathFTE = MenuBarWindow.Instance.AskForFTE(in_Args[0]);
+            ConverseProject.LoadFile(in_Args[0], pathFTE);
+        }
+
+        //protected override void OnResize(ResizeEventArgs in_E)
+        //{
+        //    base.OnResize(in_E);
+        //    if(KunaiProject != null)
+        //        KunaiProject.ScreenSize = new System.Numerics.Vector2(ClientSize.X, ClientSize.Y);
+        //}
+        //
+        public override void OnRenderImGuiFrame()
+        {
+            if (ShouldRender())
             {
-                if (IsFocused)
-                {
-                    base.OnRenderFrame(e);
-                    _controller.Update(this, (float)e.Time);
+                base.OnRenderImGuiFrame();
 
-                    GL.ClearColor(new Color4(0, 0, 0, 255));
-                    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-                    GL.Enable(EnableCap.Blend);
-                    GL.Disable(EnableCap.CullFace);
-                    GL.BlendEquation(BlendEquationMode.FuncAdd);
-                    // Enable Docking
-                    viewportDock = ImGui.DockSpaceOverViewport();
+                //float deltaTime = (float)(GetDeltaTime());
+                //co.Render(KunaiProject.WorkProjectCsd, (float)deltaTime);
 
-                    if (renderer.isFileLoaded)
-                    {
-                        Title = $"{applicationName} - [{ConverseProject.config.WorkFilePath}]";
-                    }
-                    else
-                    {
-                        Title = applicationName;
-                    }
-                    renderer.RenderWindows();
-                    _controller.Render();
-
-                    ImGuiController.CheckGLError("End of frame");
-
-                }
+               //if (converseProject.isFileLoaded)
+               //   Title = m_AppName + $" - [{converseProject.WorkFilePath}]";
+               //else
+                    Title = m_AppName;
             }
-            SwapBuffers();
-        }
-        protected override void OnTextInput(TextInputEventArgs e)
-        {
-            base.OnTextInput(e);
-
-
-            _controller.PressChar((char)e.Unicode);
-        }
-
-        protected override void OnMouseWheel(MouseWheelEventArgs e)
-        {
-            base.OnMouseWheel(e);
-
-            _controller.MouseScroll(e.Offset);
         }
     }
+    //protected override void OnLoad()
+    //{
+    //    base.OnLoad();
+    //    TeamSpettro.Resources.Initialize(Path.Combine(Program.Directory, "config.json"));
+    //    converseProject = new ConverseProject(this, new ShurikenRenderer.Vector2(1280, 720), new ShurikenRenderer.Vector2(ClientSize.X, ClientSize.Y));
+    //
+    //    Title = applicationName;
+    //    _controller = new ImGuiController(ClientSize.X, ClientSize.Y);
+    //    ImGuiThemeManager.SetTheme(SettingsManager.GetBool("IsDarkThemeEnabled", false));
+    //    converseProject.windowList.Add(MenuBarWindow.Instance);
+    //    converseProject.windowList.Add(FcoViewerWindow.Instance);
+    //    converseProject.windowList.Add(SettingsWindow.Instance);
+    //    if (Program.arguments.Length > 0)
+    //    {
+    //        string pathFTE = MenuBarWindow.Instance.AskForFTE(Program.arguments[0]);
+    //        converseProject.LoadFile(Program.arguments[0], pathFTE);
+    //    }
+    //
+    //}
+
 }

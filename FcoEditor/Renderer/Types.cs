@@ -3,6 +3,7 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using System;
 using System.Numerics;
+using ConverseEditor.ShurikenRenderer;
 
 namespace Converse.Rendering
 {
@@ -34,30 +35,52 @@ namespace Converse.Rendering
         public bool Additive;
         public bool LinearFiltering;
     }
+    public struct Crop
+    {
+        public uint TextureIndex;
+        public Vector2 TopLeft;
+        public Vector2 BottomRight;
+    }
     public class Sprite
     {
-        public readonly int ID;
-        public ConverseEditor.ShurikenRenderer.Vector2 Start { get; set; }
-        public ConverseEditor.ShurikenRenderer.Vector2 Dimensions { get; set; }
+        public Vector2 Start { get; set; }
+        public Vector2 Dimensions { get; set; }
         public Texture Texture { get; set; }
 
-        // Used for saving to avoid corruption in un-edited values
-        public float OriginalTop { get; set; }
-        public float OriginalBottom { get; set; }
-        public float OriginalLeft { get; set; }
-        public float OriginalRight { get; set; }
-        public bool HasChanged { get; set; }
+        public Crop Crop;
 
+        public Vector2 RelativeStart
+        {
+            get
+            {
+                return Start / Texture.Size;
+            }
+            set
+            {
+                Start = value * Texture.Size;
+            }
+        }
+        public Vector2 RelativeSize
+        {
+            get
+            {
+                return Dimensions / Texture.Size;
+            }
+            set
+            {
+                Dimensions = value * Texture.Size;
+            }
+        }
         public int X
         {
             get { return (int)Start.X; }
-            set { Start.X = value; CreateCrop(); HasChanged = true; }
+            set { Start = new Vector2(value, Start.Y); }
         }
 
         public int Y
         {
             get { return (int)Start.Y; }
-            set { Start.Y = value; CreateCrop(); HasChanged = true; }
+            set { Start = new Vector2(Start.X, value); }
         }
 
         public int Width
@@ -67,9 +90,7 @@ namespace Converse.Rendering
             {
                 if (X + value <= Texture.Width)
                 {
-                    Dimensions.X = value;
-                    CreateCrop();
-                    HasChanged = true;
+                    Dimensions = new Vector2(value, Dimensions.Y);
                 }
             }
         }
@@ -81,41 +102,52 @@ namespace Converse.Rendering
             {
                 if (Y + value <= Texture.Height)
                 {
-                    Dimensions.Y = value;
-                    CreateCrop();
-                    HasChanged = true;
+                    Dimensions = new Vector2(Dimensions.X, value);
                 }
             }
         }
-
-        public CroppedBitmap Crop { get; set; }
-
-        private void CreateCrop()
+        public Vector2[] GetImGuiUv()
         {
-            if (X + Width <= Texture.Width && Y + Height <= Texture.Height)
-            {
-                if (Width > 0 && Height > 0)
-                    Crop = new CroppedBitmap(Texture.ImageSource, new Int32Rect(X, Y, Width, Height));
-            }
+            Vector2 uvTl = new Vector2(
+                Start.X / Texture.Width,
+                -(Start.Y / Texture.Height));
+
+            Vector2 uvBr = uvTl + new Vector2(
+            Dimensions.X / Texture.Width,
+            -(Dimensions.Y / Texture.Height));
+
+            return [uvTl, uvBr];
         }
 
-        public Sprite(int id, Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
+        public void Recalculate()
         {
-            ID = id;
-            Texture = tex;
+            var textureSize = Texture.Size;
+            Crop.TopLeft.X = Start.X / textureSize.X;
+            Crop.TopLeft.Y = Start.Y / textureSize.Y;
+            Crop.BottomRight.X = (Start.X + Dimensions.X) / textureSize.X;
+            Crop.BottomRight.Y = (Start.Y + Dimensions.Y) / textureSize.Y;
+        }
+        public void GenerateCoordinates(Vector2 in_TextureSize)
+        {
+            var oLeft = Crop.TopLeft.X;
+            var oRight = Crop.BottomRight.X;
+            var oTop = Crop.TopLeft.Y;
+            var oBtm = Crop.BottomRight.Y;
+            var start1X = MathF.Round(oLeft * in_TextureSize.X);
+            var start1Y = MathF.Round(oTop * in_TextureSize.Y);
+            Start = new Vector2(start1X, start1Y);
+            Start = new Vector2(Math.Clamp(Start.X, 0, in_TextureSize.X), Math.Clamp(Start.Y, 0, in_TextureSize.Y));
+            Dimensions = new Vector2(MathF.Round((oRight - oLeft) * in_TextureSize.X), MathF.Round((oBtm - oTop) * in_TextureSize.Y));
+        }
+        public Sprite(Texture in_Tex, float in_Top = 0.0f, float in_Left = 0.0f, float in_Bottom = 1.0f, float in_Right = 1.0f)
+        {
+            Texture = in_Tex;
 
-            Start = new Vector2(MathF.Round(left * tex.Width), MathF.Round(top * tex.Height));
-            Start.X = Math.Clamp(Start.X, 0, Texture.Width);
-            Start.Y = Math.Clamp(Start.Y, 0, Texture.Height);
-
-            Dimensions = new Vector2(MathF.Round((right - left) * tex.Width), MathF.Round((bottom - top) * tex.Height));
-            CreateCrop();
-
-            OriginalTop = top;
-            OriginalLeft = left;
-            OriginalBottom = bottom;
-            OriginalRight = right;
-            HasChanged = false;
+            Crop = new Crop();
+            Crop.TextureIndex = (uint)SpriteHelper.Textures.IndexOf(in_Tex);
+            Crop.TopLeft = new Vector2(in_Left, in_Top);
+            Crop.BottomRight = new Vector2(in_Right, in_Bottom);
+            GenerateCoordinates(in_Tex.Size);
         }
 
         public Sprite()
@@ -124,9 +156,6 @@ namespace Converse.Rendering
             Dimensions = new Vector2();
 
             Texture = new Texture();
-            HasChanged = false;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

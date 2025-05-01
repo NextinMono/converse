@@ -1,28 +1,23 @@
 ﻿using ConverseEditor.Settings;
 using ConverseEditor.ShurikenRenderer;
+using HekonrayBase;
+using HekonrayBase.Base;
 using Hexa.NET.ImGui;
+using System.Numerics;
 using TeamSpettro.SettingsSystem;
 
 namespace ConverseEditor
 {
-    public class SettingsWindow : Window
+    public class SettingsWindow : Singleton<MenuBarWindow>, IWindow
     {
-        internal static SettingsWindow instance;
-        public static SettingsWindow Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new SettingsWindow();
-                }
-                return instance;
-            }
-        }
         public static bool Enabled = false;
         bool _themeIsDark = SettingsManager.GetBool("IsDarkThemeEnabled");
 
-        public override void Render(ConverseProject in_Renderer)
+        public void OnReset(IProgramProject in_Renderer)
+        {
+        }
+
+        public void Render(IProgramProject in_Renderer)
         {
             if (Enabled)
             {

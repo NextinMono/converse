@@ -4,23 +4,13 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using HekonrayBase.Base;
+using HekonrayBase;
 
 namespace ConverseEditor
 {
-    public class MenuBarWindow : Window
+    public class MenuBarWindow : Singleton<MenuBarWindow>, IWindow
     {
-        internal static MenuBarWindow instance;
-        public static MenuBarWindow Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new MenuBarWindow();
-                }
-                return instance;
-            }
-        }
         public static float menuBarHeight = 32;
         private readonly string fco = "fco";
         private readonly string fte = "fte";
@@ -63,8 +53,41 @@ namespace ConverseEditor
             }
             return possibleFtePath;
         }
-        public override void Render(ConverseProject in_Renderer)
+        public static string AddQuotesIfRequired(string in_Path)
         {
+            return !string.IsNullOrWhiteSpace(in_Path) ?
+                in_Path.Contains(" ") && (!in_Path.StartsWith("\"") && !in_Path.EndsWith("\"")) ?
+                    "\"" + in_Path + "\"" : in_Path :
+                    string.Empty;
+        }
+        public static void ExecuteAsAdmin(string in_FileName)
+        {
+            //Reason for this try-catch statement is because
+            //if the user cancels the UAC prompt,
+            //an exception will be thrown
+            try
+            {
+                in_FileName = AddQuotesIfRequired(in_FileName);
+                Process proc = new Process();
+                proc.StartInfo.FileName = in_FileName;
+                proc.StartInfo.UseShellExecute = true;
+                proc.StartInfo.Verb = "runas";
+                proc.Start();
+            }
+            catch(Exception e)
+            {
+
+            }
+        }
+
+        public void OnReset(IProgramProject in_Renderer)
+        {
+
+        }
+
+        public void Render(IProgramProject in_Renderer)
+        {
+            var renderer = (ConverseProject)in_Renderer;
             if (ImGui.BeginMainMenuBar())
             {
                 menuBarHeight = ImGui.GetWindowSize().Y;
@@ -77,12 +100,12 @@ namespace ConverseEditor
                         if (testdial.IsOk)
                         {
                             var possibleFtePath = AskForFTE(testdial.Path);
-                            in_Renderer.LoadFile(@testdial.Path, possibleFtePath);
+                            renderer.LoadFile(@testdial.Path, possibleFtePath);
                         }
                     }
                     if (ImGui.MenuItem("Save", "Ctrl + S"))
                     {
-                        in_Renderer.SaveCurrentFile(ConverseProject.config.WorkFilePath);
+                        renderer.SaveCurrentFile(ConverseProject.config.WorkFilePath);
                     }
                     if (ImGui.MenuItem("Save As...", "Ctrl + Alt + S"))
                     {
@@ -92,7 +115,7 @@ namespace ConverseEditor
                             string path = testdial.Path;
                             if (!Path.HasExtension(path))
                                 path += ".fco";
-                            in_Renderer.SaveCurrentFile(path);
+                            renderer.SaveCurrentFile(path);
                         }
                     }
                     if (ImGui.MenuItem("Exit"))
@@ -105,7 +128,7 @@ namespace ConverseEditor
                 {
                     if (ImGui.MenuItem("Associate extensions"))
                     {
-                        ExecuteAsAdmin(@Path.Combine(@Program.Directory, "FileTypeRegisterService.exe"));
+                        ExecuteAsAdmin(@Path.Combine(@Program.Path, "FileTypeRegisterService.exe"));
                     }
                     if (ImGui.MenuItem("Preferences", SettingsWindow.Enabled))
                     {
@@ -146,32 +169,6 @@ namespace ConverseEditor
                 ImGui.PopStyleColor();
             }
             ImGui.EndMainMenuBar();
-        }
-        public static string AddQuotesIfRequired(string in_Path)
-        {
-            return !string.IsNullOrWhiteSpace(in_Path) ?
-                in_Path.Contains(" ") && (!in_Path.StartsWith("\"") && !in_Path.EndsWith("\"")) ?
-                    "\"" + in_Path + "\"" : in_Path :
-                    string.Empty;
-        }
-        public static void ExecuteAsAdmin(string in_FileName)
-        {
-            //Reason for this try-catch statement is because
-            //if the user cancels the UAC prompt,
-            //an exception will be thrown
-            try
-            {
-                in_FileName = AddQuotesIfRequired(in_FileName);
-                Process proc = new Process();
-                proc.StartInfo.FileName = in_FileName;
-                proc.StartInfo.UseShellExecute = true;
-                proc.StartInfo.Verb = "runas";
-                proc.Start();
-            }
-            catch(Exception e)
-            {
-
-            }
         }
     }
 }

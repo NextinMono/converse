@@ -1,8 +1,6 @@
 ﻿using Amicitia.IO.Binary;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.Desktop;
 using Converse.Rendering;
-using SUFcoTool;
+using libfco;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,15 +8,18 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Texture = Converse.Rendering.Texture;
+using HekonrayBase;
+using System.Numerics;
+using ConverseEditor.ShurikenRenderer;
 
-namespace ConverseEditor.ShurikenRenderer
+namespace ConverseEditor
 {
-    public class ConverseProject
+    public class ConverseProject : IProgramProject
     {
         public struct SViewportData
         {
             public int csdRenderTextureHandle;
-            public Vector2i framebufferSize;
+            public Vector2Int framebufferSize;
             public int renderbufferHandle;
             public int framebufferHandle;
         }
@@ -31,21 +32,18 @@ namespace ConverseEditor.ShurikenRenderer
             public string WorkFilePathFTE;
         }
         public List<ConverseEditor.Window> windowList = new List<ConverseEditor.Window>();
-        public Renderer renderer;
-        public Vector2 viewportSize;
-        public Vector2 screenSize;
         public FontConverse fcoFile;
         public FontTexture fteFile;
         public static SProjectConfig config;
         private SViewportData viewportData;
         public bool isFileLoaded = false;
-
-        public ConverseProject(GameWindow window2, Vector2 in_ViewportSize, Vector2 clientSize)
+        public MainWindow window;
+        public Vector2 screenSize => new Vector2(window.WindowSize.X, window.WindowSize.Y);
+        public ConverseProject(MainWindow in_Window)
         {
-            viewportSize = in_ViewportSize;
+            window = in_Window;
             viewportData = new SViewportData();
             config = new SProjectConfig();
-            screenSize = clientSize;
         }
 
         public void ShowMessageBoxCross(string title, string message, int logType = 0)
@@ -109,24 +107,24 @@ namespace ConverseEditor.ShurikenRenderer
             if (!LoadFCO(in_Path) || !LoadFTE(in_PathFte))
                 return;
             string parentPath = Directory.GetParent(config.WorkFilePath).FullName;
-            SpriteHelper.textureList = new("");
+            SpriteHelper.Textures = new();
 
             List<string> missingTextures = new List<string>();
             foreach (var texture in fteFile.Textures)
             {
                 string pathtemp = Path.Combine(parentPath, texture.Name + ".dds");
                 if (File.Exists(pathtemp))
-                    SpriteHelper.textureList.Textures.Add(new Texture(pathtemp, false));
+                    SpriteHelper.Textures.Add(new Texture(pathtemp));
                 else
                 {
-                    var commonPathTexture = Path.Combine(Program.Directory,"Resources","CommonTextures",texture.Name + ".dds");
+                    var commonPathTexture = Path.Combine(Program.Path,"Resources","CommonTextures",texture.Name + ".dds");
                     if (File.Exists(commonPathTexture))
                     {
-                        SpriteHelper.textureList.Textures.Add(new Texture(commonPathTexture, false));
+                        SpriteHelper.Textures.Add(new Texture(commonPathTexture));
                     }
                     else
                     {
-                        SpriteHelper.textureList.Textures.Add(new Texture("", false));
+                        SpriteHelper.Textures.Add(new Texture(""));
                         missingTextures.Add(texture.Name);
                     }
                 }
@@ -145,7 +143,7 @@ namespace ConverseEditor.ShurikenRenderer
             //Gens FCO, load All table automatically since it only uses that
             if (fcoFile.Header.Version != 0)
             {
-                string path = Path.Combine(Program.ResourcesDirectory, "Tables", "bb", "All.json");
+                string path = Path.Combine(Program.Path, "Resources", "Tables", "bb", "All.json");
                 FcoViewerWindow.Instance.LoadTranslationTable(path);
             }
         }

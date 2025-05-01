@@ -2,7 +2,7 @@
 using ConverseEditor.ShurikenRenderer;
 using ConverseEditor.Utility;
 using Hexa.NET.ImGui;
-using SUFcoTool;
+using libfco;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -30,12 +30,12 @@ namespace ConverseEditor
                 in_Color.Y = 1;
                 in_Color.Z = 1;
             }
-            ConverseEditor.ShurikenRenderer.Vector2 uvTL = new ConverseEditor.ShurikenRenderer.Vector2(
+            Vector2 uvTL = new Vector2(
                         spr.Start.X / spr.Texture.Width,
                         -(spr.Start.Y / spr.Texture.Height));
 
 
-            ConverseEditor.ShurikenRenderer.Vector2 uvBR = uvTL + new ConverseEditor.ShurikenRenderer.Vector2(
+            Vector2 uvBR = uvTL + new Vector2(
             spr.Dimensions.X / spr.Texture.Width,
             -(spr.Dimensions.Y / spr.Texture.Height));
 
@@ -44,7 +44,7 @@ namespace ConverseEditor
                 //Draw sprite
                 ImGui.SameLine(0, in_OffsetX);
 
-                ImGui.Image(new ImTextureID(spr.Texture.GlTex.ID), new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y) * in_FontSize, uvTL, uvBR, in_Color);
+                ImGui.Image(new ImTextureID(spr.Texture.GlTex.Id), new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y) * in_FontSize, uvTL, uvBR);
                 
             
             return spr.Dimensions.Y * in_FontSize;
@@ -132,7 +132,7 @@ namespace ConverseEditor
                 }
             }
         }
-        public static float DrawCellFromFTE(SUFcoTool.Cell in_Cell, int[] in_ConverseIDs, float in_FontSize, ref List<SLineInfo> in_LineWidths)
+        public static float DrawCellFromFTE(libfco.Cell in_Cell, int[] in_ConverseIDs, float in_FontSize, ref List<SLineInfo> in_LineWidths)
         {
             CalculateAlignmentSpacing(in_Cell, in_ConverseIDs, in_FontSize, ref in_LineWidths);
             int lineIdx = 0;

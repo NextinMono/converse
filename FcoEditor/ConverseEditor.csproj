@@ -79,21 +79,21 @@
   <Content Remove="Resources\Tables\Subtitle\Spanish\Retail\evrt_m1_01.json" />
 </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="BCnEncoder.Net.ImageSharp" Version="1.1.1" />
+    <PackageReference Include="BCnEncoder.Net.ImageSharp" Version="1.1.2" />
     <PackageReference Include="DirectXTexNet" Version="1.0.7" />
-    <PackageReference Include="Hexa.NET.ImGui" Version="2.2.3" />
-    <PackageReference Include="Hexa.NET.ImGuizmo" Version="2.2.2" />
-    <PackageReference Include="Hexa.NET.ImPlot" Version="2.2.3" />
-    <PackageReference Include="Hexa.NET.Utilities" Version="2.2.0" />
+    <PackageReference Include="Hexa.NET.ImGui" Version="2.2.7" />
+    <PackageReference Include="Hexa.NET.ImGuizmo" Version="2.2.7" />
+    <PackageReference Include="Hexa.NET.ImPlot" Version="2.2.7" />
+    <PackageReference Include="Hexa.NET.Utilities" Version="2.2.2" />
     <PackageReference Include="NativeFileDialogSharp" Version="0.5.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
-    <PackageReference Include="OpenTK" Version="4.9.3" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.5" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FileTypeRegisterService\FileTypeRegisterService.csproj" />
+    <ProjectReference Include="..\hkrybase\HekonrayBase\HekonrayBase.csproj" />
     <ProjectReference Include="..\libfco\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj" />
     <ProjectReference Include="..\libfco\Source\libfco.csproj" />
     <ProjectReference Include="..\settings-system\SpettroSettings.csproj" />

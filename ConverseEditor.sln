@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpettroSettings", "settings
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileTypeRegisterService", "FileTypeRegisterService\FileTypeRegisterService.csproj", "{CD448A93-E7C7-4045-8FBA-DD0EE564275E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HekonrayBase", "hkrybase\HekonrayBase\HekonrayBase.csproj", "{79BE5A21-FE6F-4EB8-A237-90D0B343A082}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{CD448A93-E7C7-4045-8FBA-DD0EE564275E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CD448A93-E7C7-4045-8FBA-DD0EE564275E}.Release|x64.ActiveCfg = Release|Any CPU
 		{CD448A93-E7C7-4045-8FBA-DD0EE564275E}.Release|x64.Build.0 = Release|Any CPU
+		{79BE5A21-FE6F-4EB8-A237-90D0B343A082}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79BE5A21-FE6F-4EB8-A237-90D0B343A082}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79BE5A21-FE6F-4EB8-A237-90D0B343A082}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{79BE5A21-FE6F-4EB8-A237-90D0B343A082}.Debug|x64.Build.0 = Debug|Any CPU
+		{79BE5A21-FE6F-4EB8-A237-90D0B343A082}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79BE5A21-FE6F-4EB8-A237-90D0B343A082}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79BE5A21-FE6F-4EB8-A237-90D0B343A082}.Release|x64.ActiveCfg = Release|Any CPU
+		{79BE5A21-FE6F-4EB8-A237-90D0B343A082}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
