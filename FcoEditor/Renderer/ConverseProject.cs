@@ -155,7 +155,7 @@ namespace ConverseEditor
             if (config.fcoFile.Header.Version != 0)
             {
                 string path = Path.Combine(Program.Path, "Resources", "Tables", "bb", "All.json");
-                LoadTranslationTable(path);
+                ImportTranslationTable(path);
             }
         }
         public int GetViewportImageHandle()
@@ -169,32 +169,36 @@ namespace ConverseEditor
             //if(fcoFile != null)
             //    fcoFile.Write(in_Path);
         }
-        public void LoadTranslationTable(string @in_Path)
+        public void ImportTranslationTable(string @in_Path)
         {
+            config.translationTable.Clear();
             config.tablePath = in_Path;
             config.translationTable = TranslationTable.Read(@in_Path).Tables["Standard"];
             AddMissingFteEntriesToTable(config.translationTable, true);
         }
-        void AddMissingFteEntriesToTable(List<TranslationTable.Entry> in_Entries, bool isUnleashed)
+        void AddMissingFteEntriesToTable(List<TranslationTable.Entry> in_Entries, bool isUnleashed, bool in_AddDefault = true)
         {
-            if (isUnleashed)
+            if (in_AddDefault)
             {
-                //Add default icons
-                List<string> keys = new List<string>
+                if (isUnleashed)
+                {
+                    //Add default icons
+                    List<string> keys = new List<string>
                 {
                     "{A}", "{B}", "{X}", "{Y}", "{LB}", "{RB}", "{LT}", "{RT}",
                     "{LSUP}", "{LSRIGHT}", "{LSDOWN}", "{LSLEFT}", "{RSUP}", "{RSRIGHT}",
                     "{RSDOWN}", "{RSLEFT}", "{DPADUP}", "{DPADRIGHT}", "{DPADDOWN}",
                     "{DPADLEFT}", "{START}", "{SELECT}"
                 };
-                //Add first set of keys unaltered
-                int index = 100;
-                foreach (string key in keys)
-                {
-                    in_Entries.Add(new TranslationTable.Entry(key, index));
-                    index++;
-                }
+                    //Add first set of keys unaltered
+                    int index = 100;
+                    foreach (string key in keys)
+                    {
+                        in_Entries.Add(new TranslationTable.Entry(key, index));
+                        index++;
+                    }
 
+                }
             }
             for (int i = 0; i < in_Entries.Count; i++)
             {
@@ -215,11 +219,11 @@ namespace ConverseEditor
             }
         }
 
-        public void CreateTranslationTable()
+        public void CreateTranslationTable(bool in_AddDefault = true)
         {
             config.translationTable = new List<TranslationTable.Entry>();
             config.translationTable.Add(new TranslationTable.Entry("\\n", 0));
-            AddMissingFteEntriesToTable(config.translationTable, config.fcoFile.Header.Version == 0);
+            AddMissingFteEntriesToTable(config.translationTable, config.fcoFile.Header.Version == 0, in_AddDefault);
         }
 
         public void WriteTableToDisk(string @in_Path)

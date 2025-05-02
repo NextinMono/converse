@@ -197,12 +197,8 @@ namespace ConverseEditor
         }
         public static void InputTextCell(int[] in_ConverseIDs, string in_CellName, ref Cell in_Cell, List<TranslationTable.Entry> translationTableNew, int in_Index, int in_LineCount)
         {
-            bool tablePresent = translationTableNew?.Count >= 1;
-            ImGui.BeginDisabled(!tablePresent);
-            string cellMessageConverted =
-                !tablePresent
-                ? GetMessageAsString(in_Cell.Message)
-                : TranslationService.RawHEXtoTXT(in_ConverseIDs, translationTableNew);
+            bool tablePresent = translationTableNew?.Count > 1;
+            string cellMessageConverted = TranslationService.RawHEXtoTXT(in_ConverseIDs, translationTableNew);
             cellMessageConverted = cellMessageConverted.Replace("@@", "");
             if (ImGui.InputTextMultiline($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 512, new System.Numerics.Vector2(-1, ImGui.GetTextLineHeight() * in_LineCount)))
             {
@@ -210,13 +206,12 @@ namespace ConverseEditor
                 in_Cell.Message = joinedIDs2;
             }
 
-            ImGui.EndDisabled();
             if (!tablePresent)
             {
-                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.BeginTooltip();
-                    ImGui.Text("You cannot edit text unless you have a Translation Table open.");
+                    ImGui.Text("You need a Translation Table to be able to type text directly.");
                     ImGui.EndTooltip();
                 }
             }

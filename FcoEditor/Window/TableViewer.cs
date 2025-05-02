@@ -24,7 +24,7 @@ namespace ConverseEditor
                     var testdial = NativeFileDialogSharp.Dialog.FileOpen("json");
                     if (testdial.IsOk)
                     {
-                        renderer.LoadTranslationTable(@testdial.Path);
+                        renderer.ImportTranslationTable(@testdial.Path);
                     }
                 }
                 ImGui.SameLine();
