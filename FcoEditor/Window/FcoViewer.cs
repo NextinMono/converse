@@ -57,21 +57,18 @@ namespace ConverseEditor
             System.Numerics.Vector2 modalSize = new System.Numerics.Vector2(350, 100);
 
             // Calculate centered position
-            var viewport = ImGui.GetMainViewport();
-            System.Numerics.Vector2 centerPos = new System.Numerics.Vector2(
-                viewport.WorkPos.X + (viewport.WorkSize.X - modalSize.X) * 0.5f,
-                viewport.WorkPos.Y + (viewport.WorkSize.Y - modalSize.Y) * 0.5f
-            );
-            ImGui.SetNextWindowPos(centerPos);
-            ImGui.SetNextWindowSize(modalSize);
+            ImConverse.CenterWindow(modalSize);
             if (ImGui.BeginPopupModal("Rename", ref renamingGroup, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove))
             {
                 string newName = in_Renderer.config.fcoFile.Groups[selectedGroupIndex].Name;
                 ImGui.InputText("New Name", ref newName, 256);
                 in_Renderer.config.fcoFile.Groups[selectedGroupIndex].Name = newName;
                 ImGui.Separator();
-                if (ImGui.Button("OK"))
+                if (ImGui.Button("OK") || ImGui.IsKeyPressed(ImGuiKey.Enter))
+                {
+                    renamingGroup = false;
                     ImGui.CloseCurrentPopup();
+                }
                 ImGui.EndPopup();
             }
         }

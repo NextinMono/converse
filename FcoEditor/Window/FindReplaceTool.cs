@@ -5,6 +5,7 @@ using Hexa.NET.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace ConverseEditor
 {
@@ -16,7 +17,8 @@ namespace ConverseEditor
         public static void Render(ConverseProject in_Renderer)
         {
             ImGui.OpenPopup("Find and Replace");
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(500, 400));
+            Vector2 size = new System.Numerics.Vector2(500, 400);
+            ImConverse.CenterWindow(size);
             if (ImGui.BeginPopupModal("Find and Replace", ref Enabled, ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
             {
                 ImGui.BeginDisabled(!in_Renderer.IsTableLoaded());

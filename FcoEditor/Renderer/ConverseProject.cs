@@ -27,7 +27,7 @@ namespace ConverseEditor
         }
         public struct SProjectConfig
         {
-            public FontConverse fcoFile;
+            public /*List<FontConverse>*/FontConverse fcoFile;
             public FontTexture fteFile;
             public string fcoPath;
             public string ftePath;
@@ -38,6 +38,7 @@ namespace ConverseEditor
             public double time;
             public SProjectConfig()
             {
+                //fcoFile = new List<FontConverse>();
                 translationTable = new List<TranslationTable.Entry>();
             }
         }
@@ -77,16 +78,19 @@ namespace ConverseEditor
                 System.Windows.MessageBox.Show(message, title, System.Windows.MessageBoxButton.OK, image);
             }
         }
-        private bool LoadFCO(string in_Path)
+        private bool LoadFCO(string in_Path, bool in_OnlyOne = true)
         {
-            BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
+            //if (in_OnlyOne)
+            //    config.fcoFile.Clear();
             try
             {
+                BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
                 config.fcoFile = reader.ReadObject<FontConverse>();
             }
             catch (Exception ex)
             {
                 isFileLoaded = false;
+                config.fcoPath = "";
                 config.fcoFile = null;
                 config.fteFile = null;
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FCO file.\n{ex.Message}", 2);
@@ -96,14 +100,15 @@ namespace ConverseEditor
         }
         private bool LoadFTE(string in_Path)
         {
-            BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
             try
             {
+                BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
                 config.fteFile = reader.ReadObject<FontTexture>();
             }
             catch (Exception ex)
             {
                 isFileLoaded = false;
+                config.ftePath = "";
                 config.fcoFile = null;
                 config.fteFile = null;
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FTE file.\n{ex.Message}", 2);

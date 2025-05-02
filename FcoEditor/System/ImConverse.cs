@@ -18,9 +18,22 @@ namespace ConverseEditor
         {
             ImGui.SameLine(0);
             ImGui.SetNextItemWidth(50);
+            ImGui.PushID($"{Random.Shared.Next(0, 1000)}_{in_ConvID}");
             ImGui.Button(in_ConvID.ToString());
+            ImGui.PopID();
         }
 
+        public static void CenterWindow(Vector2 in_Size)
+        {
+            // Calculate centered position
+            var viewport = ImGui.GetMainViewport();
+            System.Numerics.Vector2 centerPos = new System.Numerics.Vector2(
+                viewport.WorkPos.X + (viewport.WorkSize.X - in_Size.X) * 0.5f,
+                viewport.WorkPos.Y + (viewport.WorkSize.Y - in_Size.Y) * 0.5f
+            );
+            ImGui.SetNextWindowPos(centerPos);
+            ImGui.SetNextWindowSize(in_Size);
+        }
         public static void EndListBoxCustom()
         {
             ImGui.EndGroup();

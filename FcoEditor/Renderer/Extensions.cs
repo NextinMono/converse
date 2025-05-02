@@ -1,9 +1,14 @@
-﻿using ConverseEditor.ShurikenRenderer;
+﻿using ConverseEditor.Rendering;
+using ConverseEditor.ShurikenRenderer;
 using System;
 using System.Text;
 
 public static class ExtensionKillMe
 {
+    public static bool IsNull(this Sprite spr)
+    {
+        return (spr == null || spr.Texture.GlTex == null);
+    }
     public unsafe static byte* StringToBytePointer(this string str)
     {
         if (str == null)
