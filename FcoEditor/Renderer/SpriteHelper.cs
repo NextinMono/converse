@@ -1,13 +1,13 @@
 ﻿
-using Converse.Rendering;
+using ConverseEditor.Rendering;
 using libfco;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Numerics;
 using System.Windows.Media;
-using Sprite = Converse.Rendering.Sprite;
-using Texture = Converse.Rendering.Texture;
+using Sprite = ConverseEditor.Rendering.Sprite;
+using Texture = ConverseEditor.Rendering.Texture;
 namespace ConverseEditor.ShurikenRenderer
 {
     public struct Crop
@@ -95,7 +95,7 @@ namespace ConverseEditor.ShurikenRenderer
     public static class SpriteHelper
     {
         public static Dictionary<Character, int> CharSprites = new Dictionary<Character, int>();
-        public static Dictionary<int, Converse.Rendering.Sprite> Sprites { get; set; } = new Dictionary<int, Sprite>();
+        public static Dictionary<int, Sprite> Sprites { get; set; } = new Dictionary<int, Sprite>();
         private static int NextSpriteID = 0;
         private static List<Crop> ncpSubimages = new List<Crop>();
         public static List<Texture> Textures { get; set; } = new List<Texture>();

@@ -1,5 +1,5 @@
 ﻿
-namespace Converse.Rendering.Gvr
+namespace ConverseEditor.Rendering.Gvr
 {
     class GvrImageDataFormatIndex4 : GvrImageDataFormat
     {

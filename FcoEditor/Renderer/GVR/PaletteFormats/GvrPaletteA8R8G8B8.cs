@@ -1,6 +1,6 @@
-﻿using Converse.Rendering.Gvr;
+﻿using ConverseEditor.Rendering.Gvr;
 
-namespace Converse.Rendering.Gvr
+namespace ConverseEditor.Rendering.Gvr
 {
     class GvrPaletteA8R8G8B8 : GvrPaletteDataFormat
     {

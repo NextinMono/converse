@@ -1,5 +1,5 @@
 ﻿using Amicitia.IO.Binary;
-using Converse.Rendering;
+using ConverseEditor.Rendering;
 using libfco;
 using System;
 using System.Collections.Generic;
@@ -7,10 +7,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using Texture = Converse.Rendering.Texture;
+using Texture = ConverseEditor.Rendering.Texture;
 using HekonrayBase;
 using System.Numerics;
 using ConverseEditor.ShurikenRenderer;
+using ConverseEditor.Utility;
 
 namespace ConverseEditor
 {
@@ -25,16 +26,22 @@ namespace ConverseEditor
         }
         public struct SProjectConfig
         {
-            public string WorkFilePath;
+            public FontConverse fcoFile;
+            public FontTexture fteFile;
+            public string fcoPath;
+            public string ftePath;
+            public string tablePath;
+            public List<TranslationTable.Entry> translationTable;
             public bool playingAnimations;
             public bool showQuads;
             public double time;
-            public string WorkFilePathFTE;
+            public SProjectConfig()
+            {
+                translationTable = new List<TranslationTable.Entry>();
+            }
         }
         public List<ConverseEditor.Window> windowList = new List<ConverseEditor.Window>();
-        public FontConverse fcoFile;
-        public FontTexture fteFile;
-        public static SProjectConfig config;
+        public SProjectConfig config;
         private SViewportData viewportData;
         public bool isFileLoaded = false;
         public MainWindow window;
@@ -71,13 +78,13 @@ namespace ConverseEditor
             BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
             try
             {
-                fcoFile = reader.ReadObject<FontConverse>();
+                config.fcoFile = reader.ReadObject<FontConverse>();
             }
             catch (Exception ex)
             {
                 isFileLoaded = false;
-                fcoFile = null;
-                fteFile = null;
+                config.fcoFile = null;
+                config.fteFile = null;
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FCO file.\n{ex.Message}", 2);
                 return false;
             }
@@ -88,13 +95,13 @@ namespace ConverseEditor
             BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
             try
             {
-                fteFile = reader.ReadObject<FontTexture>();
+                config.fteFile = reader.ReadObject<FontTexture>();
             }
             catch (Exception ex)
             {
                 isFileLoaded = false;
-                fcoFile = null;
-                fteFile = null;
+                config.fcoFile = null;
+                config.fteFile = null;
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FTE file.\n{ex.Message}", 2);
                 return false;
             }
@@ -102,15 +109,15 @@ namespace ConverseEditor
         }
         public void LoadFile(string in_Path, string in_PathFte)
         {
-            config.WorkFilePath = in_Path;
-            config.WorkFilePathFTE = in_PathFte;
+            config.fcoPath = in_Path;
+            config.ftePath = in_PathFte;
             if (!LoadFCO(in_Path) || !LoadFTE(in_PathFte))
                 return;
-            string parentPath = Directory.GetParent(config.WorkFilePath).FullName;
+            string parentPath = Directory.GetParent(config.fcoPath).FullName;
             SpriteHelper.Textures = new();
 
             List<string> missingTextures = new List<string>();
-            foreach (var texture in fteFile.Textures)
+            foreach (var texture in config.fteFile.Textures)
             {
                 string pathtemp = Path.Combine(parentPath, texture.Name + ".dds");
                 if (File.Exists(pathtemp))
@@ -137,14 +144,14 @@ namespace ConverseEditor
                 ShowMessageBoxCross("Warning", $"The file uses textures that could not be found, they will be replaced with text.\n\nMissing Textures:\n{textureNames}", 1);
             }
             ResetWindows();
-            SpriteHelper.LoadTextures(fteFile.Characters);
+            SpriteHelper.LoadTextures(config.fteFile.Characters);
             isFileLoaded = true;
 
             //Gens FCO, load All table automatically since it only uses that
-            if (fcoFile.Header.Version != 0)
+            if (config.fcoFile.Header.Version != 0)
             {
                 string path = Path.Combine(Program.Path, "Resources", "Tables", "bb", "All.json");
-                FcoViewerWindow.Instance.LoadTranslationTable(path);
+                LoadTranslationTable(path);
             }
         }
         public int GetViewportImageHandle()
@@ -154,7 +161,7 @@ namespace ConverseEditor
         public void SaveCurrentFile(string in_Path)
         {
             BinaryObjectWriter writer = new BinaryObjectWriter(in_Path, Endianness.Big, Encoding.UTF8);
-            writer.WriteObject(fcoFile);
+            writer.WriteObject(config.fcoFile);
             //if(fcoFile != null)
             //    fcoFile.Write(in_Path);
         }
@@ -172,5 +179,70 @@ namespace ConverseEditor
                 item.OnReset(this);
             }
         }
+
+
+        public void LoadTranslationTable(string @in_Path)
+        {
+            config.tablePath = in_Path;
+            config.translationTable = TranslationTable.Read(@in_Path).Tables["Standard"];
+            AddMissingFteEntriesToTable(config.translationTable, true);
+        }
+        void AddMissingFteEntriesToTable(List<TranslationTable.Entry> in_Entries, bool isUnleashed)
+        {
+            if (isUnleashed)
+            {
+                //Add default icons
+                List<string> keys = new List<string>
+                {
+                    "{A}", "{B}", "{X}", "{Y}", "{LB}", "{RB}", "{LT}", "{RT}",
+                    "{LSUP}", "{LSRIGHT}", "{LSDOWN}", "{LSLEFT}", "{RSUP}", "{RSRIGHT}",
+                    "{RSDOWN}", "{RSLEFT}", "{DPADUP}", "{DPADRIGHT}", "{DPADDOWN}",
+                    "{DPADLEFT}", "{START}", "{SELECT}"
+                };
+                //Add first set of keys unaltered
+                int index = 100;
+                foreach (string key in keys)
+                {
+                    in_Entries.Add(new TranslationTable.Entry(key, index));
+                    index++;
+                }
+
+            }
+            for (int i = 0; i < in_Entries.Count; i++)
+            {
+                //Replace legacy newline with new style
+                if (in_Entries[i].Letter == "{NewLine}")
+                {
+                    var entry2 = in_Entries[i];
+                    entry2.Letter = "\n";
+                    in_Entries[i] = entry2;
+                }
+            }
+            foreach (var spr in SpriteHelper.CharSprites)
+            {
+                if (in_Entries.FindAll(x => x.ConverseID == spr.Key.CharacterID).Count == 0)
+                {
+                    in_Entries.Add(new TranslationTable.Entry("", spr.Key.CharacterID));
+                }
+            }
+        }
+
+        public void CreateTranslationTable()
+        {
+            config.translationTable = new List<TranslationTable.Entry>();
+            config.translationTable.Add(new TranslationTable.Entry("\\n", 0));
+            AddMissingFteEntriesToTable(config.translationTable, config.fcoFile.Header.Version == 0);
+        }
+
+        public void WriteTableToDisk(string @in_Path)
+        {
+            TranslationTable table = new TranslationTable();
+            table.Standard = config.translationTable;
+            table.Write(@in_Path);
+        }
+
+        internal bool IsFcoLoaded() => !string.IsNullOrEmpty(config.fcoPath);
+        internal bool IsFteLoaded() => !string.IsNullOrEmpty(config.ftePath);
+        internal bool IsTableLoaded() => config.translationTable.Count > 0;
     }
 }

@@ -14,14 +14,13 @@ namespace ConverseEditor
         public static string replaceString = "";
         public static void Render(ConverseProject in_Renderer)
         {
-
-            ImGui.BeginDisabled(!FcoViewerWindow.Instance.tablePresent);
+            ImGui.BeginDisabled(!in_Renderer.IsTableLoaded());
             ImGui.InputTextMultiline("Find", ref findString, 1024);
             ImGui.InputTextMultiline("Replace", ref replaceString, 1024);
             if (ImGui.Button("Execute"))
                 ReplaceText(in_Renderer);
 
-            if (!FcoViewerWindow.Instance.tablePresent)
+            if (!in_Renderer.IsTableLoaded())
             {
                 if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
                 {
@@ -46,9 +45,9 @@ namespace ConverseEditor
         }
         private static void ReplaceText(ConverseProject in_Renderer)
         {
-            var hexFind = TranslationService.RawTXTtoHEX(findString, FcoViewerWindow.Instance.translationTableNew);
-            var hexReplace = TranslationService.RawTXTtoHEX(replaceString, FcoViewerWindow.Instance.translationTableNew);
-            foreach (var group in in_Renderer.fcoFile.Groups)
+            var hexFind = TranslationService.RawTXTtoHEX(findString, in_Renderer.config.translationTable);
+            var hexReplace = TranslationService.RawTXTtoHEX(replaceString, in_Renderer.config.translationTable);
+            foreach (var group in in_Renderer.config.fcoFile.Groups)
             {
                 foreach(var cell in group.CellList)
                 {

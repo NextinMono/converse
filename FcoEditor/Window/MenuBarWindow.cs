@@ -105,7 +105,7 @@ namespace ConverseEditor
                     }
                     if (ImGui.MenuItem("Save", "Ctrl + S"))
                     {
-                        renderer.SaveCurrentFile(ConverseProject.config.WorkFilePath);
+                        renderer.SaveCurrentFile(renderer.config.fcoPath);
                     }
                     if (ImGui.MenuItem("Save As...", "Ctrl + Alt + S"))
                     {

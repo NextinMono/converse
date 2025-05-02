@@ -5,7 +5,7 @@ using System;
 using System.Numerics;
 using ConverseEditor.ShurikenRenderer;
 
-namespace Converse.Rendering
+namespace ConverseEditor.Rendering
 {
     public class SLineInfo
     {

@@ -2,7 +2,7 @@
 using System.Text.Json;
 
 //Taken from GVRTool, which in turn takes it from Puyotools
-namespace Converse.Rendering.Gvr
+namespace ConverseEditor.Rendering.Gvr
 {
     class GVRMetadata
     {

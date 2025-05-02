@@ -45,7 +45,7 @@ namespace ConverseEditor
             //    converseProject.windowList.Add(SettingsWindow.Instance);
             Windows.Add(ModalHandler.Instance);
             Windows.Add(new MenuBarWindow());
-            Windows.Add(new FcoViewerWindow());
+            Windows.Add(new ViewportWindow());
             Windows.Add(new SettingsWindow());
             SettingsWindow.Instance.OnReset(null);
         }

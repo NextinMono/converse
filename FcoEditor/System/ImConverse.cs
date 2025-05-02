@@ -1,4 +1,4 @@
-﻿using Converse.Rendering;
+﻿using ConverseEditor.Rendering;
 using ConverseEditor.ShurikenRenderer;
 using ConverseEditor.Utility;
 using Hexa.NET.ImGui;
@@ -111,7 +111,7 @@ namespace ConverseEditor
             bool tablePresent = translationTableNew?.Count >= 1;
             ImGui.BeginDisabled(!tablePresent);
             string cellMessageConverted =
-                translationTableNew == null
+                !tablePresent
                 ? GetMessageAsString(in_Cell.Message)
                 : TranslationService.RawHEXtoTXT(in_ConverseIDs, translationTableNew);
             cellMessageConverted = cellMessageConverted.Replace("@@", "");
