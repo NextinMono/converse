@@ -7,6 +7,7 @@ using System.Numerics;
 
 namespace ConverseEditor
 {
+
     public static class FcoViewer
     {
         static int selectedGroupIndex;
@@ -20,50 +21,32 @@ namespace ConverseEditor
         {
             ImGui.BeginGroup();
             ImGui.Text("Groups");
-            if (ImGui.BeginListBox("##groupslist", new System.Numerics.Vector2(ImGui.GetWindowSize().X / 3, -1)))
+            if (ImConverse.BeginListBoxCustom("##groupslist", new System.Numerics.Vector2(ImGui.GetWindowSize().X / 3, -1)))
             {
                 if (in_FcoFilePresent)
                 {
-                    bool addNewGroup = false;
                     for (int i = 0; i < in_Renderer.config.fcoFile.Groups.Count; i++)
                     {
-                        int selectedGroup = selectedGroupIndex;
-
-                        if (selectedGroup == i)
+                        if (selectedGroupIndex == i)
                             ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 0.6f, 0, 1));
 
-                        if (ImGui.Selectable(string.IsNullOrEmpty(in_Renderer.config.fcoFile.Groups[i].Name) ? $"Empty{i}" : in_Renderer.config.fcoFile.Groups[i].Name))
-                            selectedGroupIndex = i;
+                        string groupName = string.IsNullOrEmpty(in_Renderer.config.fcoFile.Groups[i].Name) ? $"Empty{i}" : in_Renderer.config.fcoFile.Groups[i].Name;
+                        bool isOpen = false, isSelected = selectedGroupIndex == i;
+                        if (ImConverse.VisibilityNode(groupName, ref isOpen, ref isSelected, delegate { RightClickGroup(in_Renderer, i); }, false, NodeIconResource.Group))
+                            ImGui.TreePop();
 
-
-                        if (selectedGroup == i)
+                        if (selectedGroupIndex == i)
                             ImGui.PopStyleColor(1);
 
-                        if (ImGui.BeginPopupContextItem())
-                        {
-                            if (ImGui.Selectable("New Group"))
-                            {
-                                addNewGroup = true;
-                            }
-                            if (ImGui.Selectable("Rename"))
-                            {
-                                renamingGroup = true;
-                                selectedGroupIndex = i;
-                            }
-                            ImGui.EndPopup();
-                        }
-
-                    }
-                    if (addNewGroup)
-                    {
-                        in_Renderer.config.fcoFile.Groups.Add(new Group($"New_Group_{in_Renderer.config.fcoFile.Groups.Count}"));
+                        if (isSelected)
+                            selectedGroupIndex = i;
                     }
                 }
                 else
                 {
                     ImGui.Text("Open an FCO file to view its contents.");
                 }
-                ImGui.EndListBox();
+                ImConverse.EndListBoxCustom();
             }
             ImGui.EndGroup();
             if (renamingGroup)
@@ -90,6 +73,19 @@ namespace ConverseEditor
                 if (ImGui.Button("OK"))
                     ImGui.CloseCurrentPopup();
                 ImGui.EndPopup();
+            }
+        }
+
+        private static void RightClickGroup(ConverseProject in_Renderer, int in_CurrentGroup)
+        {
+            if (ImGui.Selectable("New Group"))
+            {
+                in_Renderer.AddNewGroup();
+            }
+            if (ImGui.Selectable("Rename"))
+            {
+                renamingGroup = true;
+                selectedGroupIndex = in_CurrentGroup;
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using ConverseEditor.ShurikenRenderer;
 using ConverseEditor.Utility;
+using HekonrayBase;
 using Hexa.NET.ImGui;
 using System;
 using System.Collections.Generic;
@@ -14,23 +15,36 @@ namespace ConverseEditor
         public static string replaceString = "";
         public static void Render(ConverseProject in_Renderer)
         {
-            ImGui.BeginDisabled(!in_Renderer.IsTableLoaded());
-            ImGui.InputTextMultiline("Find", ref findString, 1024);
-            ImGui.InputTextMultiline("Replace", ref replaceString, 1024);
-            if (ImGui.Button("Execute"))
-                ReplaceText(in_Renderer);
-
-            if (!in_Renderer.IsTableLoaded())
+            ImGui.OpenPopup("Find and Replace");
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(500, 400));
+            if (ImGui.BeginPopupModal("Find and Replace", ref Enabled, ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
             {
-                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                ImGui.BeginDisabled(!in_Renderer.IsTableLoaded());
+                ImGui.InputTextMultiline("Find", ref findString, 1024);
+                ImGui.InputTextMultiline("Replace", ref replaceString, 1024);
+                ImGui.Separator();
+                if (ImGui.Button("Execute"))
+                    ReplaceText(in_Renderer);
+
+                if (!in_Renderer.IsTableLoaded())
                 {
-                    ImGui.BeginTooltip();
-                    ImGui.Text("You cannot edit text unless you have a Translation Table open.");
-                    ImGui.EndTooltip();
+                    if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                    {
+                        ImGui.BeginTooltip();
+                        ImGui.Text("You cannot edit text unless you have a Translation Table open.");
+                        ImGui.EndTooltip();
+                    }
                 }
+                ImGui.EndDisabled();
+                ImGui.SameLine();
+                if (ImGui.Button("Cancel"))
+                {
+                    ImGui.CloseCurrentPopup();
+                    Enabled = false;
+                }
+                ImGui.EndPopup();
             }
-            ImGui.Separator();
-            ImGui.EndDisabled();
+            
         }
         static int FindSequenceIndex(int[] list, int[] sequence)
         {

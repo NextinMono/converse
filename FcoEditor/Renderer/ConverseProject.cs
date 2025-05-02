@@ -12,10 +12,11 @@ using HekonrayBase;
 using System.Numerics;
 using ConverseEditor.ShurikenRenderer;
 using ConverseEditor.Utility;
+using HekonrayBase.Base;
 
 namespace ConverseEditor
 {
-    public class ConverseProject : IProgramProject
+    public class ConverseProject : Singleton<ConverseProject>, IProgramProject
     {
         public struct SViewportData
         {
@@ -40,19 +41,22 @@ namespace ConverseEditor
                 translationTable = new List<TranslationTable.Entry>();
             }
         }
-        public List<ConverseEditor.Window> windowList = new List<ConverseEditor.Window>();
         public SProjectConfig config;
         private SViewportData viewportData;
         public bool isFileLoaded = false;
         public MainWindow window;
         public Vector2 screenSize => new Vector2(window.WindowSize.X, window.WindowSize.Y);
+        public ConverseProject() { }
         public ConverseProject(MainWindow in_Window)
         {
             window = in_Window;
             viewportData = new SViewportData();
             config = new SProjectConfig();
         }
-
+        private void SendResetSignal()
+        {
+            window.ResetWindows(this);
+        }
         public void ShowMessageBoxCross(string title, string message, int logType = 0)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -143,7 +147,7 @@ namespace ConverseEditor
                     textureNames += "-" + textureName + "\n";
                 ShowMessageBoxCross("Warning", $"The file uses textures that could not be found, they will be replaced with text.\n\nMissing Textures:\n{textureNames}", 1);
             }
-            ResetWindows();
+            SendResetSignal();
             SpriteHelper.LoadTextures(config.fteFile.Characters);
             isFileLoaded = true;
 
@@ -165,22 +169,6 @@ namespace ConverseEditor
             //if(fcoFile != null)
             //    fcoFile.Write(in_Path);
         }
-        internal void RenderWindows()
-        {
-            foreach (var item in windowList)
-            {
-                item.Render(this);
-            }
-        }
-        void ResetWindows()
-        {
-            foreach (var item in windowList)
-            {
-                item.OnReset(this);
-            }
-        }
-
-
         public void LoadTranslationTable(string @in_Path)
         {
             config.tablePath = in_Path;
@@ -244,5 +232,10 @@ namespace ConverseEditor
         internal bool IsFcoLoaded() => !string.IsNullOrEmpty(config.fcoPath);
         internal bool IsFteLoaded() => !string.IsNullOrEmpty(config.ftePath);
         internal bool IsTableLoaded() => config.translationTable.Count > 0;
+
+        internal void AddNewGroup(string in_Name = null)
+        {
+            config.fcoFile.Groups.Add(new Group(string.IsNullOrEmpty(in_Name) ? $"New_Group_{config.fcoFile.Groups.Count}" : in_Name));
+        }
     }
 }

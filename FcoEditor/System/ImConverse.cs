@@ -3,6 +3,7 @@ using ConverseEditor.ShurikenRenderer;
 using ConverseEditor.Utility;
 using Hexa.NET.ImGui;
 using libfco;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -20,6 +21,11 @@ namespace ConverseEditor
             ImGui.Button(in_ConvID.ToString());
         }
 
+        public static void EndListBoxCustom()
+        {
+            ImGui.EndGroup();
+            ImGui.EndChild();
+        }
         public static float DrawConverseCharacter(Sprite spr, Vector4 in_Color, float in_OffsetX, float in_FontSize)
         {
             //TEMPORARY
@@ -105,6 +111,89 @@ namespace ConverseEditor
         static string GetMessageAsString(int[] in_IDs)
         {
             return string.Join(", ", in_IDs);
+        }
+        public static bool VisibilityNode(string in_Name, ref bool in_Visibile, ref bool in_IsSelected, Action in_RightClickAction = null, bool in_ShowArrow = true, SIconData in_Icon = new(), string in_Id = "")
+        {
+            bool returnVal = true;
+            bool idPresent = !string.IsNullOrEmpty(in_Id);
+            string idName = idPresent ? in_Id : in_Name;
+            //Make header fit the content
+            ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new System.Numerics.Vector2(0, 3));
+            var isLeaf = !in_ShowArrow ? ImGuiTreeNodeFlags.Leaf : ImGuiTreeNodeFlags.None;
+            returnVal = ImGui.TreeNodeEx($"##{idName}header", isLeaf | ImGuiTreeNodeFlags.SpanFullWidth | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.AllowOverlap);
+            ImGui.PopStyleVar();
+            //Rightclick action
+            if (in_RightClickAction != null)
+            {
+                if (ImGui.BeginPopupContextItem())
+                {
+                    in_RightClickAction.Invoke();
+                    ImGui.EndPopup();
+                }
+            }
+            //Visibility checkbox
+            //ImGui.SameLine(0, 1 * ImGui.GetStyle().ItemSpacing.X);
+            //ImGui.Checkbox($"##{idName}togg", ref in_Visibile);
+            ImGui.SameLine(0, 1 * ImGui.GetStyle().ItemSpacing.X);
+            //Show text with icon (cant have them merged because of stupid imgui c# bindings)
+
+            Vector2 p = ImGui.GetCursorScreenPos();
+            ImGui.SetNextItemAllowOverlap();
+
+            //Setup button so that the borders and background arent seen unless its hovered
+            ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
+            ImGui.PushStyleColor(ImGuiCol.Border, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
+            ImGui.PushStyleColor(ImGuiCol.Button, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
+            bool iconPresent = !in_Icon.IsNull();
+            in_IsSelected = ImGui.Button($"##invButton{idName}", new Vector2(-1, 25));
+            ImGui.PopStyleColor(3);
+
+            //Begin drawing text & icon if it exists
+            ImGui.SetNextItemAllowOverlap();
+            ImGui.PushID($"##text{idName}");
+            ImGui.BeginGroup();
+
+            if (iconPresent)
+            {
+                //Draw icon
+                //ImGui.PushFont(ImGuiController.FontAwesomeFont);
+                ImGui.SameLine(0, 0);
+                ImGui.SetNextItemAllowOverlap();
+                ImGui.SetCursorScreenPos(p);
+                ImGui.TextColored(in_Icon.Color, in_Icon.Icon);
+                //ImGui.PopFont();
+                ImGui.SameLine(0, 0);
+            }
+            else
+            {
+                //Set size for the text as if there was an icon
+                ImGui.SetCursorScreenPos(p + new Vector2(0, 2));
+            }
+            ImGui.SetNextItemAllowOverlap();
+            ImGui.Text(iconPresent ? $" {in_Name}" : in_Name);
+
+            ImGui.EndGroup();
+            ImGui.PopID();
+            return returnVal;
+        }
+        /// <summary>
+        /// Fake list box that allows horizontal scrolling
+        /// </summary>
+        /// <param name="in_Label"></param>
+        /// <param name="in_Size"></param>
+        /// <returns></returns>
+        public static bool BeginListBoxCustom(string in_Label, Vector2 in_Size)
+        {
+            bool returnVal = ImGui.BeginChild(in_Label, in_Size, ImGuiChildFlags.FrameStyle, ImGuiWindowFlags.HorizontalScrollbar);
+            unsafe
+            {
+                //Ass Inc.
+                //This is so that the child window has the same color as normal list boxes would
+                ImGui.PushStyleColor(ImGuiCol.ChildBg, ImGui.ColorConvertFloat4ToU32(*ImGui.GetStyleColorVec4(ImGuiCol.FrameBg)));
+            }
+            ImGui.BeginGroup();
+            ImGui.PopStyleColor();
+            return returnVal;
         }
         public static void InputTextCell(int[] in_ConverseIDs, string in_CellName, ref Cell in_Cell, List<TranslationTable.Entry> translationTableNew, int in_Index, int in_LineCount)
         {

@@ -1,23 +1,16 @@
 ﻿using Hexa.NET.ImGui;
-using ConverseEditor.ShurikenRenderer;
-using ConverseEditor.Utility;
-using ConverseEditor.Rendering;
-using libfco;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 using HekonrayBase.Base;
 using HekonrayBase;
 namespace ConverseEditor
 {
     public class ViewportWindow : Singleton<ViewportWindow>, IWindow
-    {       
-
+    {
         public void Render(IProgramProject in_Renderer)
         {
             var renderer = (ConverseProject)in_Renderer;
-            ImGui.SetNextWindowPos(new System.Numerics.Vector2(0, MenuBarWindow.menuBarHeight), ImGuiCond.Always);
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(renderer.screenSize.X, renderer.screenSize.Y - MenuBarWindow.menuBarHeight), ImGuiCond.Always);
+            ImGui.SetNextWindowPos(new Vector2(0, MenuBarWindow.menuBarHeight), ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(renderer.screenSize.X, renderer.screenSize.Y - MenuBarWindow.menuBarHeight), ImGuiCond.Always);
             if (ImGui.Begin("##FCOViewerWindow", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove))
             {
                 if (FindReplaceTool.Enabled)
@@ -50,7 +43,6 @@ namespace ConverseEditor
         {
             var renderer = (ConverseProject)in_Renderer;
             renderer.config.translationTable.Clear();
-
         }
     }
 }
