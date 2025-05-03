@@ -42,18 +42,7 @@ namespace ConverseEditor
                 }
             }
         }
-        public string AskForFTE(string in_FcoPath)
-        {
-            var possibleFtePath = Path.Combine(Directory.GetParent(in_FcoPath).FullName, "fte_ConverseMain.fte");
-
-            var testdial2 = NativeFileDialogSharp.Dialog.FileOpen(fte, Directory.GetParent(in_FcoPath).FullName);
-            if (testdial2.IsOk)
-            {
-                possibleFtePath = testdial2.Path;
-            }
-            return possibleFtePath;
-        }
-
+        
         public void OnReset(IProgramProject in_Renderer)
         {
 
@@ -76,7 +65,7 @@ namespace ConverseEditor
                         var testdial = NativeFileDialogSharp.Dialog.FileOpen(fco);
                         if (testdial.IsOk)
                         {
-                            var possibleFtePath = AskForFTE(testdial.Path);
+                            var possibleFtePath = renderer.AskForFTE(testdial.Path);
                             renderer.LoadPairFile(@testdial.Path, possibleFtePath);
                         }
                     }

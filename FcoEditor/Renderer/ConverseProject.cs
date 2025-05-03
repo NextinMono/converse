@@ -276,21 +276,41 @@ namespace ConverseEditor
         }
 
         internal List<SFileInfo> GetFcoFiles() => config.fcoFile;
+        public string AskForFTE(string in_FcoPath, bool in_UseParent = true)
+        {
+            var possibleFtePath = Path.Combine(in_UseParent ? Directory.GetParent(in_FcoPath).FullName : in_FcoPath, "fte_ConverseMain.fte");
+
+            var testdial2 = NativeFileDialogSharp.Dialog.FileOpen("fte", Directory.GetParent(in_FcoPath).FullName);
+            if (testdial2.IsOk)
+            {
+                possibleFtePath = testdial2.Path;
+            }
+            return possibleFtePath;
+        }
 
         internal void LoadFolder(string path)
         {
             config.fcoFile.Clear();
+            config.fteFile = null;
+            config.ftePath = "";
             var files = Directory.GetFiles(path, "*.fco");
-            var fte = Directory.GetFiles(path, "*.fte");
-            if(fte.Length > 1)
+            var ftePaths = Directory.GetFiles(path, "*.fte");
+            string ftePath = "";
+            if (files.Length == 0)
+                return;
+            if(ftePaths.Length > 1 || ftePaths.Length == 0)
             {
-                throw new Exception("More than one FTE");
+                ftePath = AskForFTE(path);
+            }
+            else
+            {
+                ftePath = ftePaths[0];
             }
             foreach (var file in files)
             {
                 LoadFCO(file, false);
             }
-            LoadFTE(fte[0]);
+            LoadFTE(ftePath);
             AfterLoadFile();
         }
     }

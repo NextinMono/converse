@@ -7,7 +7,6 @@ using System.Numerics;
 
 namespace ConverseEditor
 {
-
     public static class FcoViewer
     {
         static int selectedFileIndex;
@@ -16,41 +15,55 @@ namespace ConverseEditor
         static bool expandAllCells = false;
         static float averageSize = 50;
         static float fontSizeMultiplier = 1;
+        static TempSearchBox searchBox = new TempSearchBox();
         static List<SLineInfo> lineWidth = new List<SLineInfo>();
 
         static void DrawGroupSelection(ConverseProject in_Renderer, bool in_FcoFilePresent)
         {
+            var size = new System.Numerics.Vector2(ImGui.GetWindowSize().X / 3, -1);
             ImGui.BeginGroup();
-            ImGui.Text("Groups");
+            //ImGui.Text("Groups");
+            searchBox.Render(size);
             var fcoFiles = in_Renderer.GetFcoFiles();
-            if (ImConverse.BeginListBoxCustom("##groupslist", new System.Numerics.Vector2(ImGui.GetWindowSize().X / 3, -1)))
+            if (ImConverse.BeginListBoxCustom("##groupslist", size))
             {
                 if (in_FcoFilePresent)
                 {
+
                     for (int a = 0; a < fcoFiles.Count; a++)
                     {
+
                         bool isSelected = false;
                         if (ImConverse.VisibilityNode(fcoFiles[a].GetFileName(), ref isSelected, null, fcoFiles[a].file.Groups.Count > 0, NodeIconResource.File))
                         {
+
                             for (int i = 0; i < fcoFiles[a].file.Groups.Count; i++)
                             {
-                                if (selectedGroupIndex == i && selectedFileIndex == a)
-                                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 0.6f, 0, 1));
-
-                                string groupName = string.IsNullOrEmpty(fcoFiles[a].file.Groups[i].Name) ? $"Empty{i}" : fcoFiles[a].file.Groups[i].Name;
-                                bool isSelectedG = selectedGroupIndex == i && selectedFileIndex == a;
-
-                                if (ImConverse.VisibilityNode(groupName, ref isSelectedG, delegate { RightClickGroup(in_Renderer, i); }, false, NodeIconResource.Group))
-                                    ImGui.TreePop();
-
-                                if (selectedGroupIndex == i && selectedFileIndex == a)
-                                    ImGui.PopStyleColor(1);
-
-                                if (isSelectedG)
+                                if (searchBox.IsSearching)
                                 {
-                                    selectedGroupIndex = i;
-                                    selectedFileIndex = a;
+                                    searchBox.Update(fcoFiles[a].file.Groups[i].Name);
+                                    if (!searchBox.MatchResult())
+                                        continue;
                                 }
+                                    if (selectedGroupIndex == i && selectedFileIndex == a)
+                                        ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 0.6f, 0, 1));
+
+                                    string groupName = string.IsNullOrEmpty(fcoFiles[a].file.Groups[i].Name) ? $"Empty{i}" : fcoFiles[a].file.Groups[i].Name;
+                                    bool isSelectedG = selectedGroupIndex == i && selectedFileIndex == a;
+
+                                    if (ImConverse.VisibilityNode(groupName, ref isSelectedG, delegate { RightClickGroup(in_Renderer, i); }, false, NodeIconResource.Group))
+                                        ImGui.TreePop();
+
+                                    if (selectedGroupIndex == i && selectedFileIndex == a)
+                                        ImGui.PopStyleColor(1);
+
+                                    if (isSelectedG)
+                                    {
+                                        selectedGroupIndex = i;
+                                        selectedFileIndex = a;
+                                    }
+
+                                
                             }
                             ImGui.TreePop();
                         }
@@ -65,8 +78,8 @@ namespace ConverseEditor
                 {
                     ImGui.Text("Open an FCO file to view its contents.");
                 }
-                ImConverse.EndListBoxCustom();
             }
+            ImConverse.EndListBoxCustom();
             ImGui.EndGroup();
             if (renamingGroup)
             {
@@ -123,8 +136,8 @@ namespace ConverseEditor
                         }
                     }
                 }
+                ImGui.EndListBox();
             }
-            ImGui.EndListBox();
             float sizeX = (ImGui.GetContentRegionAvail().X - ImGui.GetStyle().ItemSpacing.X) / 2;
             //ImGui.SetNextItemWidth(sizeX);
             //ImGui.Button("Add Cell", new System.Numerics.Vector2(sizeX, 25));
@@ -254,7 +267,7 @@ namespace ConverseEditor
             ImGui.SameLine();
             ImGui.Checkbox("Expand all", ref expandAllCells);
             ImGui.Separator();
-            bool isFcoLoaded = in_Renderer.IsFteLoaded();
+            bool isFcoLoaded = in_Renderer.GetFcoFiles().Count > 0;
             DrawGroupSelection(in_Renderer, isFcoLoaded);
             ImGui.SameLine();
             DrawCells(in_Renderer, isFcoLoaded);
