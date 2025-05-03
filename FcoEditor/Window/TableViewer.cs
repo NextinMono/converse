@@ -12,7 +12,7 @@ namespace ConverseEditor
         public static void Render(ConverseProject renderer)
         {
             //TODO: split into new class
-            if (renderer.IsFcoLoaded())
+            if (renderer.IsFteLoaded())
             {
                 ImGui.PushStyleColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0.7f, 1, 1)));
                 ImGui.TextWrapped("A translation table is necessary to be able to edit text from FCOs, as they do not store the character used to type out the sentences.");

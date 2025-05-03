@@ -18,6 +18,21 @@ namespace ConverseEditor
 {
     public class ConverseProject : Singleton<ConverseProject>, IProgramProject
     {
+        public struct SFileInfo
+        {
+            public string path;
+            public FontConverse file;
+            public SFileInfo(FontConverse in_File, string in_Path)
+            {
+                this.file = in_File;
+                this.path = in_Path;
+            }
+
+            internal string GetFileName()
+            {
+                return Path.GetFileName(path);
+            }
+        }
         public struct SViewportData
         {
             public int csdRenderTextureHandle;
@@ -27,9 +42,8 @@ namespace ConverseEditor
         }
         public struct SProjectConfig
         {
-            public /*List<FontConverse>*/FontConverse fcoFile;
+            public List<SFileInfo> fcoFile;
             public FontTexture fteFile;
-            public string fcoPath;
             public string ftePath;
             public string tablePath;
             public List<TranslationTable.Entry> translationTable;
@@ -38,7 +52,7 @@ namespace ConverseEditor
             public double time;
             public SProjectConfig()
             {
-                //fcoFile = new List<FontConverse>();
+                fcoFile = new List<SFileInfo>();
                 translationTable = new List<TranslationTable.Entry>();
             }
         }
@@ -57,6 +71,12 @@ namespace ConverseEditor
         private void SendResetSignal()
         {
             window.ResetWindows(this);
+        }
+        public void Reset()
+        {
+            isFileLoaded = false;
+            config.fcoFile.Clear();
+            config.fteFile = null;
         }
         public void ShowMessageBoxCross(string title, string message, int logType = 0)
         {
@@ -78,21 +98,20 @@ namespace ConverseEditor
                 System.Windows.MessageBox.Show(message, title, System.Windows.MessageBoxButton.OK, image);
             }
         }
-        private bool LoadFCO(string in_Path, bool in_OnlyOne = true)
+        public bool LoadFCO(string in_Path, bool in_OnlyOne = true)
         {
-            //if (in_OnlyOne)
-            //    config.fcoFile.Clear();
+            if (in_OnlyOne)
+            {
+                config.fcoFile.Clear();
+            }
             try
             {
                 BinaryObjectReader reader = new BinaryObjectReader(in_Path, Endianness.Big, Encoding.GetEncoding("UTF-8"));
-                config.fcoFile = reader.ReadObject<FontConverse>();
+                config.fcoFile.Add(new SFileInfo(reader.ReadObject<FontConverse>(), in_Path));
             }
             catch (Exception ex)
             {
-                isFileLoaded = false;
-                config.fcoPath = "";
-                config.fcoFile = null;
-                config.fteFile = null;
+                Reset();
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FCO file.\n{ex.Message}", 2);
                 return false;
             }
@@ -107,22 +126,12 @@ namespace ConverseEditor
             }
             catch (Exception ex)
             {
-                isFileLoaded = false;
-                config.ftePath = "";
-                config.fcoFile = null;
-                config.fteFile = null;
+                Reset();
                 ShowMessageBoxCross("Error", $"An error occured whilst trying to load the FTE file.\n{ex.Message}", 2);
                 return false;
             }
-            return true;
-        }
-        public void LoadFile(string in_Path, string in_PathFte)
-        {
-            config.fcoPath = in_Path;
-            config.ftePath = in_PathFte;
-            if (!LoadFCO(in_Path) || !LoadFTE(in_PathFte))
-                return;
-            string parentPath = Directory.GetParent(config.fcoPath).FullName;
+            config.ftePath = in_Path;
+            string parentPath = Directory.GetParent(config.fcoFile[0].path).FullName;
             SpriteHelper.Textures = new();
 
             List<string> missingTextures = new List<string>();
@@ -133,7 +142,7 @@ namespace ConverseEditor
                     SpriteHelper.Textures.Add(new Texture(pathtemp));
                 else
                 {
-                    var commonPathTexture = Path.Combine(Program.Path,"Resources","CommonTextures",texture.Name + ".dds");
+                    var commonPathTexture = Path.Combine(Program.Path, "Resources", "CommonTextures", texture.Name + ".dds");
                     if (File.Exists(commonPathTexture))
                     {
                         SpriteHelper.Textures.Add(new Texture(commonPathTexture));
@@ -152,25 +161,42 @@ namespace ConverseEditor
                     textureNames += "-" + textureName + "\n";
                 ShowMessageBoxCross("Warning", $"The file uses textures that could not be found, they will be replaced with text.\n\nMissing Textures:\n{textureNames}", 1);
             }
-            SendResetSignal();
+
             SpriteHelper.LoadTextures(config.fteFile.Characters);
+            return true;
+        }
+        private void AfterLoadFile()
+        {
+            SendResetSignal();
             isFileLoaded = true;
 
             //Gens FCO, load All table automatically since it only uses that
-            if (config.fcoFile.Header.Version != 0)
+            if (config.fcoFile[0].file.Header.Version != 0)
             {
                 string path = Path.Combine(Program.Path, "Resources", "Tables", "bb", "All.json");
                 ImportTranslationTable(path);
             }
         }
+        public void LoadPairFile(string in_Path, string in_PathFte)
+        {
+            if (!LoadFCO(in_Path) || !LoadFTE(in_PathFte))
+                return;
+            AfterLoadFile();
+        }
         public int GetViewportImageHandle()
         {
             return viewportData.csdRenderTextureHandle;
         }
-        public void SaveCurrentFile(string in_Path)
+        public void SaveFcoFiles(string in_Path)
         {
-            BinaryObjectWriter writer = new BinaryObjectWriter(in_Path, Endianness.Big, Encoding.UTF8);
-            writer.WriteObject(config.fcoFile);
+            bool usePathArg = string.IsNullOrEmpty(in_Path);
+            string parentDir = usePathArg ? Directory.GetParent(in_Path).FullName : "";
+            foreach(var file in config.fcoFile)
+            {
+                string path = usePathArg ? Path.Combine(parentDir, Path.GetFileName(file.path)) : file.path;
+                BinaryObjectWriter writer = new BinaryObjectWriter(path, Endianness.Big, Encoding.UTF8);
+                writer.WriteObject(file.file);
+            }
             //if(fcoFile != null)
             //    fcoFile.Write(in_Path);
         }
@@ -228,7 +254,7 @@ namespace ConverseEditor
         {
             config.translationTable = new List<TranslationTable.Entry>();
             config.translationTable.Add(new TranslationTable.Entry("\\n", 0));
-            AddMissingFteEntriesToTable(config.translationTable, config.fcoFile.Header.Version == 0, in_AddDefault);
+            AddMissingFteEntriesToTable(config.translationTable, config.fcoFile[0].file.Header.Version == 0, in_AddDefault);
         }
 
         public void WriteTableToDisk(string @in_Path)
@@ -238,13 +264,32 @@ namespace ConverseEditor
             table.Write(@in_Path);
         }
 
-        internal bool IsFcoLoaded() => !string.IsNullOrEmpty(config.fcoPath);
         internal bool IsFteLoaded() => !string.IsNullOrEmpty(config.ftePath);
         internal bool IsTableLoaded() => config.translationTable.Count > 0;
 
-        internal void AddNewGroup(string in_Name = null)
+        internal void AddNewGroup(int in_FileIndex, string in_Name = null)
         {
-            config.fcoFile.Groups.Add(new Group(string.IsNullOrEmpty(in_Name) ? $"New_Group_{config.fcoFile.Groups.Count}" : in_Name));
+            var list = config.fcoFile[in_FileIndex].file;
+            list.Groups.Add(new Group(string.IsNullOrEmpty(in_Name) ? $"New_Group_{list.Groups.Count}" : in_Name));
+        }
+
+        internal List<SFileInfo> GetFcoFiles() => config.fcoFile;
+
+        internal void LoadFolder(string path)
+        {
+            config.fcoFile.Clear();
+            var files = Directory.GetFiles(path, "*.fco");
+            var fte = Directory.GetFiles(path, "*.fte");
+            if(fte.Length > 1)
+            {
+                throw new Exception("More than one FTE");
+            }
+            foreach (var file in files)
+            {
+                LoadFCO(file, false);
+            }
+            LoadFTE(fte[0]);
+            AfterLoadFile();
         }
     }
 }

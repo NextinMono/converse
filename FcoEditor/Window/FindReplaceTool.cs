@@ -63,17 +63,20 @@ namespace ConverseEditor
         {
             var hexFind = TranslationService.RawTXTtoHEX(findString, in_Renderer.config.translationTable);
             var hexReplace = TranslationService.RawTXTtoHEX(replaceString, in_Renderer.config.translationTable);
-            foreach (var group in in_Renderer.config.fcoFile.Groups)
+            foreach(var file in in_Renderer.GetFcoFiles())
             {
-                foreach(var cell in group.CellList)
+                foreach (var group in file.file.Groups)
                 {
-                    int index = FindSequenceIndex(cell.Message, hexFind);
-                    if (index != -1)
+                    foreach (var cell in group.CellList)
                     {
-                        var list = cell.Message.ToList();
-                        list.RemoveRange(index, hexFind.Length);
-                        list.InsertRange(index, hexReplace);
-                        cell.Message = list.ToArray();
+                        int index = FindSequenceIndex(cell.Message, hexFind);
+                        if (index != -1)
+                        {
+                            var list = cell.Message.ToList();
+                            list.RemoveRange(index, hexFind.Length);
+                            list.InsertRange(index, hexReplace);
+                            cell.Message = list.ToArray();
+                        }
                     }
                 }
             }

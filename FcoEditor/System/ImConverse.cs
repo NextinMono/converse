@@ -125,7 +125,7 @@ namespace ConverseEditor
         {
             return string.Join(", ", in_IDs);
         }
-        public static bool VisibilityNode(string in_Name, ref bool in_Visibile, ref bool in_IsSelected, Action in_RightClickAction = null, bool in_ShowArrow = true, SIconData in_Icon = new(), string in_Id = "")
+        public static bool VisibilityNode(string in_Name, ref bool in_IsSelected, Action in_RightClickAction = null, bool in_ShowArrow = true, SIconData in_Icon = new(), string in_Id = "")
         {
             bool returnVal = true;
             bool idPresent = !string.IsNullOrEmpty(in_Id);

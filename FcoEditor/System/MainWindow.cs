@@ -53,7 +53,7 @@ namespace ConverseEditor
         private void LoadFromArgs(string[] in_Args)
         {
             string pathFTE = MenuBarWindow.Instance.AskForFTE(in_Args[0]);
-            ConverseProject.LoadFile(in_Args[0], pathFTE);
+            ConverseProject.LoadPairFile(in_Args[0], pathFTE);
         }
 
         //protected override void OnResize(ResizeEventArgs in_E)

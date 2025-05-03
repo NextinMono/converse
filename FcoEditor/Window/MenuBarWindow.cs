@@ -100,12 +100,20 @@ namespace ConverseEditor
                         if (testdial.IsOk)
                         {
                             var possibleFtePath = AskForFTE(testdial.Path);
-                            renderer.LoadFile(@testdial.Path, possibleFtePath);
+                            renderer.LoadPairFile(@testdial.Path, possibleFtePath);
+                        }
+                    }
+                    if (ImGui.MenuItem("Import Folder"))
+                    {
+                        var testdial = NativeFileDialogSharp.Dialog.FolderPicker(fco);
+                        if (testdial.IsOk)
+                        {
+                            renderer.LoadFolder(@testdial.Path);
                         }
                     }
                     if (ImGui.MenuItem("Save", "Ctrl + S"))
                     {
-                        renderer.SaveCurrentFile(renderer.config.fcoPath);
+                        renderer.SaveFcoFiles(null);
                     }
                     if (ImGui.MenuItem("Save As...", "Ctrl + Alt + S"))
                     {
@@ -115,7 +123,7 @@ namespace ConverseEditor
                             string path = testdial.Path;
                             if (!Path.HasExtension(path))
                                 path += ".fco";
-                            renderer.SaveCurrentFile(path);
+                            renderer.SaveFcoFiles(path);
                         }
                     }
                     if (ImGui.MenuItem("Exit"))
