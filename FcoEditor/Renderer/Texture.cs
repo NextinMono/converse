@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Image = SixLabors.ImageSharp.Image;
 
-namespace ConverseEditor.Rendering
+namespace Converse.Rendering
 {
     public class Texture
     {

@@ -1,4 +1,4 @@
-﻿using ConverseEditor.ShurikenRenderer;
+﻿using Converse.ShurikenRenderer;
 using DirectXTexNet;
 using Hexa.NET.ImGui;
 using SixLabors.ImageSharp;
@@ -11,7 +11,7 @@ using System.IO;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
 
-namespace ConverseEditor
+namespace Converse
 {
     public static class FteTextureGenerator
     {

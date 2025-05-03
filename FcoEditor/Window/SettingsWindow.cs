@@ -1,5 +1,5 @@
-﻿using ConverseEditor.Settings;
-using ConverseEditor.ShurikenRenderer;
+﻿using Converse.Settings;
+using Converse.ShurikenRenderer;
 using HekonrayBase;
 using HekonrayBase.Base;
 using Hexa.NET.ImGui;
@@ -9,7 +9,7 @@ using System.IO;
 using System.Numerics;
 using TeamSpettro.SettingsSystem;
 
-namespace ConverseEditor
+namespace Converse
 {
     public class SettingsWindow : Singleton<MenuBarWindow>, IWindow
     {

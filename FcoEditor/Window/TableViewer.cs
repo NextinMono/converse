@@ -1,11 +1,11 @@
-﻿using ConverseEditor.Rendering;
-using ConverseEditor.ShurikenRenderer;
+﻿using Converse.Rendering;
+using Converse.ShurikenRenderer;
 using Hexa.NET.ImGui;
 using Octokit;
 using System;
 using System.Numerics;
 
-namespace ConverseEditor
+namespace Converse
 {
     public static class TableViewer
     {

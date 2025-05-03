@@ -1,11 +1,11 @@
-﻿using ConverseEditor.Rendering;
+﻿using Converse.Rendering;
 using Hexa.NET.ImGui;
 using libfco;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace ConverseEditor
+namespace Converse
 {
     public static class FcoViewer
     {

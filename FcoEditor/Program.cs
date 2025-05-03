@@ -4,7 +4,7 @@ using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace ConverseEditor
+namespace Converse
 {
     internal class Program
     {

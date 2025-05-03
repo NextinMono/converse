@@ -1,5 +1,5 @@
-﻿using ConverseEditor.ShurikenRenderer;
-using ConverseEditor.Utility;
+﻿using Converse.ShurikenRenderer;
+using Converse.Utility;
 using HekonrayBase;
 using Hexa.NET.ImGui;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace ConverseEditor
+namespace Converse
 {
     internal class FindReplaceTool
     {

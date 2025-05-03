@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace ConverseEditor.Rendering.Gvr
+namespace Converse.Rendering.Gvr
 {
     public abstract class ImageDataFormatBase
     {

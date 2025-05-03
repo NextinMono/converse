@@ -1,5 +1,5 @@
-﻿using ConverseEditor.Rendering;
-using ConverseEditor.ShurikenRenderer;
+﻿using Converse.Rendering;
+using Converse.ShurikenRenderer;
 using System;
 using System.Text;
 

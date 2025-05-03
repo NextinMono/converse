@@ -1,7 +1,7 @@
 ﻿using Hexa.NET.ImGui;
 using System.Numerics;
 
-namespace ConverseEditor.Settings
+namespace Converse.Settings
 {
     public static class ImGuiThemeManager
     {

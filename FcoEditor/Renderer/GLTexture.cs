@@ -1,6 +1,6 @@
 ﻿using Hexa.NET.OpenGL;
 
-namespace ConverseEditor.Rendering
+namespace Converse.Rendering
 {
     public class GlTexture
     {

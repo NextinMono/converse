@@ -1,6 +1,6 @@
 ﻿using Amicitia.IO.Binary;
-using ConverseEditor.ShurikenRenderer;
-using ConverseEditor.Utility;
+using Converse.ShurikenRenderer;
+using Converse.Utility;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using SixLabors.ImageSharp.Drawing.Processing;
 using System.Runtime.CompilerServices;
 using HekonrayBase;
-namespace ConverseEditor
+namespace Converse
 {
     class CharacterBitmapInfo
     {

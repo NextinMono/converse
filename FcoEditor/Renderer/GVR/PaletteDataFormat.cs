@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace ConverseEditor.Rendering.Gvr
+namespace Converse.Rendering.Gvr
 {
     abstract class PaletteDataFormat
     {

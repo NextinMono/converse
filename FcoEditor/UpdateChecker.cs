@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace ConverseEditor
+namespace Converse
 {
     internal class UpdateChecker
     {

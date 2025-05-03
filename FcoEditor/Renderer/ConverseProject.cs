@@ -1,5 +1,5 @@
 ﻿using Amicitia.IO.Binary;
-using ConverseEditor.Rendering;
+using Converse.Rendering;
 using libfco;
 using System;
 using System.Collections.Generic;
@@ -7,14 +7,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using Texture = ConverseEditor.Rendering.Texture;
+using Texture = Converse.Rendering.Texture;
 using HekonrayBase;
 using System.Numerics;
-using ConverseEditor.ShurikenRenderer;
-using ConverseEditor.Utility;
+using Converse.ShurikenRenderer;
+using Converse.Utility;
 using HekonrayBase.Base;
 
-namespace ConverseEditor
+namespace Converse
 {
     public class ConverseProject : Singleton<ConverseProject>, IProgramProject
     {

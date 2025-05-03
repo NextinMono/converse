@@ -1,7 +1,7 @@
 ﻿using Hexa.NET.ImGui;
 using System.Numerics;
 
-namespace ConverseEditor
+namespace Converse
 {
     public static class ColorResource
     {

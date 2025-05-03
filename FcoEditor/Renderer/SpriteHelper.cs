@@ -1,14 +1,14 @@
 ﻿
-using ConverseEditor.Rendering;
+using Converse.Rendering;
 using libfco;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Numerics;
 using System.Windows.Media;
-using Sprite = ConverseEditor.Rendering.Sprite;
-using Texture = ConverseEditor.Rendering.Texture;
-namespace ConverseEditor.ShurikenRenderer
+using Sprite = Converse.Rendering.Sprite;
+using Texture = Converse.Rendering.Texture;
+namespace Converse.ShurikenRenderer
 {
     public struct Crop
     {

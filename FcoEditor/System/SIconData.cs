@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace ConverseEditor
+namespace Converse
 {
     public struct SIconData
     {

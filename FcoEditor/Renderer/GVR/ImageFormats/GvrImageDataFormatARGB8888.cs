@@ -1,4 +1,4 @@
-﻿namespace ConverseEditor.Rendering.Gvr
+﻿namespace Converse.Rendering.Gvr
 {
     class GvrImageDataFormatARGB8888 : GvrImageDataFormat
     {

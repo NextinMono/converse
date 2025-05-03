@@ -1,5 +1,5 @@
 ﻿using Hexa.NET.ImGui;
-using ConverseEditor.ShurikenRenderer;
+using Converse.ShurikenRenderer;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -7,7 +7,7 @@ using System.Diagnostics;
 using HekonrayBase.Base;
 using HekonrayBase;
 
-namespace ConverseEditor
+namespace Converse
 {
     public class MenuBarWindow : Singleton<MenuBarWindow>, IWindow
     {

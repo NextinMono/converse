@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <StartupObject>ConverseEditor.Program</StartupObject>
+    <StartupObject>Converse.Program</StartupObject>
     <ApplicationIcon>Resources\Icons\fco.ico</ApplicationIcon>
   </PropertyGroup>
 

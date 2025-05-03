@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConverseEditor.Rendering.Gvr
+namespace Converse.Rendering.Gvr
 {
     //Modified from GVRTool
     abstract class GvrPaletteDataFormat : PaletteDataFormat

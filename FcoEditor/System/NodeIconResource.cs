@@ -1,4 +1,4 @@
-﻿namespace ConverseEditor
+﻿namespace Converse
 {
     using IconFonts;
 

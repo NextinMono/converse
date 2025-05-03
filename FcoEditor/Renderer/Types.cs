@@ -3,9 +3,9 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using System;
 using System.Numerics;
-using ConverseEditor.ShurikenRenderer;
+using Converse.ShurikenRenderer;
 
-namespace ConverseEditor.Rendering
+namespace Converse.Rendering
 {
     public class SLineInfo
     {

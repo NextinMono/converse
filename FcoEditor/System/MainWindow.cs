@@ -1,16 +1,16 @@
 ﻿using Hexa.NET.ImGui;
-using ConverseEditor.ShurikenRenderer;
+using Converse.ShurikenRenderer;
 using System.IO;
 using System;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Runtime.CompilerServices;
-using ConverseEditor.Settings;
+using Converse.Settings;
 using TeamSpettro.SettingsSystem;
 using HekonrayBase;
 using System.Runtime.InteropServices;
 using System.Numerics;
 
-namespace ConverseEditor
+namespace Converse
 {
     public class MainWindow : HekonrayMainWindow
     {

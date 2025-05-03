@@ -1,6 +1,6 @@
-﻿using ConverseEditor.Rendering;
-using ConverseEditor.ShurikenRenderer;
-using ConverseEditor.Utility;
+﻿using Converse.Rendering;
+using Converse.ShurikenRenderer;
+using Converse.Utility;
 using Hexa.NET.ImGui;
 using libfco;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace ConverseEditor
+namespace Converse
 {
     public static class ImConverse
     {

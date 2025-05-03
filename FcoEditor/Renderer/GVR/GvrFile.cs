@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace ConverseEditor.Rendering.Gvr
+namespace Converse.Rendering.Gvr
 {
     //Taken from GVRTool, which in turn gets it from puyotools
     // https://github.com/nickworonekin/puyotools
