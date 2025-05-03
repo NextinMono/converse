@@ -34,7 +34,7 @@ namespace ConverseEditor
                         {
                             for (int i = 0; i < fcoFiles[a].file.Groups.Count; i++)
                             {
-                                if (selectedGroupIndex == i)
+                                if (selectedGroupIndex == i && selectedFileIndex == a)
                                     ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 0.6f, 0, 1));
 
                                 string groupName = string.IsNullOrEmpty(fcoFiles[a].file.Groups[i].Name) ? $"Empty{i}" : fcoFiles[a].file.Groups[i].Name;
@@ -43,7 +43,7 @@ namespace ConverseEditor
                                 if (ImConverse.VisibilityNode(groupName, ref isSelectedG, delegate { RightClickGroup(in_Renderer, i); }, false, NodeIconResource.Group))
                                     ImGui.TreePop();
 
-                                if (selectedGroupIndex == i)
+                                if (selectedGroupIndex == i && selectedFileIndex == a)
                                     ImGui.PopStyleColor(1);
 
                                 if (isSelectedG)
@@ -105,7 +105,7 @@ namespace ConverseEditor
             }
         }
 
-        static void DrawCellList(ConverseProject in_Renderer, bool in_FcoFilePresent)
+        static void DrawCells(ConverseProject in_Renderer, bool in_FcoFilePresent)
         {
             ImGui.BeginGroup();
             ImGui.Text("Cells");
@@ -115,11 +115,11 @@ namespace ConverseEditor
                 if (in_FcoFilePresent)
                 {
                     libfco.Group selectedGroup = in_Renderer.GetFcoFiles()[selectedFileIndex].file.Groups[selectedGroupIndex];
-                    if (selectedGroup.CellList.Count != 0)
+                    if (selectedGroup.Cells.Count != 0)
                     {
-                        for (int x = 0; x < selectedGroup.CellList.Count; x++)
+                        for (int x = 0; x < selectedGroup.Cells.Count; x++)
                         {
-                            DrawCellHeader(selectedGroup, selectedGroup.CellList[x], x, in_Renderer);
+                            DrawCellHeader(selectedGroup, selectedGroup.Cells[x], x, in_Renderer);
                         }
                     }
                 }
@@ -146,7 +146,7 @@ namespace ConverseEditor
             {
                 if (ImGui.MenuItem("Add"))
                 {
-                    in_SelectedGroup.CellList.Add(new Cell());
+                    in_SelectedGroup.Cells.Add(new Cell());
                 }
                 if (ImGui.MenuItem("Delete"))
                 {
@@ -240,22 +240,24 @@ namespace ConverseEditor
             ImGui.PopID();
             ImGui.EndGroup();
             if (clHeadDelete)
-                in_SelectedGroup.CellList.Remove(in_Cell);
+                in_SelectedGroup.Cells.Remove(in_Cell);
         }
         public static void Reset()
         {
             selectedGroupIndex = 0;
+            selectedFileIndex = 0;
         }
         public static void Render(ConverseProject in_Renderer)
         {
-            ImGui.Checkbox("Expand all", ref expandAllCells);
-            ImGui.SameLine();
+            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X / 3);
             ImGui.SliderFloat("Font Size", ref fontSizeMultiplier, 0.5f, 2);
+            ImGui.SameLine();
+            ImGui.Checkbox("Expand all", ref expandAllCells);
             ImGui.Separator();
             bool isFcoLoaded = in_Renderer.IsFteLoaded();
             DrawGroupSelection(in_Renderer, isFcoLoaded);
             ImGui.SameLine();
-            DrawCellList(in_Renderer, isFcoLoaded);
+            DrawCells(in_Renderer, isFcoLoaded);
             ImGui.EndTabItem();
         }
     }

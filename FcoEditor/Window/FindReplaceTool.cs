@@ -12,32 +12,64 @@ namespace ConverseEditor
     internal class FindReplaceTool
     {
         public static bool Enabled = false;
+        public static int occurencesCount;
+        public static bool replaceMode;
         public static string findString = "";
         public static string replaceString = "";
+        public static void SetActive(bool in_Status, bool in_ReplaceMode)
+        {
+            Enabled = in_Status;
+            replaceMode = in_ReplaceMode;
+        }
         public static void Render(ConverseProject in_Renderer)
         {
             ImGui.OpenPopup("Find and Replace");
-            Vector2 size = new System.Numerics.Vector2(500, 400);
+            Vector2 size = new Vector2(500, replaceMode ? 400 : 255);
             ImConverse.CenterWindow(size);
             if (ImGui.BeginPopupModal("Find and Replace", ref Enabled, ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
             {
-                ImGui.BeginDisabled(!in_Renderer.IsTableLoaded());
-                ImGui.InputTextMultiline("Find", ref findString, 1024);
-                ImGui.InputTextMultiline("Replace", ref replaceString, 1024);
+                //ImGui.BeginDisabled(!in_Renderer.IsTableLoaded());
+                if (ImGui.InputTextMultiline("Find...", ref findString, 2048))
+                    occurencesCount = 0;
+                if (replaceMode)
+                {
+                    ImGui.InputTextMultiline("Replace with...", ref replaceString, 2048);
+                }
+                else
+                {
+                    if (occurencesCount > 0)
+                    {
+                        ImGui.Text($"Found \"{findString}\" in {occurencesCount} cells.");
+                    }
+                }
                 ImGui.Separator();
-                if (ImGui.Button("Execute"))
-                    ReplaceText(in_Renderer);
+                if(replaceMode)
+                {
+                    if (ImGui.Button("Replace"))
+                    {
+                        ReplaceText(in_Renderer);
+                        ImGui.CloseCurrentPopup();
+                        Enabled = false;
+                    }
+                }
+                else
+                {
+                    if (ImGui.Button("Find"))
+                    {
+                        occurencesCount = FindText(in_Renderer);
+                    }
+                }
 
                 if (!in_Renderer.IsTableLoaded())
                 {
-                    if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                    if (ImGui.IsItemHovered())
                     {
                         ImGui.BeginTooltip();
-                        ImGui.Text("You cannot edit text unless you have a Translation Table open.");
+                        ImGui.Text("You cannot enter text directly without a Translation Table.");
                         ImGui.EndTooltip();
                     }
                 }
-                ImGui.EndDisabled();
+                //ImGui.EndDisabled();
                 ImGui.SameLine();
                 if (ImGui.Button("Cancel"))
                 {
@@ -67,7 +99,7 @@ namespace ConverseEditor
             {
                 foreach (var group in file.file.Groups)
                 {
-                    foreach (var cell in group.CellList)
+                    foreach (var cell in group.Cells)
                     {
                         int index = FindSequenceIndex(cell.Message, hexFind);
                         if (index != -1)
@@ -80,6 +112,26 @@ namespace ConverseEditor
                     }
                 }
             }
+        }
+        private static int FindText(ConverseProject in_Renderer)
+        {
+            int result = 0;
+            var hexFind = TranslationService.RawTXTtoHEX(findString, in_Renderer.config.translationTable);
+            foreach (var file in in_Renderer.GetFcoFiles())
+            {
+                foreach (var group in file.file.Groups)
+                {
+                    foreach (var cell in group.Cells)
+                    {
+                        int index = FindSequenceIndex(cell.Message, hexFind);
+                        if (index != -1)
+                        {
+                            result++;
+                        }
+                    }
+                }
+            }
+            return result;
         }
     }
 }

@@ -39,6 +39,40 @@ namespace ConverseEditor
             ImGui.EndGroup();
             ImGui.EndChild();
         }
+        public static void ImageViewport(string in_Label, Vector2 in_Size, float in_ImageAspect, float in_Zoom, ImTextureID in_Texture, Action<SCenteredImageData> in_QuadDraw = null, Vector4 in_BackgroundColor = default)
+        {
+            float desiredSize = in_Size.X == -1 ? ImGui.GetContentRegionAvail().X : in_Size.X;
+            var vwSize = new Vector2(desiredSize, desiredSize * in_ImageAspect);
+
+            if (BeginListBoxCustom(in_Label, in_Size))
+            {
+                Vector2 cursorpos2 = ImGui.GetCursorScreenPos();
+                var wndSize = ImGui.GetWindowSize();
+
+                // Ensure viewport size correctly reflects the zoomed content
+                var scaledSize = vwSize * in_Zoom;
+                var vwPos = (wndSize - scaledSize) * 0.5f;
+
+                var fixedVwPos = new Vector2(Math.Max(0, vwPos.X), Math.Max(0, vwPos.Y));
+
+                // Set scroll region to match full zoomed element
+                ImGui.SetCursorPosX(fixedVwPos.X);
+                ImGui.SetCursorPosY(fixedVwPos.Y);
+
+                if (in_BackgroundColor != Vector4.Zero)
+                {
+                    ImGui.AddRectFilled(ImGui.GetWindowDrawList(), ImGui.GetWindowPos() + fixedVwPos, ImGui.GetWindowPos() + fixedVwPos + scaledSize, ImGui.ColorConvertFloat4ToU32(in_BackgroundColor));
+
+                }
+                // Render the zoomed image
+                ImGui.Image(
+                    in_Texture, scaledSize,
+                    new Vector2(0, 1), new Vector2(1, 0));
+                in_QuadDraw?.Invoke(new SCenteredImageData(cursorpos2, ImGui.GetWindowPos(), scaledSize, fixedVwPos));
+                //DrawQuadList(cursorpos2, windowPos, scaledSize, fixedVwPos);
+            }
+            EndListBoxCustom();
+        }
         public static float DrawConverseCharacter(Sprite spr, Vector4 in_Color, float in_OffsetX, float in_FontSize)
         {
             //TEMPORARY

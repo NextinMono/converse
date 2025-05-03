@@ -150,7 +150,8 @@ namespace ConverseEditor
                     else
                     {
                         SpriteHelper.Textures.Add(new Texture(""));
-                        missingTextures.Add(texture.Name);
+                        if(!missingTextures.Contains(texture.Name + ".dds"))
+                            missingTextures.Add(texture.Name + ".dds");
                     }
                 }
             }
@@ -158,8 +159,8 @@ namespace ConverseEditor
             {
                 string textureNames = "";
                 foreach (string textureName in missingTextures)
-                    textureNames += "-" + textureName + "\n";
-                ShowMessageBoxCross("Warning", $"The file uses textures that could not be found, they will be replaced with text.\n\nMissing Textures:\n{textureNames}", 1);
+                    textureNames += "- " + textureName + "\n";
+                ShowMessageBoxCross("Warning", $"The FTE file uses some textures that could not be found. Characters that use these textures will be shown as squares with numbers.\n\nMissing Textures:\n{textureNames}\nYou can put these textures in \"Resources\\CommonTextures\" to make them always load whenever you load another FTE file.", 1);
             }
 
             SpriteHelper.LoadTextures(config.fteFile.Characters);
@@ -190,13 +191,14 @@ namespace ConverseEditor
         public void SaveFcoFiles(string in_Path)
         {
             bool usePathArg = string.IsNullOrEmpty(in_Path);
-            string parentDir = usePathArg ? Directory.GetParent(in_Path).FullName : "";
+            string parentDir = !usePathArg ? Directory.GetParent(in_Path).FullName : "";
             foreach(var file in config.fcoFile)
             {
                 string path = usePathArg ? Path.Combine(parentDir, Path.GetFileName(file.path)) : file.path;
-                BinaryObjectWriter writer = new BinaryObjectWriter(path, Endianness.Big, Encoding.UTF8);
+                using BinaryObjectWriter writer = new BinaryObjectWriter(path, Endianness.Big, Encoding.UTF8);
                 writer.WriteObject(file.file);
             }
+            System.Media.SystemSounds.Asterisk.Play();
             //if(fcoFile != null)
             //    fcoFile.Write(in_Path);
         }

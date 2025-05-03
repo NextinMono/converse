@@ -15,7 +15,7 @@ namespace ConverseEditor
     public class MainWindow : HekonrayMainWindow
     {
         private IntPtr m_IniName;
-        private string m_AppName = "Kunai";
+        private string m_AppName = "Converse";
         public ConverseProject ConverseProject => (ConverseProject)Project;
         public static ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse;
 
@@ -72,9 +72,14 @@ namespace ConverseEditor
                 //float deltaTime = (float)(GetDeltaTime());
                 //co.Render(KunaiProject.WorkProjectCsd, (float)deltaTime);
 
-               //if (converseProject.isFileLoaded)
-               //   Title = m_AppName + $" - [{converseProject.WorkFilePath}]";
-               //else
+                if (ConverseProject.GetFcoFiles().Count > 0)
+                {
+                    if (ConverseProject.GetFcoFiles().Count > 1)
+                        Title = m_AppName + $" - [{ConverseProject.config.ftePath}]";
+                    else
+                        Title = m_AppName + $" - [{ConverseProject.config.fcoFile[0].path}]";
+                }
+                else
                     Title = m_AppName;
             }
         }
