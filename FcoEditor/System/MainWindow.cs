@@ -9,6 +9,8 @@ using TeamSpettro.SettingsSystem;
 using HekonrayBase;
 using System.Runtime.InteropServices;
 using System.Numerics;
+using Hexa.NET.ImGui.Utilities;
+using IconFonts;
 
 namespace Converse
 {
@@ -23,7 +25,19 @@ namespace Converse
         {
             Title = m_AppName;
         }
+        public override void SetupFonts(ImGuiFontBuilder in_Builder)
+        {
+            unsafe
+            {
+            in_Builder
+                .SetOption(config => { config.FontBuilderFlags |= (uint)ImGuiFreeTypeBuilderFlags.LoadColor; })
+                .AddFontFromFileTTF(Path.Combine(Application.ResourcesDirectory, "RobotoVariable.ttf"), 16 * GetDpiScaling())
+                .AddFontFromFileTTF(Path.Combine(Application.ResourcesDirectory, "NotoSansJP-Regular.ttf"), 18 * GetDpiScaling(), ImGui.GetIO().Fonts.GetGlyphRangesJapanese())
+                .AddFontFromFileTTF(Path.Combine(Application.ResourcesDirectory, FontAwesome6.FontIconFileNameFAS), 16 * GetDpiScaling(), [0x1, 0x1FFFF])
+                .Build();
 
+            }
+        }
         public override void OnLoad()
         {
             OnActionWithArgs = LoadFromArgs;
