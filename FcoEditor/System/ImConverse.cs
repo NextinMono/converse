@@ -87,19 +87,23 @@ namespace Converse
                         spr.Start.X / spr.Texture.Width,
                         -(spr.Start.Y / spr.Texture.Height));
 
-
             Vector2 uvBR = uvTL + new Vector2(
             spr.Dimensions.X / spr.Texture.Width,
             -(spr.Dimensions.Y / spr.Texture.Height));
 
-            
-                float width = (float)spr.Dimensions.X;
-                //Draw sprite
-                ImGui.SameLine(0, in_OffsetX);
+            //Draw sprite
+            ImGui.SameLine(0, in_OffsetX);
 
-                ImGui.Image(new ImTextureID(spr.Texture.GlTex.Id), new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y) * in_FontSize, uvTL, uvBR);
-                
-            
+            Vector2 cursorPos = ImGui.GetCursorScreenPos();
+            Vector2 size = new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y) * in_FontSize;
+            ImGui.GetWindowDrawList()
+                 .AddImage(new ImTextureID(spr.Texture.GlTex.Id),
+                           cursorPos,
+                           cursorPos + size,
+                           uvTL,
+                           uvBR,
+                           ImGui.ColorConvertFloat4ToU32(in_Color));
+            ImGui.Dummy(size);
             return spr.Dimensions.Y * in_FontSize;
         }
         static void AlignForWidth(float width, float alignment = 0.5f)
@@ -128,7 +132,7 @@ namespace Converse
             }
             return 0;
         }
-        static void CalculateAlignmentSpacing(Cell in_Cell, int[] in_ConverseIDs,float in_FontSize, ref List<SLineInfo> in_LineWidths)
+        static void CalculateAlignmentSpacing(Cell in_Cell, int[] in_ConverseIDs, float in_FontSize, ref List<SLineInfo> in_LineWidths)
         {
             //Calculate the width and the amount of characters per line
             if (in_Cell.Alignment != Cell.TextAlign.Left)
@@ -255,7 +259,7 @@ namespace Converse
 
             if (!tablePresent)
             {
-                if(ImGui.IsItemHovered())
+                if (ImGui.IsItemHovered())
                 {
                     ImGui.BeginTooltip();
                     ImGui.Text("You need a Translation Table to be able to type text directly.");
@@ -309,7 +313,7 @@ namespace Converse
                     {
                         offset = ((ImGui.GetContentRegionAvail().X - 50) - ((spr.Dimensions.X * in_FontSize) * in_LineWidths[lineIdx].amount)) / (in_LineWidths[lineIdx].amount - 1);
                     }
-                    averageSize =  ImConverse.DrawConverseCharacter(spr, color.ArgbColor, offset, in_FontSize);
+                    averageSize = ImConverse.DrawConverseCharacter(spr, color.ArgbColor, offset, in_FontSize);
                 }
             }
             return averageSize;
