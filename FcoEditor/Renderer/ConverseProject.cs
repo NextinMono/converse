@@ -194,7 +194,7 @@ namespace Converse
             string parentDir = !usePathArg ? Directory.GetParent(in_Path).FullName : "";
             foreach(var file in config.fcoFile)
             {
-                string path = usePathArg ? Path.Combine(parentDir, Path.GetFileName(file.path)) : file.path;
+                string path = !usePathArg ? Path.Combine(parentDir, Path.GetFileName(file.path)) : file.path;
                 using BinaryObjectWriter writer = new BinaryObjectWriter(path, Endianness.Big, Encoding.UTF8);
                 writer.WriteObject(file.file);
             }

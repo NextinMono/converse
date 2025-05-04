@@ -73,7 +73,7 @@ namespace Converse
             }
             EndListBoxCustom();
         }
-        public static float DrawConverseCharacter(Sprite spr, Vector4 in_Color, float in_OffsetX, float in_FontSize)
+        public static float DrawConverseCharacter(Sprite spr, Vector4 in_Color, float in_OffsetX, float in_FontSize, bool in_IgnoreSpacing = false)
         {
             //TEMPORARY
             //Since the bg is black, if the text is black, itll be unreadable
@@ -103,7 +103,8 @@ namespace Converse
                            uvTL,
                            uvBR,
                            ImGui.ColorConvertFloat4ToU32(in_Color));
-            ImGui.Dummy(size);
+            if(!in_IgnoreSpacing)
+                ImGui.Dummy(size);
             return spr.Dimensions.Y * in_FontSize;
         }
         static void AlignForWidth(float width, float alignment = 0.5f)
@@ -134,6 +135,8 @@ namespace Converse
         }
         static void CalculateAlignmentSpacing(Cell in_Cell, int[] in_ConverseIDs, float in_FontSize, ref List<SLineInfo> in_LineWidths)
         {
+            if (in_ConverseIDs.Length == 0)
+                return;
             //Calculate the width and the amount of characters per line
             if (in_Cell.Alignment != Cell.TextAlign.Left)
             {
@@ -162,6 +165,70 @@ namespace Converse
         static string GetMessageAsString(int[] in_IDs)
         {
             return string.Join(", ", in_IDs);
+        }
+        public static bool VisibilityNodeSimple(string in_Name, Action in_RightClickAction = null, bool in_ShowArrow = true, SIconData in_Icon = new(), string in_Id = "")
+        {
+            bool returnVal = true;
+            bool idPresent = !string.IsNullOrEmpty(in_Id);
+            string idName = idPresent ? in_Id : in_Name;
+            //Make header fit the content
+            ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new System.Numerics.Vector2(0, 3));
+            var isLeaf = !in_ShowArrow ? ImGuiTreeNodeFlags.Leaf : ImGuiTreeNodeFlags.None;
+            returnVal = ImGui.TreeNodeEx($"##{idName}header", isLeaf | ImGuiTreeNodeFlags.SpanFullWidth | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.AllowOverlap);
+            ImGui.PopStyleVar();
+            //Rightclick action
+            if (in_RightClickAction != null)
+            {
+                if (ImGui.BeginPopupContextItem())
+                {
+                    in_RightClickAction.Invoke();
+                    ImGui.EndPopup();
+                }
+            }
+            //Visibility checkbox
+            //ImGui.SameLine(0, 1 * ImGui.GetStyle().ItemSpacing.X);
+            //ImGui.Checkbox($"##{idName}togg", ref in_Visibile);
+            ImGui.SameLine(0, 1 * ImGui.GetStyle().ItemSpacing.X);
+            //Show text with icon (cant have them merged because of stupid imgui c# bindings)
+
+            Vector2 p = ImGui.GetCursorScreenPos();
+            ImGui.SetNextItemAllowOverlap();
+
+            ////Setup button so that the borders and background arent seen unless its hovered
+            //ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
+            //ImGui.PushStyleColor(ImGuiCol.Border, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
+            //ImGui.PushStyleColor(ImGuiCol.Button, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
+            bool iconPresent = !in_Icon.IsNull();
+            ////ImGui.Button($"##invButton{idName}", new Vector2(-1, 25));
+            //ImGui.PopStyleColor(3);
+
+            //Begin drawing text & icon if it exists
+            ImGui.SetNextItemAllowOverlap();
+            ImGui.PushID($"##text{idName}");
+            ImGui.BeginGroup();
+
+            if (iconPresent)
+            {
+                //Draw icon
+                //ImGui.PushFont(ImGuiController.FontAwesomeFont);
+                ImGui.SameLine(0, 0);
+                ImGui.SetNextItemAllowOverlap();
+                ImGui.SetCursorScreenPos(p);
+                ImGui.TextColored(in_Icon.Color, in_Icon.Icon);
+                //ImGui.PopFont();
+                ImGui.SameLine(0, 0);
+            }
+            else
+            {
+                //Set size for the text as if there was an icon
+                ImGui.SetCursorScreenPos(p + new Vector2(0, 2));
+            }
+            ImGui.SetNextItemAllowOverlap();
+            ImGui.Text(iconPresent ? $" {in_Name}" : in_Name);
+
+            ImGui.EndGroup();
+            ImGui.PopID();
+            return returnVal;
         }
         public static bool VisibilityNode(string in_Name, ref bool in_IsSelected, Action in_RightClickAction = null, bool in_ShowArrow = true, SIconData in_Icon = new(), string in_Id = "")
         {
@@ -246,15 +313,15 @@ namespace Converse
             ImGui.PopStyleColor();
             return returnVal;
         }
-        public static void InputTextCell(int[] in_ConverseIDs, string in_CellName, ref Cell in_Cell, List<TranslationTable.Entry> translationTableNew, int in_Index, int in_LineCount)
+        public static void InputTextCell(ref int[] in_ConverseIDs, string in_CellName, List<TranslationTable.Entry> translationTableNew, int in_Index, int in_LineCount)
         {
             bool tablePresent = translationTableNew?.Count > 1;
             string cellMessageConverted = TranslationService.RawHEXtoTXT(in_ConverseIDs, translationTableNew);
             cellMessageConverted = cellMessageConverted.Replace("@@", "");
-            if (ImGui.InputTextMultiline($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 512, new System.Numerics.Vector2(-1, ImGui.GetTextLineHeight() * in_LineCount)))
+            if (ImGui.InputTextMultiline($"##{in_CellName}_{in_Index}text", ref cellMessageConverted, 2048, new System.Numerics.Vector2(-1, ImGui.GetTextLineHeight() * in_LineCount)))
             {
                 var joinedIDs2 = TranslationService.RawTXTtoHEX(cellMessageConverted, translationTableNew);
-                in_Cell.Message = joinedIDs2;
+                in_ConverseIDs = joinedIDs2;
             }
 
             if (!tablePresent)
@@ -288,25 +355,20 @@ namespace Converse
                     }
                     continue;
                 }
-
+                
                 //In the case that a texture cant be found or if its unregistered through
                 //SpriteHelper, print the converse id and skip
                 Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
-                if (spr == null)
+                if (spr.IsNull())
                 {
                     ImConverse.EmptyButton(converseID);
-                    continue;
                 }
                 else
                 {
-                    if (spr.Texture.GlTex == null)
-                    {
-                        ImConverse.EmptyButton(converseID);
-                        continue;
-                    }
                     //Get the color to render the text with
                     CellColor currentHighlight = in_Cell.Highlights.FirstOrDefault(x => i >= x.Start && i <= x.End);
                     CellColor color = currentHighlight == null ? in_Cell.MainColor : currentHighlight;
+                    
                     //Calc spacing for justified text
                     float offset = 0;
                     if (in_Cell.Alignment == Cell.TextAlign.Justified)
@@ -316,6 +378,8 @@ namespace Converse
                     averageSize = ImConverse.DrawConverseCharacter(spr, color.ArgbColor, offset, in_FontSize);
                 }
             }
+            //Implement subcell drawing here at some point
+
             return averageSize;
         }
     }

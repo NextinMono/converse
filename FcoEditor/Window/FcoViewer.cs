@@ -182,8 +182,9 @@ namespace Converse
                         lineCount++;
 
                 ImGui.InputText("Name", ref name, 256);
-                ImConverse.InputTextCell(in_Cell.Message, cellName, ref in_Cell, in_Renderer.config.translationTable, in_Index, lineCount);
-
+                var msg = in_Cell.Message;
+                ImConverse.InputTextCell(ref msg, cellName, in_Renderer.config.translationTable, in_Index, lineCount);
+                in_Cell.Message = msg;
                 ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 1)));
                 if (ImGui.BeginListBox($"##group{in_SelectedGroup.Name}_{in_Cell.Name}", new System.Numerics.Vector2(-1, lineCount * averageSize)))
                 {
@@ -194,16 +195,64 @@ namespace Converse
                 ImGui.Combo("Alignment", ref alignmentIdx, alignmentOptions, 4);
                 ImGui.ColorEdit4("Color", ref colorMain);
                 ImGui.PushID($"##highlightlist{in_SelectedGroup.Name}_{in_Cell.Name}");
-                if (ImGui.TreeNodeEx("Extra"))
+                if (ImConverse.VisibilityNodeSimple("Furigana", in_ShowArrow: true, in_Icon: NodeIconResource.Subcell))
                 {
-                    ImGui.ColorEdit4("Color Sub 1", ref colorSub1);
-                    ImGui.ColorEdit4("Color Sub 2", ref colorSub2);
-                    if (ImGui.CollapsingHeader("Highlights"))
+                    if (ImGui.BeginListBox("Subcell List", new Vector2(-1, 200)))
                     {
-                        if (ImGui.Button("Add"))
+                        for (int i = 0; i < in_Cell.SubCells.Count; i++)
                         {
-                            in_Cell.Highlights.Add(new CellColor(2));
+                            ImGui.PushID($"##subcell_{i}_{in_SelectedGroup.Name}_{in_Cell.Name}");
+                            bool hlOpen = ImGui.TreeNodeEx($"Subcell {i}");
+                            bool delete = false;
+                            if (ImGui.BeginPopupContextItem())
+                            {
+                                if (ImGui.MenuItem("Delete"))
+                                {
+                                    delete = true;
+                                }
+                                ImGui.EndPopup();
+                            }
+                            if (hlOpen)
+                            {
+                                //ImGui in c# is ass.
+                                SubCell subcell = in_Cell.SubCells[i];
+                                var message = subcell.SubMessage;
+
+                                ImConverse.InputTextCell(ref message, cellName, in_Renderer.config.translationTable, in_Index, 2);
+                                ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 1)));
+                                if (ImGui.BeginListBox($"##groupsub{in_SelectedGroup.Name}_{in_Cell.Name}", new System.Numerics.Vector2(-1, averageSize)))
+                                {
+                                    ImConverse.DrawCellFromFTE(in_Cell, message, fontSizeMultiplier, ref lineWidth);
+                                    ImGui.EndListBox();
+                                }
+                                subcell.SubMessage = message;
+                                ImGui.PopStyleColor();
+                                int startIdx = subcell.Start;
+                                int endIdx = subcell.End;
+                                ImGui.InputInt("Start", ref startIdx);
+                                ImGui.InputInt("End", ref endIdx);
+                                subcell.Start = startIdx;
+                                subcell.End = endIdx;
+                                ImGui.TreePop();
+
+                            }
+
+                            ImGui.PopID();
+                            if (delete)
+                                in_Cell.SubCells.RemoveAt(i);
                         }
+                        ImGui.EndListBox();
+                    }
+                    if (ImGui.Button("Add", new Vector2(-1, 32)))
+                    {
+                        in_Cell.SubCells.Add(new SubCell());
+                    }
+                    ImGui.TreePop();
+                }
+                if (ImConverse.VisibilityNodeSimple("Highlights", in_ShowArrow: true, in_Icon: NodeIconResource.Highlight))
+                {
+                    if (ImGui.BeginListBox("Highlights List", new Vector2(-1, 200)))
+                    {
                         for (int i = 0; i < in_Cell.Highlights.Count; i++)
                         {
                             ImGui.PushID($"##highlight_{i}_{in_SelectedGroup.Name}_{in_Cell.Name}");
@@ -240,6 +289,18 @@ namespace Converse
                                 in_Cell.Highlights.RemoveAt(i);
                         }
                     }
+                    ImGui.EndListBox();
+                    if (ImGui.Button("Add", new Vector2(-1, 32)))
+                    {
+                        in_Cell.Highlights.Add(new CellColor(2));
+                    }
+                    ImGui.TreePop();
+                }
+                if (ImConverse.VisibilityNodeSimple("Extra", in_ShowArrow: true, in_Icon: NodeIconResource.Extra))
+                {
+                    ImGui.ColorEdit4("Color Sub 1", ref colorSub1);
+                    ImGui.ColorEdit4("Color Sub 2", ref colorSub2);
+                    
                     ImGui.TreePop();
                 }
                 ImGui.PopID();
