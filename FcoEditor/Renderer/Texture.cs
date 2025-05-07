@@ -26,6 +26,11 @@ namespace Converse.Rendering
         internal GlTexture GlTex { get; private set; }
         public List<int> CropIndices { get; set; }
 
+        public bool IsEmpty()
+        {
+            return string.IsNullOrEmpty(FullName) && GlTex == null;
+        }
+
         private void CreateTexture(ScratchImage in_Img)
         {
             if (TexHelper.Instance.IsCompressed(in_Img.GetMetadata().Format))

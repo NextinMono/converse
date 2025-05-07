@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace Converse
 {
-    public static class ImConverse
+    public static partial class ImConverse
     {
         public static readonly int newLineValue = 0;
         public static void EmptyButton(int in_ConvID)
@@ -21,6 +21,96 @@ namespace Converse
             ImGui.PushID($"{Random.Shared.Next(0, 1000)}_{in_ConvID}");
             ImGui.Button(in_ConvID.ToString());
             ImGui.PopID();
+        }
+        public static unsafe bool SpriteImageButton(string in_Id, Sprite in_Spr, Vector2 in_Size = default)
+        {
+            //This is so stupid, this is how youre supposed to do it according to the HexaNET issues
+            unsafe
+            {
+                var name = Marshal.StringToHGlobalAnsi($"##{in_Id}");
+                var uvCoords = in_Spr.GetImGuiUv();
+                //Draw sprite
+                return ImGui.ImageButton((byte*)name, new ImTextureID(in_Spr.Texture.GlTex.Id), in_Size == Vector2.Zero ? new System.Numerics.Vector2(50, 50) : in_Size, uvCoords[0], uvCoords[1]);
+            }
+        }
+        public static bool EmptyTextureButton(int in_Id)
+        {
+            bool val = ImGui.Button($"##pattern{in_Id}", new System.Numerics.Vector2(55, 55));
+            ImGui.SameLine();
+            return val;
+        }
+        public static STextureSelectorResult TextureSelector(ConverseProject in_Renderer, bool in_EditMode)
+        {
+            int selectedIndex = -2;
+            int selectedSpriteIndex = -2;
+            int idx = 0;
+            if (in_Renderer.IsFteLoaded())
+            {
+                foreach (var texture in in_Renderer.config.fteFile.Textures)
+                {
+                    if (ImGui.CollapsingHeader(texture.Name))
+                    {
+                        if (in_EditMode)
+                            ImGui.Indent();
+                        int idx2 = 0;
+                        var spritesList = SpriteHelper.Textures[idx].CropIndices;
+                        for (int i = 0; i < spritesList.Count; i++)
+                        {
+                            int spriteIdx = spritesList[i];
+                            Sprite spr = SpriteHelper.Sprites[spriteIdx];
+                            ImGui.BeginGroup();
+                            if (spr != null)
+                            {
+                                if (spr.IsNull())
+                                {
+                                    ImConverse.EmptyTextureButton(idx2);
+                                }
+                                else
+                                {
+                                    if (ImConverse.SpriteImageButton($"##{texture.Name}_crop{idx2}", spr))
+                                    {
+                                        selectedIndex = idx;
+                                        selectedSpriteIndex = idx2;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                ImConverse.EmptyTextureButton(idx2);
+                            }
+                            if (in_EditMode)
+                            {
+                                if (ImGui.BeginPopupContextItem())
+                                {
+                                    if (ImGui.MenuItem("Add"))
+                                    {
+                                        SpriteHelper.CreateSprite(SpriteHelper.Textures[idx]);
+                                    }
+                                    ImGui.BeginDisabled(spritesList.Count <= 1);
+                                    if (ImGui.MenuItem("Delete"))
+                                    {
+                                        SpriteHelper.DeleteSprite(spriteIdx);
+                                    }
+                                    ImGui.EndDisabled();
+                                    ImGui.EndPopup();
+                                }
+                            }
+                            ImGui.SameLine();
+                            ImGui.PushID($"##{texture.Name}_crop{idx2}txt");
+                            ImGui.Text($"Converse ID {SpriteHelper.GetConverseIDFromSprite(spr)}");
+                            ImGui.PopID();
+                            ImGui.EndGroup();
+
+                            idx2++;
+                        }
+                        if (in_EditMode)
+                            ImGui.Unindent();
+
+                    }
+                    idx++;
+                }
+            }
+            return new STextureSelectorResult(selectedIndex, selectedSpriteIndex);
         }
 
         public static void CenterWindow(Vector2 in_Size)
@@ -361,13 +451,12 @@ namespace Converse
                 Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
                 if (spr.IsNull())
                 {
-                    ImConverse.EmptyButton(converseID);
+                    EmptyButton(converseID);
                 }
                 else
                 {
                     //Get the color to render the text with
-                    CellColor currentHighlight = in_Cell.Highlights.FirstOrDefault(x => i >= x.Start && i <= x.End);
-                    CellColor color = currentHighlight == null ? in_Cell.MainColor : currentHighlight;
+                    CellColor color = in_Cell.FindHighlightFromPos(i);
                     
                     //Calc spacing for justified text
                     float offset = 0;
@@ -375,7 +464,7 @@ namespace Converse
                     {
                         offset = ((ImGui.GetContentRegionAvail().X - 50) - ((spr.Dimensions.X * in_FontSize) * in_LineWidths[lineIdx].amount)) / (in_LineWidths[lineIdx].amount - 1);
                     }
-                    averageSize = ImConverse.DrawConverseCharacter(spr, color.ArgbColor, offset, in_FontSize);
+                    averageSize = DrawConverseCharacter(spr, color.ArgbColor, offset, in_FontSize);
                 }
             }
             //Implement subcell drawing here at some point

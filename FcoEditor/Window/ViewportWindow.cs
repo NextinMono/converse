@@ -31,8 +31,8 @@ namespace Converse
                     }
                     if (ImGui.BeginTabItem("FTE Generator"))
                     {
-                        FteTextureGenerator.Draw(renderer);
-                        ImGui.EndTabItem();
+                        FteCropEditor.Render(renderer);
+                        //FteTextureGenerator.Draw(renderer);
                     }
                     ImGui.EndTabBar();
                 }

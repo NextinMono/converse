@@ -17,13 +17,13 @@ namespace Converse
     public class MainWindow : HekonrayMainWindow
     {
         private IntPtr m_IniName;
-        private string m_AppName = "Converse";
+        public string appName = "Converse";
         public ConverseProject ConverseProject => (ConverseProject)Project;
         public static ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse;
 
         public MainWindow(Version in_OpenGlVersion, Vector2Int in_WindowSize) : base(in_OpenGlVersion, in_WindowSize)
         {
-            Title = m_AppName;
+            Title = appName;
         }
         public override void SetupFonts(ImGuiFontBuilder in_Builder)
         {
@@ -35,7 +35,6 @@ namespace Converse
                 .AddFontFromFileTTF(Path.Combine(Application.ResourcesDirectory, "NotoSansJP-Regular.ttf"), 18 * GetDpiScaling(), ImGui.GetIO().Fonts.GetGlyphRangesJapanese())
                 .AddFontFromFileTTF(Path.Combine(Application.ResourcesDirectory, FontAwesome6.FontIconFileNameFAS), 16 * GetDpiScaling(), [0x1, 0x1FFFF])
                 .Build();
-
             }
         }
         public override void OnLoad()
@@ -86,15 +85,7 @@ namespace Converse
                 //float deltaTime = (float)(GetDeltaTime());
                 //co.Render(KunaiProject.WorkProjectCsd, (float)deltaTime);
 
-                if (ConverseProject.GetFcoFiles().Count > 0)
-                {
-                    if (ConverseProject.GetFcoFiles().Count > 1)
-                        Title = m_AppName + $" - [{ConverseProject.config.ftePath}]";
-                    else
-                        Title = m_AppName + $" - [{ConverseProject.config.fcoFile[0].path}]";
-                }
-                else
-                    Title = m_AppName;
+                
             }
         }
     }

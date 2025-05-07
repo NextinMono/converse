@@ -177,6 +177,15 @@ namespace Converse
                 string path = Path.Combine(Program.Path, "Resources", "Tables", "bb", "All.json");
                 ImportTranslationTable(path);
             }
+            if (GetFcoFiles().Count > 0)
+            {
+                if (GetFcoFiles().Count > 1)
+                    window.Title = window.appName + $" - [{config.ftePath}]";
+                else
+                    window.Title = window.appName + $" - [{config.fcoFile[0].path}]";
+            }
+            else
+                window.Title = window.appName;
         }
         public void LoadPairFile(string in_Path, string in_PathFte)
         {
@@ -198,6 +207,13 @@ namespace Converse
                 using BinaryObjectWriter writer = new BinaryObjectWriter(path, Endianness.Big, Encoding.UTF8);
                 writer.WriteObject(file.file);
             }
+            List<Character> characters = new List<Character>();
+            SpriteHelper.BuildCropList(ref characters);
+            config.fteFile.Characters = characters;
+
+            using BinaryObjectWriter writer2 = new BinaryObjectWriter(config.ftePath, Endianness.Big, Encoding.UTF8);
+            writer2.WriteObject(config.fteFile);
+
             System.Media.SystemSounds.Asterisk.Play();
             //if(fcoFile != null)
             //    fcoFile.Write(in_Path);

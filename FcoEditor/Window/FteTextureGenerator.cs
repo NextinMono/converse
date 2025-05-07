@@ -71,6 +71,7 @@ namespace Converse
                 in_Renderer.ShowMessageBoxCross("Converse", "A new font atlas and FTE file have been generated in the same folder as the FCO file.\nThe new FTE file is called \"fte_ConverseMain_Generated.fte\".");
             }
             ImGui.EndDisabled();
+            ImGui.EndTabItem();
         }
     }
 }

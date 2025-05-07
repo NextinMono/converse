@@ -1,6 +1,7 @@
 ﻿
 using Converse.Rendering;
 using libfco;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -121,11 +122,58 @@ namespace Converse.ShurikenRenderer
             Sprites.Add(NextSpriteID, spr);
             return NextSpriteID++;
         }
+        public static void DeleteSprite(int in_SprIndex)
+        {
+            Sprites.TryGetValue(in_SprIndex, out Sprite sprite);
+            sprite.Texture.CropIndices.Remove(in_SprIndex);
+            Sprites.Remove(in_SprIndex);
+            NextSpriteID--;
+        }
         public static int CreateSprite(Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
         {
             Sprite spr = new Sprite(tex, top, left, bottom, right);
-            return AppendSprite(spr);
+            int newId = AppendSprite(spr);
+            tex.CropIndices.Add(newId);
+            return newId;
         }
+        /// <summary>
+        /// Create a list of Csd Crops from Kunai sprites.
+        /// </summary>
+        /// <param name="in_SubImages"></param>
+        /// <param name="in_TextureSizes"></param>
+        public static void BuildCropList(ref List<Character> in_SubImages)
+        {
+            in_SubImages = new();
+            foreach (var entry in CharSprites)
+            {
+                Sprite sprite = Sprites[entry.Value];
+                int textureIndex = Textures.IndexOf(sprite.Texture);
+
+                var size = sprite.Texture.Size;
+                //sprite.GenerateCoordinates(size);
+
+                Character subImage = entry.Key;
+                subImage.CharacterID = GetConverseIDFromSprite(sprite);
+                subImage.TextureIndex = textureIndex;
+                subImage.TopLeft = new Vector2((float)sprite.X / size.X, (float)sprite.Y / size.Y);
+                subImage.BottomRight = new Vector2((float)(sprite.X + sprite.Width) / size.X, (float)(sprite.Y + sprite.Height) / size.Y);
+                in_SubImages.Add(subImage);
+            }
+        }
+
+        public static int GetConverseIDFromSprite(Sprite in_Spr)
+        {
+            foreach (var v in CharSprites)
+            {
+                if (Sprites[v.Value] == in_Spr)
+                {
+                    return v.Key.CharacterID;
+                }
+            }
+            return -1;
+        }
+        
+
         public static void LoadTextures(List<Character> in_CsdProject)
         {
             ncpSubimages.Clear();
