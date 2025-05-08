@@ -96,45 +96,50 @@ namespace Converse
                     }
                     CharacterSprite? spr2 = SpriteHelper.GetCharaSpriteFromID(translationTableNew[selectedBox].ConverseID);
 
-                    if(spr2 != null)
+                    if (spr2 != null)
                     {
-                        if (!spr2.Value.sprite.IsNull())
-                        {
-                            currentTextureIdx = SpriteHelper.Textures.IndexOf(spr2.Value.sprite.Texture);
-                            var avgSizeWin = (ImGui.GetContentRegionAvail().X / 2);
-                            Vector2 availableSize = new Vector2(ImGui.GetContentRegionAvail().X / 2, ImGui.GetContentRegionAvail().Y);
-                            Vector2 viewportPos = ImGui.GetWindowPos() + ImGui.GetCursorPos();
-                            var textureSize = SpriteHelper.Textures[currentTextureIdx].Size;
+                        //if (!spr2.Value.sprite.IsNull())
+                        //{
+                        currentTextureIdx = SpriteHelper.Textures.IndexOf(spr2.Value.sprite.Texture);
+                        var avgSizeWin = (ImGui.GetContentRegionAvail().X / 2);
+                        Vector2 availableSize = new Vector2(ImGui.GetContentRegionAvail().X / 2, ImGui.GetContentRegionAvail().Y);
+                        Vector2 viewportPos = ImGui.GetWindowPos() + ImGui.GetCursorPos();
+                        var textureSize = SpriteHelper.Textures[currentTextureIdx].Size;
 
-                            Vector2 imageSize;
-                            if (textureSize.X > textureSize.Y)
-                                imageSize = new Vector2(availableSize.Y, (textureSize.Y / textureSize.X) * availableSize.Y);
-                            else
-                                imageSize = new Vector2(availableSize.X, (textureSize.X / textureSize.Y) * availableSize.X);
+                        Vector2 imageSize;
+                        if (textureSize.X > textureSize.Y)
+                            imageSize = new Vector2(availableSize.Y, (textureSize.Y / textureSize.X) * availableSize.Y);
+                        else
+                            imageSize = new Vector2(availableSize.X, (textureSize.X / textureSize.Y) * availableSize.X);
 
-                            //Texture Image
-                            var size2 = ImGui.GetContentRegionAvail().X - avgSizeWin - 20;
-                            ImGui.SameLine();
-                            ImConverse.ImageViewport("##cropEdit", new Vector2(size2, -1), SpriteHelper.Textures[currentTextureIdx].Size.Y / SpriteHelper.Textures[currentTextureIdx].Size.X, zoomFactor, new ImTextureID(SpriteHelper.Textures[currentTextureIdx].GlTex.Id), DrawQuadList, new Vector4(0.5f, 0.5f, 0.5f, 1));
+                        //Texture Image
+                        var size2 = ImGui.GetContentRegionAvail().X - avgSizeWin - 20;
+                        ImGui.SameLine();
+                        ImConverse.ImageViewport("##cropEdit", new Vector2(size2, -1), zoomFactor, SpriteHelper.Textures[currentTextureIdx], DrawQuadList, new Vector4(0.5f, 0.5f, 0.5f, 1));
+                        
+                        bool windowHovered = ImGui.IsItemHovered() && ImGui.IsKeyDown(ImGuiKey.ModCtrl);
+                        if (windowHovered)
+                            zoomFactor += ImGui.GetIO().MouseWheel / 5;
+                        else
+                            ImGui.SetItemTooltip("Hold Ctrl and use the mouse wheel to zoom.");
 
-                            bool windowHovered = ImGui.IsItemHovered() && ImGui.IsKeyDown(ImGuiKey.ModCtrl);
-                            if (windowHovered)
-                                zoomFactor += ImGui.GetIO().MouseWheel / 5;
-
-                            zoomFactor = Math.Clamp(zoomFactor, 0.5f, 10);
-                            ImGui.SetCursorPosY(cursor.Y);
-                            ImGui.NewLine();
-                            ImGui.NewLine();
-                            ImConverse.DrawConverseCharacter(spr2.Value, renderer.config.fteFile, new Vector4(1, 1, 1, 1), cursor.X - spr2.Value.sprite.Dimensions.X / 2, 2);
-                            ImGui.NewLine();
-                            string text = "Converse ID: " + "{" + translationTableNew[selectedBox].ConverseID.ToString() + "}";
-                            float textWidth = ImGui.CalcTextSize(text).X;
-                            float centeredX = cursor.X + (spr2.Value.sprite.Dimensions.X - textWidth) / 2;
-                            ImGui.SetCursorPosX(centeredX);
-                            ImGui.Text(text);
-                        }
+                        zoomFactor = Math.Clamp(zoomFactor, 0.5f, 10);
+                        ImGui.SetCursorPosY(cursor.Y);
+                        ImGui.NewLine();
+                        ImGui.NewLine();
+                        //if (!spr2.Value.sprite.IsNull())
+                        //{
+                        //    ImConverse.DrawConverseCharacter(spr2.Value, renderer.config.fteFile, new Vector4(1, 1, 1, 1), cursor.X - spr2.Value.sprite.Dimensions.X / 2, 2);
+                        //}
+                        ImGui.NewLine();
+                        string text = "Converse ID: " + "{" + translationTableNew[selectedBox].ConverseID.ToString() + "}";
+                        float textWidth = ImGui.CalcTextSize(text).X;
+                        float centeredX = cursor.X - (textWidth / 2) ;
+                        ImGui.SetCursorPosX(centeredX);
+                        ImGui.Text(text);
+                        //}
                     }
-                    
+
                 }
             }
             else

@@ -11,7 +11,7 @@ namespace Converse
     {
         public static float ZoomFactor = 1;
         public static bool Enabled = false;
-        static int m_SelectedIndex = 0;
+        static int m_SelectedIndex = 2;
         static int m_SelectedSpriteIndex = 0;
         static bool m_ShowAllCoords;
         public static void Reset()
@@ -69,23 +69,37 @@ namespace Converse
             {
                 if (SpriteHelper.Textures.Count > m_SelectedIndex)
                 {
+                    // Texture "header"
                     Texture texture = SpriteHelper.Textures[m_SelectedIndex];
                     ImGui.SeparatorText("Texture Info");
-                    ImGui.Text($"Name: {texture.Name}");
-                    ImGui.Text($"Width: {texture.Width}");
-                    ImGui.Text($"Height: {texture.Height}");
-                    ImGui.SeparatorText("Crop");
+                    ImGui.BeginDisabled(true);
+                    string texName = texture.Name;
+                    ImGui.InputText($"Name", ref texName, 512);
+                    Vector2 texSizeDds = texture.Size;
+                    ImGui.InputFloat2($"Size", ref texSizeDds);
+                    ImGui.EndDisabled();
                     if(m_SelectedSpriteIndex >= texture.CropIndices.Count)
                     {
                         m_SelectedSpriteIndex = texture.CropIndices.Count - 1;
                     }
-                    ImGui.Text($"Currently editing: Crop ({m_SelectedSpriteIndex})");
+                    // Crop info section
                     if(texture.CropIndices.Count != 0)
                     {
                         var sprite = SpriteHelper.Sprites[texture.CropIndices[m_SelectedSpriteIndex]];
-                        ImGui.Text($"Converse ID: {SpriteHelper.GetConverseIDFromSprite(sprite)}");
+                        var chara = SpriteHelper.GetCharaSpriteFromID(SpriteHelper.GetConverseIDFromSprite(sprite)).Value;
+                        var charaIdx = SpriteHelper.ConverseSprites.IndexOf(chara);
+                        var fteTex = renderer.config.fteFile.Textures[chara.converseChara.TextureIndex];
+                        var fteTexSize = fteTex.Size;
+                        int convId = chara.converseChara.CharacterID;
                         Vector2 spriteStart = sprite.Start;
-                        Vector2 spriteSize = sprite.Dimensions; ImGui.DragFloat2("Position", ref spriteStart, "%.0f");
+                        Vector2 spriteSize = sprite.Dimensions;
+                        ImGui.SeparatorText("Font Texture");
+                        ImGui.InputFloat2("Display Size", ref fteTexSize);
+                        ImGui.SetItemTooltip("This is used ingame to display the characters at a reasonable size.\nThe formula the game uses is:\n(spriteDimension / ddsTexSize) * fteTextureSize");
+                        ImGui.SeparatorText("Crop");
+                        ImGui.Text($"Currently editing: Crop ({m_SelectedSpriteIndex})");
+                        ImGui.InputInt("Converse ID", ref convId);
+                        ImGui.DragFloat2("Position", ref spriteStart, "%.0f");
                         ImGui.DragFloat2("Dimension", ref spriteSize, "%.0f");
                         if (!texture.IsEmpty())
                         {
@@ -103,6 +117,11 @@ namespace Converse
                             sprite.Start = spriteStart;
                             sprite.Dimensions = spriteSize;
                         }
+
+                        fteTex.Size = fteTexSize;
+                        renderer.config.fteFile.Textures[chara.converseChara.TextureIndex] = fteTex;
+                        chara.converseChara.CharacterID = convId;
+                        SpriteHelper.ConverseSprites[charaIdx] = chara;
                     }                    
                 }
                 ImGui.EndListBox();
