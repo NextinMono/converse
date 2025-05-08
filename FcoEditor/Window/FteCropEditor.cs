@@ -110,11 +110,8 @@ namespace Converse
         {
             if (!in_Renderer.IsFteLoaded())
                 return;
-            if (SpriteHelper.Textures[m_SelectedIndex].GlTex == null)
-                return;
             Vector2 availableSize = new Vector2(ImGui.GetWindowSize().X / 2, ImGui.GetContentRegionAvail().Y);
             Vector2 viewportPos = ImGui.GetWindowPos() + ImGui.GetCursorPos();
-
             var textureSize = SpriteHelper.Textures[m_SelectedIndex].Size;
 
             Vector2 imageSize;
@@ -125,7 +122,7 @@ namespace Converse
 
             //Texture Image
             var size2 = ImGui.GetContentRegionAvail().X - in_AvgSizeWin;
-            ImConverse.ImageViewport("##cropEdit", new Vector2(size2, -1), SpriteHelper.Textures[m_SelectedIndex].Size.Y / SpriteHelper.Textures[m_SelectedIndex].Size.X, ZoomFactor, new ImTextureID(SpriteHelper.Textures[m_SelectedIndex].GlTex.Id), DrawQuadList, new Vector4(0.5f, 0.5f, 0.5f, 1));
+            ImConverse.ImageViewport("##cropEdit", new Vector2(size2, -1), ZoomFactor, SpriteHelper.Textures[m_SelectedIndex], DrawQuadList, new Vector4(0.5f, 0.5f, 0.5f, 1));
 
             bool windowHovered = ImGui.IsWindowHovered(ImGuiHoveredFlags.ChildWindows) && ImGui.IsItemHovered();
             if (windowHovered)

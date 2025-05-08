@@ -48,6 +48,7 @@ namespace Converse
             {
                 foreach (var texture in in_Renderer.config.fteFile.Textures)
                 {
+                    ImGui.PushID($"##{texture.Name}_{idx}");
                     if (ImGui.CollapsingHeader(texture.Name))
                     {
                         if (in_EditMode)
@@ -84,12 +85,12 @@ namespace Converse
                                 {
                                     if (ImGui.MenuItem("Add"))
                                     {
-                                        SpriteHelper.CreateSprite(SpriteHelper.Textures[idx]);
+                                        SpriteHelper.CreateCharacter(SpriteHelper.Textures[idx]);
                                     }
                                     ImGui.BeginDisabled(spritesList.Count <= 1);
                                     if (ImGui.MenuItem("Delete"))
                                     {
-                                        SpriteHelper.DeleteSprite(spriteIdx);
+                                        SpriteHelper.DeleteCharacter(spriteIdx);
                                     }
                                     ImGui.EndDisabled();
                                     ImGui.EndPopup();
@@ -107,6 +108,7 @@ namespace Converse
                             ImGui.Unindent();
 
                     }
+                    ImGui.PopID();
                     idx++;
                 }
             }
@@ -128,6 +130,19 @@ namespace Converse
         {
             ImGui.EndGroup();
             ImGui.EndChild();
+        }
+        public static void ImageViewport(string in_Label, Vector2 in_Size, float in_Zoom, Texture in_Tex, Action<SCenteredImageData> in_QuadDraw = null, Vector4 in_BackgroundColor = default)
+        {
+            if (!in_Tex.IsEmpty())
+                ImageViewport(in_Label, in_Size, in_Tex.Size.Y / in_Tex.Size.X, in_Zoom, new ImTextureID(in_Tex.GlTex.Id), in_QuadDraw, in_BackgroundColor);
+            else
+            {
+                if(BeginListBoxCustom(in_Label, in_Size))
+                {
+                    ImGui.Text("Missing Texture");
+                    EndListBoxCustom();
+                }
+            }
         }
         public static void ImageViewport(string in_Label, Vector2 in_Size, float in_ImageAspect, float in_Zoom, ImTextureID in_Texture, Action<SCenteredImageData> in_QuadDraw = null, Vector4 in_BackgroundColor = default)
         {
