@@ -188,7 +188,7 @@ namespace Converse
                 ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 1)));
                 if (ImGui.BeginListBox($"##group{in_SelectedGroup.Name}_{in_Cell.Name}", new System.Numerics.Vector2(-1, lineCount * averageSize)))
                 {
-                    ImConverse.DrawCellFromFTE(in_Cell, in_Cell.Message, fontSizeMultiplier, ref lineWidth);
+                    ImConverse.DrawCellFromFTE(in_Cell, in_Renderer.config.fteFile, in_Cell.Message, fontSizeMultiplier, ref lineWidth);
                     ImGui.EndListBox();
                 }
                 ImGui.PopStyleColor();
@@ -222,7 +222,7 @@ namespace Converse
                                 ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 1)));
                                 if (ImGui.BeginListBox($"##groupsub{in_SelectedGroup.Name}_{in_Cell.Name}", new System.Numerics.Vector2(-1, averageSize)))
                                 {
-                                    ImConverse.DrawCellFromFTE(in_Cell, message, fontSizeMultiplier, ref lineWidth);
+                                    ImConverse.DrawCellFromFTE(in_Cell, in_Renderer.config.fteFile, message, fontSizeMultiplier, ref lineWidth);
                                     ImGui.EndListBox();
                                 }
                                 subcell.SubMessage = message;

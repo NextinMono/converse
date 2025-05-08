@@ -62,7 +62,7 @@ namespace Converse
         public MainWindow window;
         public Vector2 screenSize => new Vector2(window.WindowSize.X, window.WindowSize.Y);
         public ConverseProject() { }
-        public ConverseProject(MainWindow in_Window)
+        public void Setup(MainWindow in_Window)
         {
             window = in_Window;
             viewportData = new SViewportData();
@@ -139,17 +139,17 @@ namespace Converse
             {
                 string pathtemp = Path.Combine(parentPath, texture.Name + ".dds");
                 if (File.Exists(pathtemp))
-                    SpriteHelper.Textures.Add(new Texture(pathtemp));
+                    SpriteHelper.AddTexture(new Texture(pathtemp));
                 else
                 {
                     var commonPathTexture = Path.Combine(Program.Path, "Resources", "CommonTextures", texture.Name + ".dds");
                     if (File.Exists(commonPathTexture))
                     {
-                        SpriteHelper.Textures.Add(new Texture(commonPathTexture));
+                        SpriteHelper.AddTexture(new Texture(commonPathTexture));
                     }
                     else
                     {
-                        SpriteHelper.Textures.Add(new Texture(""));
+                        SpriteHelper.AddTexture(new Texture(""));
                         if(!missingTextures.Contains(texture.Name + ".dds"))
                             missingTextures.Add(texture.Name + ".dds");
                     }

@@ -1,5 +1,7 @@
 ﻿using libfco;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using Sprite = Converse.Rendering.Sprite;
@@ -150,6 +152,17 @@ namespace Converse.ShurikenRenderer
             return -1;
         }        
 
+        public static Character? GetConverseCharaFromSprite(Sprite in_Spr)
+        {
+            foreach (var v in ConverseSprites)
+            {
+                if (v.sprite == in_Spr)
+                {
+                    return v.converseChara;
+                }
+            }
+            return null;
+        }
         /// <summary>
         /// Load necessary textures from FTE.
         /// </summary>
@@ -182,6 +195,40 @@ namespace Converse.ShurikenRenderer
             }
             Textures.Clear();
             Sprites.Clear();
+        }
+
+        internal static bool DoesTextureExist(string in_Path)
+        {
+            string filename = Path.GetFileNameWithoutExtension(in_Path);
+            foreach (var t in Textures)
+            {
+                if (t.Name == filename)
+                    return true;
+            }
+            return false;
+        }
+
+        public static void AddTexture(Texture in_Texture, bool in_CreateCharacter = false)
+        {
+            Textures.Add(in_Texture);
+            if(in_CreateCharacter)
+            {
+                var texture2 = new TextureEntry(in_Texture.Name, in_Texture.Size);
+                ConverseProject.Instance.config.fteFile.Textures.Add(texture2);
+                CreateCharacter(in_Texture);
+            }    
+        }
+
+        public static CharacterSprite? GetCharaSpriteFromID(int converseID)
+        {
+            foreach (CharacterSprite v in ConverseSprites)
+            {
+                if (v.converseChara.CharacterID == converseID)
+                {
+                    return v;
+                }
+            }
+            return null;
         }
     }
 }

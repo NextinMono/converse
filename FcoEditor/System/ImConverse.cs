@@ -178,8 +178,9 @@ namespace Converse
             }
             EndListBoxCustom();
         }
-        public static float DrawConverseCharacter(Sprite spr, Vector4 in_Color, float in_OffsetX, float in_FontSize, bool in_IgnoreSpacing = false)
+        public static float DrawConverseCharacter(CharacterSprite in_Sprite, FontTexture in_Fte, Vector4 in_Color, float in_OffsetX, float in_FontSize, bool in_IgnoreSpacing = false)
         {
+            var spr = in_Sprite.sprite;
             //TEMPORARY
             //Since the bg is black, if the text is black, itll be unreadable
             if (in_Color.X == 0 && in_Color.Y == 0 && in_Color.Z == 0 && in_Color.W != 0)
@@ -188,6 +189,7 @@ namespace Converse
                 in_Color.Y = 1;
                 in_Color.Z = 1;
             }
+            var textureDesiredSize = in_Fte.Textures[in_Sprite.converseChara.TextureIndex].Size;
             Vector2 uvTL = new Vector2(
                         spr.Start.X / spr.Texture.Width,
                         -(spr.Start.Y / spr.Texture.Height));
@@ -200,7 +202,7 @@ namespace Converse
             ImGui.SameLine(0, in_OffsetX);
 
             Vector2 cursorPos = ImGui.GetCursorScreenPos();
-            Vector2 size = new System.Numerics.Vector2(spr.Dimensions.X, spr.Dimensions.Y) * in_FontSize;
+            Vector2 size = ((spr.Dimensions / spr.Texture.Size) * textureDesiredSize )* in_FontSize;
             ImGui.GetWindowDrawList()
                  .AddImage(new ImTextureID(spr.Texture.GlTex.Id),
                            cursorPos,
@@ -439,7 +441,7 @@ namespace Converse
                 }
             }
         }
-        public static float DrawCellFromFTE(libfco.Cell in_Cell, int[] in_ConverseIDs, float in_FontSize, ref List<SLineInfo> in_LineWidths)
+        public static float DrawCellFromFTE(libfco.Cell in_Cell,FontTexture in_Fte, int[] in_ConverseIDs, float in_FontSize, ref List<SLineInfo> in_LineWidths)
         {
             CalculateAlignmentSpacing(in_Cell, in_ConverseIDs, in_FontSize, ref in_LineWidths);
             int lineIdx = 0;
@@ -463,8 +465,8 @@ namespace Converse
                 
                 //In the case that a texture cant be found or if its unregistered through
                 //SpriteHelper, print the converse id and skip
-                Sprite spr = SpriteHelper.GetSpriteFromConverseID(converseID);
-                if (spr.IsNull())
+                var spr = SpriteHelper.GetCharaSpriteFromID(converseID).Value;
+                if (spr.sprite.IsNull())
                 {
                     EmptyButton(converseID);
                 }
@@ -477,9 +479,9 @@ namespace Converse
                     float offset = 0;
                     if (in_Cell.Alignment == Cell.TextAlign.Justified)
                     {
-                        offset = ((ImGui.GetContentRegionAvail().X - 50) - ((spr.Dimensions.X * in_FontSize) * in_LineWidths[lineIdx].amount)) / (in_LineWidths[lineIdx].amount - 1);
+                        offset = ((ImGui.GetContentRegionAvail().X - 50) - ((spr.sprite.Dimensions.X * in_FontSize) * in_LineWidths[lineIdx].amount)) / (in_LineWidths[lineIdx].amount - 1);
                     }
-                    averageSize = DrawConverseCharacter(spr, color.ArgbColor, offset, in_FontSize);
+                    averageSize = DrawConverseCharacter(spr, in_Fte, color.ArgbColor, offset, in_FontSize);
                 }
             }
             //Implement subcell drawing here at some point

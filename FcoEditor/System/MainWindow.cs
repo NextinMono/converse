@@ -41,7 +41,8 @@ namespace Converse
         {
             OnActionWithArgs = LoadFromArgs;
             TeamSpettro.Resources.Initialize(Path.Combine(Program.Path, "config.json"));
-            Project = new ConverseProject(this);
+            ConverseProject.Instance.Setup(this);
+            Project = ConverseProject.Instance;
             base.OnLoad();
 
             ImGuiThemeManager.SetTheme(SettingsManager.GetBool("IsDarkThemeEnabled", false));

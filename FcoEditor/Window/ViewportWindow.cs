@@ -44,7 +44,7 @@ namespace Converse
             var renderer = (ConverseProject)in_Renderer;
             renderer.config.translationTable.Clear();
             FcoViewer.Reset();
-
+            FteCropEditor.Reset();
         }
     }
 }

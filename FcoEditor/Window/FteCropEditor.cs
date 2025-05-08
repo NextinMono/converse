@@ -1,7 +1,7 @@
 ﻿using Converse.Rendering;
 using Converse.ShurikenRenderer;
+using HekonrayBase;
 using Hexa.NET.ImGui;
-using Octokit;
 using System;
 using System.Numerics;
 
@@ -75,6 +75,10 @@ namespace Converse
                     ImGui.Text($"Width: {texture.Width}");
                     ImGui.Text($"Height: {texture.Height}");
                     ImGui.SeparatorText("Crop");
+                    if(m_SelectedSpriteIndex >= texture.CropIndices.Count)
+                    {
+                        m_SelectedSpriteIndex = texture.CropIndices.Count - 1;
+                    }
                     ImGui.Text($"Currently editing: Crop ({m_SelectedSpriteIndex})");
                     if(texture.CropIndices.Count != 0)
                     {
@@ -99,9 +103,7 @@ namespace Converse
                             sprite.Start = spriteStart;
                             sprite.Dimensions = spriteSize;
                         }
-
-                    }
-                    
+                    }                    
                 }
                 ImGui.EndListBox();
             }
@@ -146,9 +148,24 @@ namespace Converse
         {
             if (renderer.IsFteLoaded())
             {
-                ImGui.PushStyleColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0.7f, 1, 1)));
-                ImGui.TextWrapped("A translation table is necessary to be able to edit text from FCOs, as they do not store the character used to type out the sentences.");
-                ImGui.PopStyleColor();
+                if(ImGui.Button("Add Texture"))
+                {
+                    var res = NativeFileDialogSharp.Dialog.FileOpen("dds");
+                    if (res.IsOk)
+                    {
+                        if (!SpriteHelper.DoesTextureExist(res.Path))
+                        {
+                            SpriteHelper.AddTexture(new Texture(res.Path), true);
+                        }
+                        else
+                        {
+                            Application.ShowMessageBoxCross("Error", "A texture with this exact name already exists!\nPlease rename the target texture and try again.");
+                        }
+                    }
+                }
+                //ImGui.PushStyleColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0.7f, 1, 1)));
+                //ImGui.TextWrapped("A translation table is necessary to be able to edit text from FCOs, as they do not store the character used to type out the sentences.");
+                //ImGui.PopStyleColor();
                 var padding = ImGui.GetStyle().ItemSpacing;
                 var avgSizeWin = (ImGui.GetWindowSize().X / 4) - padding.X;
                 ZoomFactor = Math.Clamp(ZoomFactor, 0.5f, 5);
@@ -162,9 +179,6 @@ namespace Converse
             {
                 ImGui.Text("Open an FCO file to make a translation table for it.");
             }
-
-
-
             ImGui.EndTabItem();
         }
     }
