@@ -208,7 +208,7 @@ namespace Converse
                 writer.WriteObject(file.file);
             }
             List<Character> characters = new List<Character>();
-            SpriteHelper.BuildCropList(ref characters);
+            SpriteHelper.BuildCharaList(ref characters);
             config.fteFile.Characters = characters;
 
             using BinaryObjectWriter writer2 = new BinaryObjectWriter(config.ftePath, Endianness.Big, Encoding.UTF8);
@@ -259,11 +259,11 @@ namespace Converse
                     in_Entries[i] = entry2;
                 }
             }
-            foreach (var spr in SpriteHelper.CharSprites)
+            foreach (var spr in SpriteHelper.ConverseSprites)
             {
-                if (in_Entries.FindAll(x => x.ConverseID == spr.Key.CharacterID).Count == 0)
+                if (in_Entries.FindAll(x => x.ConverseID == spr.converseChara.CharacterID).Count == 0)
                 {
-                    in_Entries.Add(new TranslationTable.Entry("", spr.Key.CharacterID));
+                    in_Entries.Add(new TranslationTable.Entry("", spr.converseChara.CharacterID));
                 }
             }
         }
