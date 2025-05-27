@@ -29,7 +29,7 @@ namespace Converse
                     {
                         TableViewer.Render(renderer);
                     }
-                    if (ImGui.BeginTabItem("FTE Generator"))
+                    if (ImGui.BeginTabItem("FTE Editor"))
                     {
                         FteCropEditor.Render(renderer);
                         //FteTextureGenerator.Draw(renderer);

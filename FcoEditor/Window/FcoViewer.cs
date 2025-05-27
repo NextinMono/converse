@@ -195,7 +195,7 @@ namespace Converse
                 ImGui.Combo("Alignment", ref alignmentIdx, alignmentOptions, 4);
                 ImGui.ColorEdit4("Color", ref colorMain);
                 ImGui.PushID($"##highlightlist{in_SelectedGroup.Name}_{in_Cell.Name}");
-                if (ImConverse.VisibilityNodeSimple("Furigana", in_ShowArrow: true, in_Icon: NodeIconResource.Subcell))
+                if (ImConverse.VisibilityNodeSimple("Ruby Characters", in_ShowArrow: true, in_Icon: NodeIconResource.Subcell))
                 {
                     if (ImGui.BeginListBox("Subcell List", new Vector2(-1, 200)))
                     {

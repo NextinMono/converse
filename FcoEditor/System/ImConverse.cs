@@ -465,23 +465,31 @@ namespace Converse
                 
                 //In the case that a texture cant be found or if its unregistered through
                 //SpriteHelper, print the converse id and skip
-                var spr = SpriteHelper.GetCharaSpriteFromID(converseID).Value;
-                if (spr.sprite.IsNull())
+                var charaSprite = SpriteHelper.GetCharaSpriteFromID(converseID);
+                if(charaSprite != null)
                 {
-                    EmptyButton(converseID);
+                    var spr = charaSprite.Value;
+                    if (spr.sprite.IsNull())
+                    {
+                        EmptyButton(converseID);
+                    }
+                    else
+                    {
+                        //Get the color to render the text with
+                        CellColor color = in_Cell.FindHighlightFromPos(i);
+
+                        //Calc spacing for justified text
+                        float offset = 0;
+                        if (in_Cell.Alignment == Cell.TextAlign.Justified)
+                        {
+                            offset = ((ImGui.GetContentRegionAvail().X - 50) - ((spr.sprite.Dimensions.X * in_FontSize) * in_LineWidths[lineIdx].amount)) / (in_LineWidths[lineIdx].amount - 1);
+                        }
+                        averageSize = DrawConverseCharacter(spr, in_Fte, color.ArgbColor, offset, in_FontSize);
+                    }
                 }
                 else
                 {
-                    //Get the color to render the text with
-                    CellColor color = in_Cell.FindHighlightFromPos(i);
-                    
-                    //Calc spacing for justified text
-                    float offset = 0;
-                    if (in_Cell.Alignment == Cell.TextAlign.Justified)
-                    {
-                        offset = ((ImGui.GetContentRegionAvail().X - 50) - ((spr.sprite.Dimensions.X * in_FontSize) * in_LineWidths[lineIdx].amount)) / (in_LineWidths[lineIdx].amount - 1);
-                    }
-                    averageSize = DrawConverseCharacter(spr, in_Fte, color.ArgbColor, offset, in_FontSize);
+                    EmptyButton(converseID);
                 }
             }
             //Implement subcell drawing here at some point
