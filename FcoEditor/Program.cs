@@ -1,32 +1,24 @@
-﻿using System.IO;
+﻿using HekonrayBase;
+using System;
+using System.IO;
+using System.Numerics;
 using System.Threading.Tasks;
-namespace ConverseEditor
-{
-    class Program
-    {
-        public static string[] arguments;
-        public static string? Directory
-        {
-            get
-            {
-                return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            }
-        }
-        public static string? ResourcesDirectory
-        {
-            get
-            {
-                return Path.Combine(Directory, "Resources");
-            }
-        }
 
-        static void Main(string[] args)
+namespace Converse
+{
+    internal class Program
+    {
+        public static string[] Arguments;
+        public static string Path = Directory.GetParent(System.Environment.ProcessPath).FullName;
+        public static string PathToExec = System.Environment.ProcessPath;
+
+        private static void Main(string[] in_Args)
         {
-            MainWindow wnd = new MainWindow();
-            wnd.Title = MainWindow.applicationName;
-            arguments = args;
+            Application.LaunchArguments = in_Args;
             Task.Run(UpdateChecker.CheckUpdate);
-            wnd.Run();
+
+            MainWindow mainWindow = new MainWindow(new Version(3, 3), new Vector2Int(1600, 900));
+            mainWindow.Run();
         }
     }
 }

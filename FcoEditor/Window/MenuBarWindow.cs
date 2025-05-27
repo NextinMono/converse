@@ -1,26 +1,16 @@
 ﻿using Hexa.NET.ImGui;
-using ConverseEditor.ShurikenRenderer;
+using Converse.ShurikenRenderer;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using HekonrayBase.Base;
+using HekonrayBase;
 
-namespace ConverseEditor
+namespace Converse
 {
-    public class MenuBarWindow : Window
+    public class MenuBarWindow : Singleton<MenuBarWindow>, IWindow
     {
-        internal static MenuBarWindow instance;
-        public static MenuBarWindow Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new MenuBarWindow();
-                }
-                return instance;
-            }
-        }
         public static float menuBarHeight = 32;
         private readonly string fco = "fco";
         private readonly string fte = "fte";
@@ -52,19 +42,18 @@ namespace ConverseEditor
                 }
             }
         }
-        public string AskForFTE(string in_FcoPath)
+        
+        public void OnReset(IProgramProject in_Renderer)
         {
-            var possibleFtePath = Path.Combine(Directory.GetParent(in_FcoPath).FullName, "fte_ConverseMain.fte");
 
-            var testdial2 = NativeFileDialogSharp.Dialog.FileOpen(fte, Directory.GetParent(in_FcoPath).FullName);
-            if (testdial2.IsOk)
-            {
-                possibleFtePath = testdial2.Path;
-            }
-            return possibleFtePath;
         }
-        public override void Render(ConverseProject in_Renderer)
+        void SaveFileAction(ConverseProject in_Renderer)
         {
+            in_Renderer.SaveFcoFiles(null);
+        }
+        public void Render(IProgramProject in_Renderer)
+        {
+            var renderer = (ConverseProject)in_Renderer;
             if (ImGui.BeginMainMenuBar())
             {
                 menuBarHeight = ImGui.GetWindowSize().Y;
@@ -76,25 +65,37 @@ namespace ConverseEditor
                         var testdial = NativeFileDialogSharp.Dialog.FileOpen(fco);
                         if (testdial.IsOk)
                         {
-                            var possibleFtePath = AskForFTE(testdial.Path);
-                            in_Renderer.LoadFile(@testdial.Path, possibleFtePath);
+                            var possibleFtePath = renderer.AskForFTE(testdial.Path);
+                            renderer.LoadPairFile(@testdial.Path, possibleFtePath);
                         }
                     }
+                    if (ImGui.MenuItem("Open folder"))
+                    {
+                        var testdial = NativeFileDialogSharp.Dialog.FolderPicker(fco);
+                        if (testdial.IsOk)
+                        {
+                            renderer.LoadFolder(@testdial.Path);
+                        }
+                    }
+                    if(ImGui.MenuItem("Open folder in Explorer", false, renderer.IsFteLoaded()))
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                        {
+                            FileName = Directory.GetParent(renderer.config.ftePath).FullName,
+                            UseShellExecute = true,
+                            Verb = "open"
+                        });
+                    }
+                    ImGui.Separator();
                     if (ImGui.MenuItem("Save", "Ctrl + S"))
                     {
-                        in_Renderer.SaveCurrentFile(ConverseProject.config.WorkFilePath);
+                        SaveFileAction(renderer);
                     }
                     if (ImGui.MenuItem("Save As...", "Ctrl + Alt + S"))
                     {
-                        var testdial = NativeFileDialogSharp.Dialog.FileSave(fco);
-                        if (testdial.IsOk)
-                        {
-                            string path = testdial.Path;
-                            if (!Path.HasExtension(path))
-                                path += ".fco";
-                            in_Renderer.SaveCurrentFile(path);
-                        }
+                        SaveFileAsAction(renderer);
                     }
+                    ImGui.Separator();
                     if (ImGui.MenuItem("Exit"))
                     {
                         Environment.Exit(0);
@@ -103,20 +104,22 @@ namespace ConverseEditor
                 }
                 if (ImGui.BeginMenu("Edit"))
                 {
-                    if (ImGui.MenuItem("Associate extensions"))
+                    if (ImGui.MenuItem("Find","Ctrl + F", FindReplaceTool.Enabled))
                     {
-                        ExecuteAsAdmin(@Path.Combine(@Program.Directory, "FileTypeRegisterService.exe"));
+                        FindReplaceTool.SetActive(true, false);
                     }
+                    if (ImGui.MenuItem("Find and Replace", "Ctrl + H", FindReplaceTool.Enabled))
+                    {
+                        FindReplaceTool.SetActive(true, true);
+                    }
+                    ImGui.Separator();
                     if (ImGui.MenuItem("Preferences", SettingsWindow.Enabled))
                     {
                         SettingsWindow.Enabled = !SettingsWindow.Enabled;
                     }
-                    if (ImGui.MenuItem("Replace", FindReplaceTool.Enabled))
-                    {
-                        FindReplaceTool.Enabled = !FindReplaceTool.Enabled;
-                    }
                     ImGui.EndMenu();
                 }
+                
 
                 if (ImGui.BeginMenu("Help"))
                 {
@@ -145,33 +148,46 @@ namespace ConverseEditor
                 }
                 ImGui.PopStyleColor();
             }
+            ProcessShortcuts(renderer);
             ImGui.EndMainMenuBar();
         }
-        public static string AddQuotesIfRequired(string in_Path)
-        {
-            return !string.IsNullOrWhiteSpace(in_Path) ?
-                in_Path.Contains(" ") && (!in_Path.StartsWith("\"") && !in_Path.EndsWith("\"")) ?
-                    "\"" + in_Path + "\"" : in_Path :
-                    string.Empty;
-        }
-        public static void ExecuteAsAdmin(string in_FileName)
-        {
-            //Reason for this try-catch statement is because
-            //if the user cancels the UAC prompt,
-            //an exception will be thrown
-            try
-            {
-                in_FileName = AddQuotesIfRequired(in_FileName);
-                Process proc = new Process();
-                proc.StartInfo.FileName = in_FileName;
-                proc.StartInfo.UseShellExecute = true;
-                proc.StartInfo.Verb = "runas";
-                proc.Start();
-            }
-            catch(Exception e)
-            {
 
-            }
+        private void SaveFileAsAction(ConverseProject in_Renderer)
+        {
+            var testdial = NativeFileDialogSharp.Dialog.FileSave(fco);
+            if (testdial.IsOk)
+            {
+                string path = testdial.Path;
+                if (!Path.HasExtension(path))
+                    path += ".fco";
+                in_Renderer.SaveFcoFiles(path);
+            };
+        }
+
+        private void ProcessShortcuts(ConverseProject in_Renderer)
+        {
+            if (ImGui.IsKeyDown(ImGuiKey.ModCtrl))
+            {
+                if (ImGui.IsKeyPressed(ImGuiKey.F))
+                {
+                    FindReplaceTool.SetActive(true, false);
+                }
+                if (ImGui.IsKeyPressed(ImGuiKey.H))
+                {
+                    FindReplaceTool.SetActive(true, true);
+                }
+                if (ImGui.IsKeyPressed(ImGuiKey.S))
+                {
+                    if (ImGui.IsKeyDown(ImGuiKey.ModAlt))
+                    {
+                        SaveFileAsAction(in_Renderer);
+                    }
+                    else
+                    {
+                        SaveFileAction(in_Renderer);
+                    }
+                }
+            };
         }
     }
 }

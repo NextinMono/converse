@@ -15,7 +15,7 @@ namespace FileTypeRegisterService
         private static void AssociateFileTypeSingle(string in_Ext, string in_TypeDesc)
         {
             string parentPath = Directory.GetParent(in_Ext).FullName;
-            string kunaiExecPath = Path.Combine(parentPath, "ConverseEditor.exe");
+            string kunaiExecPath = Path.Combine(parentPath, "Converse.exe");
             FileAssociationInfo fai = new FileAssociationInfo($".{in_Ext}");
             if (fai.Exists)
                 fai.Delete();

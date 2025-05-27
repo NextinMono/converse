@@ -1,163 +1,134 @@
-﻿using System.IO;
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Media.Imaging;
-using DirectXTexNet;
-using Converse.Rendering.Gvr;
-using System.Windows.Media;
-using System.Drawing;
-using System.Windows.Interop;
-using OpenTK.Graphics.OpenGL;
+﻿using DirectXTexNet;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace Converse.Rendering
-{    
+{
     public class Texture
     {
         public string Name { get; }
         public string FullName { get; }
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public Vector2 Size { get { return new Vector2(Width, Height); } set { Width = (int)value.X; Height = (int)value.Y; } }
 
+        public bool IsLoaded => GlTex != null;
         public BitmapSource ImageSource { get; private set; }
-        internal GLTexture GlTex { get; private set; }
-        public ObservableCollection<int> Sprites { get; set; }
+        internal GlTexture GlTex { get; private set; }
+        public List<int> CropIndices { get; set; }
 
-        private void CreateTexture(ScratchImage img)
+        public bool IsEmpty()
         {
-            if (TexHelper.Instance.IsCompressed(img.GetMetadata().Format))
-                img = img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM);
+            return string.IsNullOrEmpty(FullName) && GlTex == null;
+        }
 
-            else if (img.GetMetadata().Format != DXGI_FORMAT.B8G8R8A8_UNORM)
-                img = img.Convert(DXGI_FORMAT.B8G8R8A8_UNORM, TEX_FILTER_FLAGS.DEFAULT, 0.5f);
+        private void CreateTexture(ScratchImage in_Img)
+        {
+            if (TexHelper.Instance.IsCompressed(in_Img.GetMetadata().Format))
+                in_Img = in_Img.Decompress(DXGI_FORMAT.B8G8R8A8_UNORM);
 
-            Width = img.GetImage(0).Width;
-            Height = img.GetImage(0).Height;
+            else if (in_Img.GetMetadata().Format != DXGI_FORMAT.B8G8R8A8_UNORM)
+                in_Img = in_Img.Convert(DXGI_FORMAT.B8G8R8A8_UNORM, TEX_FILTER_FLAGS.DEFAULT, 0.5f);
 
-            GlTex = new GLTexture(img.FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL).GetImage(0).Pixels, Width, Height);
+            Width = in_Img.GetImage(0).Width;
+            Height = in_Img.GetImage(0).Height;
 
-            CreateBitmap(img);
+            GlTex = new GlTexture(in_Img.FlipRotate(TEX_FR_FLAGS.FLIP_VERTICAL).GetImage(0).Pixels, Width, Height);
 
-            img.Dispose();
+            CreateBitmap(in_Img);
+
+            in_Img.Dispose();
         }
 
         public void Destroy()
         {
-            if(GlTex != null)
-            GL.DeleteTexture(GlTex.ID);
-        }
-        /// <summary>
-        /// Used for GVR textures for GNCPs, converts GVR's to BitmapSource and output a pixel array for the GL WPF Control
-        /// </summary>
-        /// <param name="in_Gvr">GVR Texture</param>
-        /// <param name="out_Pixels">Pixel array output for GL</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException">Thrown if the GVR pixel array is null</exception>
-        public static BitmapSource LoadTga(GVRFile in_Gvr, ref byte[] out_Pixels)
-        {
-            if (in_Gvr.Pixels == null) throw new ArgumentNullException("GVR Image might be invalid, pixel array is null.");
-            var pixelFormat = PixelFormats.Bgr32; //temporary!!!!!!
-
-            ///FIX PLEASE THIS IS HORRIBLE AND MAKES THIS NOT FULLY FUNCTIONAL
-            if (in_Gvr.DataFormat == GvrDataFormat.Index4 || in_Gvr.DataFormat == GvrDataFormat.Index8)
+            if (GlTex != null)
             {
-                var bitmap2 = new WriteableBitmap(
-                in_Gvr.Width, in_Gvr.Height,
-                96, 96,
-                pixelFormat,
-                null
-                );
-                return bitmap2;
+                GlTex.Dispose();
             }
-            int bytesPerPixel = pixelFormat.BitsPerPixel / 8;
-            int stride = in_Gvr.Width * bytesPerPixel;
-
-            var bitmap = new WriteableBitmap(
-                in_Gvr.Width, in_Gvr.Height,
-                96, 96,
-                pixelFormat,
-                null
-            );
-
-            bitmap.WritePixels(
-                new Int32Rect(0, 0, in_Gvr.Width, in_Gvr.Height),
-                in_Gvr.Pixels,
-                stride,
-                0
-            );
-            //Flip vertically
-            TransformedBitmap transformedBitmap = new TransformedBitmap();
-            WriteableBitmap bmpClone = bitmap.Clone();
-            transformedBitmap.BeginInit();
-            transformedBitmap.Source = bmpClone;
-            ScaleTransform transform = new ScaleTransform(1, -1, 0, 0);
-            transformedBitmap.Transform = transform;
-            transformedBitmap.EndInit();
-
-            out_Pixels = new byte[stride * transformedBitmap.PixelHeight];
-
-            transformedBitmap.CopyPixels(out_Pixels, stride, 0);
-
-            return bitmap;
+            ImageSource = null;
         }
-        private unsafe void CreateTextureGvr(GVRFile gvr)
+       
+        private unsafe void CreateTexture(byte[] in_Bytes)
         {
-            Width = gvr.Width;
-            Height = gvr.Height;
-
-            byte[] forGlTex = null;
-            var bmp = LoadTga(gvr, ref forGlTex);
-            if (bmp == null)
-                return;
-
-            fixed (byte* pBytes = forGlTex)
-                GlTex = new GLTexture((nint)pBytes, Width, Height);
-            ImageSource = bmp;
+            fixed (byte* pBytes = in_Bytes)
+                CreateTexture(TexHelper.Instance.LoadFromDDSMemory((nint)pBytes, in_Bytes.Length, DDS_FLAGS.NONE));
         }
 
-        private unsafe void CreateTexture(byte[] bytes)
+        private void CreateTextureDds(string in_Filename)
         {
-            fixed (byte* pBytes = bytes)
-                CreateTexture(TexHelper.Instance.LoadFromDDSMemory((nint)pBytes, bytes.Length, DDS_FLAGS.NONE));
+            CreateTexture(TexHelper.Instance.LoadFromDDSFile(in_Filename, DDS_FLAGS.NONE));
         }
 
-        private void CreateTexture(string filename)
+        private void CreateBitmap(ScratchImage in_Img)
         {
-            CreateTexture(TexHelper.Instance.LoadFromDDSFile(filename, DDS_FLAGS.NONE));
-        }
-
-        private void CreateBitmap(ScratchImage img)
-        {
-            var bmp = BitmapConverter.FromTextureImage(img, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var bmp = BitmapConverter.FromTextureImage(in_Img, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             ImageSource = BitmapConverter.FromBitmap(bmp);
 
-            img.Dispose();
+            in_Img.Dispose();
             bmp.Dispose();
         }
 
-        public Texture(string filename, bool gvrTex = false) : this()
+        public Texture(string in_Filename) : this()
         {
-            FullName = filename;
-            if(string.IsNullOrEmpty(filename))
+            FullName = in_Filename;
+            if (string.IsNullOrEmpty(in_Filename))
             {
                 return;
             }
-            Name = Path.GetFileNameWithoutExtension(filename);
-            if (gvrTex)
+            Name = Path.GetFileNameWithoutExtension(in_Filename);
+
+            if (File.Exists(in_Filename))
             {
-                GVRFile gVR = new GVRFile();
-                gVR.LoadFromGvrFile(filename.ToLower());
-                CreateTextureGvr(gVR);
+                string ext = Path.GetExtension(in_Filename);
+                
+                if (ext == ".dds")
+                {
+                    CreateTextureDds(in_Filename);
+                    return;
+                }
+                try
+                {
+                    CreateTextureUnknown(in_Filename);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Unknown file format.");
+                }
+
             }
-            else
-                CreateTexture(filename);
         }
 
-        public Texture(string name, byte[] bytes) : this()
+        private void CreateTextureUnknown(string in_Filename)
         {
-            FullName = name;
-            Name = name;
-            CreateTexture(bytes);
+            Image<Bgra32> image = Image.Load<Bgra32>(in_Filename);
+
+            image.Mutate(in_X => in_X.Flip(FlipMode.Vertical));
+            Width = image.Width;
+            Height = image.Height;
+            byte[] pixelArray = new byte[(image.Width * image.Height) * 4];
+            image.CopyPixelDataTo(pixelArray);
+            unsafe
+            {
+                fixed (byte* pBytes = pixelArray)
+                    GlTex = new GlTexture((nint)pBytes, Width, Height);
+            }
+        }
+
+        public Texture(string in_Name, byte[] in_Bytes) : this()
+        {
+            FullName = in_Name;
+            Name = in_Name;
+            CreateTexture(in_Bytes);
         }
 
         public Texture()
@@ -167,7 +138,7 @@ namespace Converse.Rendering
             ImageSource = null;
             GlTex = null;
 
-            Sprites = new ObservableCollection<int>();
+            CropIndices = new List<int>();
         }
     }
 }

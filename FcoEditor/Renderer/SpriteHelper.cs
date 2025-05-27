@@ -1,111 +1,43 @@
-﻿
-using Converse.Rendering;
-using SUFcoTool;
+﻿using libfco;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Media;
+using System.IO;
+using System.Linq;
+using System.Numerics;
 using Sprite = Converse.Rendering.Sprite;
 using Texture = Converse.Rendering.Texture;
-namespace ConverseEditor.ShurikenRenderer
+
+namespace Converse.ShurikenRenderer
 {
-    public struct Crop
-    {
-        public Character Character;
-        public uint TextureIndex;
-        public Vector2 TopLeft;
-        public Vector2 BottomRight;
-    }
-    public class TextureList
-    {
-        private string name;
-        public string Name
-        {
-            get { return name; }
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                    name = value;
-            }
-        }
-
-        public List<Texture> Textures { get; set; } = new List<Texture>();
-
-        public TextureList(string listName)
-        {
-            name = listName;
-            Textures = new List<Texture>();
-        }
-    }
-    public class UIFont
-    {
-        public int ID { get; private set; }
-
-        private string name;
-        public string Name
-        {
-            get => name;
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                    name = value;
-            }
-        }
-
-        public List<CharacterMapping> Mappings { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public UIFont(string name, int id)
-        {
-            ID = id;
-            Name = name;
-            Mappings = new List<CharacterMapping>();
-        }
-    }
-    public class CharacterMapping
-    {
-        private char character;
-        public char Character
-        {
-            get => character;
-            set
-            {
-                if (!string.IsNullOrEmpty(value.ToString()))
-                    character = value;
-            }
-        }
-
-        public int Sprite { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public CharacterMapping(char c, int sprID)
-        {
-            Character = c;
-            Sprite = sprID;
-        }
-
-        public CharacterMapping()
-        {
-            Sprite = -1;
-        }
-    }
     public static class SpriteHelper
     {
-        public static Dictionary<Character, int> CharSprites = new Dictionary<Character, int>();
-        public static Dictionary<int, Converse.Rendering.Sprite> Sprites { get; set; } = new Dictionary<int, Sprite>();
-        private static int NextSpriteID = 0;
-        private static List<Crop> ncpSubimages = new List<Crop>();
-        public static TextureList textureList;
+        /// <summary>
+        /// List of converse characters with their respective sprite
+        /// </summary>
+        public static List<CharacterSprite> ConverseSprites = new List<CharacterSprite>();
 
+        /// <summary>
+        /// List of all loaded sprites with their ID
+        /// </summary>
+        public static Dictionary<int, Sprite> Sprites { get; set; } = new Dictionary<int, Sprite>();
+
+        /// <summary>
+        /// List of all loaded texture files
+        /// </summary>
+        public static List<Texture> Textures { get; set; } = new List<Texture>();
+
+        /// <summary>
+        /// Fetch a sprite based only on the Character ID.
+        /// </summary>
+        /// <param name="converseID"></param>
+        /// <returns>Sprite</returns>
         public static Sprite GetSpriteFromConverseID(int converseID)
         {
-            foreach (var v in CharSprites)
+            foreach (CharacterSprite v in ConverseSprites)
             {
-                if (v.Key.CharacterID == converseID)
+                if (v.converseChara.CharacterID == converseID)
                 {
-                    return TryGetSprite(v.Value);
+                    return v.sprite;
                 }
             }
             return null;
@@ -115,79 +47,188 @@ namespace ConverseEditor.ShurikenRenderer
             Sprites.TryGetValue(id, out Sprite sprite);
             return sprite;
         }
-        public static int AppendSprite(Sprite spr)
+        private static int AppendSprite(Sprite spr)
         {
-            Sprites.Add(NextSpriteID, spr);
-            return NextSpriteID++;
+            Sprites.Add(Sprites.Count, spr);
+            return Sprites.Count - 1;
         }
+        public static void DeleteCharacter(int in_SprID)
+        {
+            for (int i = 0; i < ConverseSprites.Count; i++)
+            {
+                if (ConverseSprites[i].spriteId == in_SprID)
+                {
+                    DeleteSprite(ConverseSprites[i].spriteId);
+                    return;
+                }
+            }
+        }
+        public static void DeleteCharacter(Character in_Chara)
+        {
+            for (int i = 0; i < ConverseSprites.Count; i++)
+            {
+                if (ConverseSprites[i].converseChara.CharacterID == in_Chara.CharacterID)
+                {
+                    DeleteSprite(ConverseSprites[i].spriteId);
+                    return;
+                }
+            }
+        }
+        public static void DeleteSprite(int in_SprIndex)
+        {
+            Sprites.TryGetValue(in_SprIndex, out Sprite sprite);
+            sprite.Texture.CropIndices.Remove(in_SprIndex);
+            Sprites.Remove(in_SprIndex);
+        }
+
+        /// <summary>
+        /// Create a new cropped Sprite from a texture.
+        /// </summary>
+        /// <param name="tex">Texture</param>
+        /// <param name="top">Top UV coordinate</param>
+        /// <param name="left">Left UV coordinate</param>
+        /// <param name="bottom">Bottom UV coordinate</param>
+        /// <param name="right">Right UV coordinate</param>
+        /// <returns>Sprite ID</returns>
         public static int CreateSprite(Texture tex, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
         {
-            Sprite spr = new Sprite(NextSpriteID, tex, top, left, bottom, right);
-            return AppendSprite(spr);
+            Sprite spr = new Sprite(tex, top, left, bottom, right);
+            int newId = AppendSprite(spr);
+            tex.CropIndices.Add(newId);
+            return newId;
         }
-        public static void LoadTextures(List<Character> in_CsdProject)
-        {
-            ncpSubimages.Clear();
-            Sprites.Clear();
-            CharSprites.Clear();
-            GetSubImages(in_CsdProject);
-            LoadSubimages(textureList, ncpSubimages);
-        }
-        public static void GetSubImages(List<Character> node)
-        {
-            //foreach (var scene in node.Scenes)
-            //{
 
-
-            foreach (var item in node)
+        public static int CreateCharacter(Texture in_Tex, int in_CharacterID = -1, float top = 0.0f, float left = 0.0f, float bottom = 1.0f, float right = 1.0f)
+        {
+            var res = CreateSprite(in_Tex, top, left, bottom, right);
+            if(in_CharacterID == -1)
             {
-                var i = new Crop();
-                i.Character = item;
-                i.TextureIndex = (uint)item.TextureIndex;
-                i.TopLeft = new Vector2(item.TopLeft.X, item.TopLeft.Y);
-                i.BottomRight = new Vector2(item.BottomRight.X, item.BottomRight.Y);
-                ncpSubimages.Add(i);
+                var highestID = ConverseSprites.Max(x => x.converseChara.CharacterID);
+                in_CharacterID = highestID + 1;
             }
-            //}
-
-            //foreach (KeyValuePair<string, SceneNode> child in node.Children)
-            //{
-            //    if (ncpSubimages.Count > 0)
-            //        return;
-            //
-            //    GetSubImages(child.Value);
-            //}
+            Character character = new Character();
+            character.CharacterID = in_CharacterID;
+            ConverseSprites.Add(new CharacterSprite(character, res));
+            return ConverseSprites.Count - 1;
         }
-        private static void LoadSubimages(ConverseEditor.ShurikenRenderer.TextureList texList, List<Crop> subimages)
+        /// <summary>
+        /// Converts all stored sprites back into FTE characters.
+        /// </summary>
+        /// <param name="in_SubImages"></param>
+        /// <param name="in_TextureSizes"></param>
+        public static void BuildCharaList(ref List<Character> in_SubImages)
         {
-            foreach (var image in subimages)
+            in_SubImages = new();
+            foreach (CharacterSprite entry in ConverseSprites)
             {
-                int textureIndex = (int)image.TextureIndex;
-                //if (textureIndex >= 0 && textureIndex < texList.Textures.Count)
-                //{
-                if (!CharSprites.ContainsKey(image.Character))
+                Sprite sprite = entry.sprite;
+                int textureIndex = Textures.IndexOf(sprite.Texture);
+
+                var size = sprite.Texture.Size;
+                //sprite.GenerateCoordinates(size);
+
+                Character subImage = entry.converseChara;
+                subImage.CharacterID = entry.converseChara.CharacterID;
+                subImage.TextureIndex = textureIndex;
+                subImage.TopLeft = new Vector2((float)sprite.X / size.X, (float)sprite.Y / size.Y);
+                subImage.BottomRight = new Vector2((float)(sprite.X + sprite.Width) / size.X, (float)(sprite.Y + sprite.Height) / size.Y);
+                in_SubImages.Add(subImage);
+            }
+        }
+        /// <summary>
+        /// Fetch the correct Character ID from a Sprite.
+        /// </summary>
+        /// <param name="in_Spr"></param>
+        /// <returns></returns>
+        public static int GetConverseIDFromSprite(Sprite in_Spr)
+        {
+            foreach (var v in ConverseSprites)
+            {
+                if (v.sprite == in_Spr)
                 {
-                    int id = CreateSprite(texList.Textures[textureIndex], image.TopLeft.Y, image.TopLeft.X,
-                        image.BottomRight.Y, image.BottomRight.X);
-                    CharSprites.Add(image.Character, id);
-                    texList.Textures[textureIndex].Sprites.Add(id);
+                    return v.converseChara.CharacterID;
                 }
+            }
+            return -1;
+        }        
+
+        public static Character? GetConverseCharaFromSprite(Sprite in_Spr)
+        {
+            foreach (var v in ConverseSprites)
+            {
+                if (v.sprite == in_Spr)
+                {
+                    return v.converseChara;
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// Load necessary textures from FTE.
+        /// </summary>
+        /// <param name="in_Characters"></param>
+        public static void LoadTextures(List<Character> in_Characters)
+        {
+            Sprites.Clear();
+            ConverseSprites.Clear();
+            CreateCropsFromFte(in_Characters);
+        }
+        public static void CreateCropsFromFte(List<Character> in_Characters)
+        {
+            foreach (Character item in in_Characters)
+            {
+                //if (!CharSprites.Contains(x item))
+                //{
+                int textureIndex = (int)item.TextureIndex;
+                int id = CreateSprite(Textures[textureIndex], item.TopLeft.Y, item.TopLeft.X,
+                    item.BottomRight.Y, item.BottomRight.X);
+                ConverseSprites.Add(new CharacterSprite(item, id));
                 //}
             }
         }
 
         internal static void ClearTextures()
         {
-            if (textureList == null)
-                return;
-            foreach(var f in textureList.Textures)
+            foreach (var f in Textures)
             {
                 f.Destroy();
             }
-            textureList.Textures.Clear();
-            ncpSubimages.Clear();
+            Textures.Clear();
             Sprites.Clear();
-            NextSpriteID = 1;
+        }
+
+        internal static bool DoesTextureExist(string in_Path)
+        {
+            string filename = Path.GetFileNameWithoutExtension(in_Path);
+            foreach (var t in Textures)
+            {
+                if (t.Name == filename)
+                    return true;
+            }
+            return false;
+        }
+
+        public static void AddTexture(Texture in_Texture, bool in_CreateCharacter = false)
+        {
+            Textures.Add(in_Texture);
+            if(in_CreateCharacter)
+            {
+                var texture2 = new TextureEntry(in_Texture.Name, in_Texture.Size);
+                ConverseProject.Instance.config.fteFile.Textures.Add(texture2);
+                CreateCharacter(in_Texture);
+            }    
+        }
+
+        public static CharacterSprite? GetCharaSpriteFromID(int converseID)
+        {
+            foreach (CharacterSprite v in ConverseSprites)
+            {
+                if (v.converseChara.CharacterID == converseID)
+                {
+                    return v;
+                }
+            }
+            return null;
         }
     }
 }

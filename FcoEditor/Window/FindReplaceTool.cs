@@ -1,37 +1,84 @@
-﻿using ConverseEditor.ShurikenRenderer;
-using ConverseEditor.Utility;
+﻿using Converse.ShurikenRenderer;
+using Converse.Utility;
+using HekonrayBase;
 using Hexa.NET.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
-namespace ConverseEditor
+namespace Converse
 {
     internal class FindReplaceTool
     {
         public static bool Enabled = false;
+        public static int occurencesCount;
+        public static bool replaceMode;
         public static string findString = "";
         public static string replaceString = "";
+        public static void SetActive(bool in_Status, bool in_ReplaceMode)
+        {
+            Enabled = in_Status;
+            replaceMode = in_ReplaceMode;
+        }
         public static void Render(ConverseProject in_Renderer)
         {
-
-            ImGui.BeginDisabled(!FcoViewerWindow.Instance.tablePresent);
-            ImGui.InputTextMultiline("Find", ref findString, 1024);
-            ImGui.InputTextMultiline("Replace", ref replaceString, 1024);
-            if (ImGui.Button("Execute"))
-                ReplaceText(in_Renderer);
-
-            if (!FcoViewerWindow.Instance.tablePresent)
+            ImGui.OpenPopup("Find and Replace");
+            Vector2 size = new Vector2(500, replaceMode ? 400 : 255);
+            ImConverse.CenterWindow(size);
+            if (ImGui.BeginPopupModal("Find and Replace", ref Enabled, ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
             {
-                if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                //ImGui.BeginDisabled(!in_Renderer.IsTableLoaded());
+                if (ImGui.InputTextMultiline("Find...", ref findString, 2048))
+                    occurencesCount = 0;
+                if (replaceMode)
                 {
-                    ImGui.BeginTooltip();
-                    ImGui.Text("You cannot edit text unless you have a Translation Table open.");
-                    ImGui.EndTooltip();
+                    ImGui.InputTextMultiline("Replace with...", ref replaceString, 2048);
                 }
+                else
+                {
+                    if (occurencesCount > 0)
+                    {
+                        ImGui.Text($"Found \"{findString}\" in {occurencesCount} cells.");
+                    }
+                }
+                ImGui.Separator();
+                if(replaceMode)
+                {
+                    if (ImGui.Button("Replace"))
+                    {
+                        ReplaceText(in_Renderer);
+                        ImGui.CloseCurrentPopup();
+                        Enabled = false;
+                    }
+                }
+                else
+                {
+                    if (ImGui.Button("Find"))
+                    {
+                        occurencesCount = FindText(in_Renderer);
+                    }
+                }
+
+                if (!in_Renderer.IsTableLoaded())
+                {
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.BeginTooltip();
+                        ImGui.Text("You cannot enter text directly without a Translation Table.");
+                        ImGui.EndTooltip();
+                    }
+                }
+                //ImGui.EndDisabled();
+                ImGui.SameLine();
+                if (ImGui.Button("Cancel"))
+                {
+                    ImGui.CloseCurrentPopup();
+                    Enabled = false;
+                }
+                ImGui.EndPopup();
             }
-            ImGui.Separator();
-            ImGui.EndDisabled();
+            
         }
         static int FindSequenceIndex(int[] list, int[] sequence)
         {
@@ -46,22 +93,45 @@ namespace ConverseEditor
         }
         private static void ReplaceText(ConverseProject in_Renderer)
         {
-            var hexFind = TranslationService.RawTXTtoHEX(findString, FcoViewerWindow.Instance.translationTableNew);
-            var hexReplace = TranslationService.RawTXTtoHEX(replaceString, FcoViewerWindow.Instance.translationTableNew);
-            foreach (var group in in_Renderer.fcoFile.Groups)
+            var hexFind = TranslationService.RawTXTtoHEX(findString, in_Renderer.config.translationTable);
+            var hexReplace = TranslationService.RawTXTtoHEX(replaceString, in_Renderer.config.translationTable);
+            foreach(var file in in_Renderer.GetFcoFiles())
             {
-                foreach(var cell in group.CellList)
+                foreach (var group in file.file.Groups)
                 {
-                    int index = FindSequenceIndex(cell.Message, hexFind);
-                    if (index != -1)
+                    foreach (var cell in group.Cells)
                     {
-                        var list = cell.Message.ToList();
-                        list.RemoveRange(index, hexFind.Length);
-                        list.InsertRange(index, hexReplace);
-                        cell.Message = list.ToArray();
+                        int index = FindSequenceIndex(cell.Message, hexFind);
+                        if (index != -1)
+                        {
+                            var list = cell.Message.ToList();
+                            list.RemoveRange(index, hexFind.Length);
+                            list.InsertRange(index, hexReplace);
+                            cell.Message = list.ToArray();
+                        }
                     }
                 }
             }
+        }
+        private static int FindText(ConverseProject in_Renderer)
+        {
+            int result = 0;
+            var hexFind = TranslationService.RawTXTtoHEX(findString, in_Renderer.config.translationTable);
+            foreach (var file in in_Renderer.GetFcoFiles())
+            {
+                foreach (var group in file.file.Groups)
+                {
+                    foreach (var cell in group.Cells)
+                    {
+                        int index = FindSequenceIndex(cell.Message, hexFind);
+                        if (index != -1)
+                        {
+                            result++;
+                        }
+                    }
+                }
+            }
+            return result;
         }
     }
 }

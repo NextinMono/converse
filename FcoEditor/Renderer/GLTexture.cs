@@ -1,40 +1,41 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿using Hexa.NET.OpenGL;
+
 namespace Converse.Rendering
 {
-    internal class GLTexture
+    public class GlTexture
     {
-        private int id = 0;
-        public int ID
+        private uint m_Id = 0;
+        public uint Id
         {
-            get { return id; }
-            set { id = value; }
+            get { return m_Id; }
+            set { m_Id = value; }
         }
 
-        public GLTexture()
+        public GlTexture()
         {
 
         }
 
-        public GLTexture(nint pixels, int width, int height)
+        public GlTexture(nint in_Pixels, int in_Width, int in_Height)
         {
-            GL.GenTextures(1, out id);
+            GLSingle.Ins.GenTextures(1, ref m_Id);
 
-            GL.BindTexture(TextureTarget.Texture2D, ID);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
+            GLSingle.Ins.BindTexture(GLTextureTarget.Texture2D, Id);
+            GLSingle.Ins.TexParameterf(GLTextureTarget.Texture2D, GLTextureParameterName.WrapS, (int)GLTextureWrapMode.Repeat);
+            GLSingle.Ins.TexParameterf(GLTextureTarget.Texture2D, GLTextureParameterName.WrapT, (int)GLTextureWrapMode.Repeat);
+            GLSingle.Ins.TexParameterf(GLTextureTarget.Texture2D, GLTextureParameterName.MinFilter, (int)GLTextureMinFilter.Linear);
+            GLSingle.Ins.TexParameterf(GLTextureTarget.Texture2D, GLTextureParameterName.MagFilter, (int)GLTextureMagFilter.Linear);
+            GLSingle.Ins.TexImage2D(GLTextureTarget.Texture2D, 0, GLInternalFormat.Rgba, in_Width, in_Height, 0, GLPixelFormat.Bgra, GLPixelType.UnsignedByte, in_Pixels);
         }
 
         public void Bind()
         {
-            GL.BindTexture(TextureTarget.Texture2D, id);
+            GLSingle.Ins.BindTexture(GLTextureTarget.Texture2D, m_Id);
         }
 
         public void Dispose()
         {
-            GL.DeleteTextures(1, ref id);
+            GLSingle.Ins.DeleteTextures(1, ref m_Id);
         }
     }
 

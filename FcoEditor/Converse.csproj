@@ -1,0 +1,125 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <StartupObject>Converse.Program</StartupObject>
+    <ApplicationIcon>Resources\Icons\fco.ico</ApplicationIcon>
+	<PublishSingleFile>true</PublishSingleFile>
+
+	  <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+<ItemGroup>
+    <Content Include="Resources\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+</ItemGroup>
+<ItemGroup>
+  <Content Remove="Resources\Tables\Icons.json" />
+  <Content Remove="Resources\Tables\Languages\English\DLC\Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Preview\Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Preview\In-Stage.json" />
+  <Content Remove="Resources\Tables\Languages\English\Preview\Tornado.json" />
+  <Content Remove="Resources\Tables\Languages\English\Preview\WorldMap.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\EvilActionCommon.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\ExStageTails_Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Install.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\SonicActionCommon.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Town_Africa_Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Town_Mykonos_Common.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Town_Mykonos_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\Town_Mykonos_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\English\Retail\WorldMap.json" />
+  <Content Remove="Resources\Tables\Languages\Icons.json" />
+  <Content Remove="Resources\Tables\Languages\Italian\Retail\WorldMap.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\EvilActionCommon.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\ExStageTails_Common (fte_ConverseMain).json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\SonicActionCommon.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\S_Town_Africa_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\S_Town_Africa_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\S_Town_Africa_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Africa_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Africa_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Africa_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_China_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_China_Common2.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_China_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_China_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EggManBase_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EggManBase_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EggManBase_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EULabo_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EuropeanCity_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EuropeanCity_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_EuropeanCity_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Mykonos_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Mykonos_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Mykonos_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_NYCity_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_NYCity_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_NYCity_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_PetraCapital_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_PetraCapital_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_PetraCapital_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Snow_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Snow_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_Snow_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_SouthEastAsia_Common.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_SouthEastAsia_Common_Extra.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\Town_SouthEastAsia_Common_Large.json" />
+  <Content Remove="Resources\Tables\Languages\Spanish\Retail\WorldMap.json" />
+  <Content Remove="Resources\Tables\Subtitle\Icons.json" />
+  <Content Remove="Resources\Tables\Subtitle\Spanish\Retail\evrt_m0_01_05.json" />
+  <Content Remove="Resources\Tables\Subtitle\Spanish\Retail\evrt_m0_06.json" />
+  <Content Remove="Resources\Tables\Subtitle\Spanish\Retail\evrt_m1_01.json" />
+</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BCnEncoder.Net.ImageSharp" Version="1.1.2" />
+    <PackageReference Include="DirectXTexNet" Version="1.0.7" />
+    <PackageReference Include="Hexa.NET.ImGui" Version="2.2.7" />
+    <PackageReference Include="Hexa.NET.ImGuizmo" Version="2.2.7" />
+    <PackageReference Include="Hexa.NET.ImPlot" Version="2.2.7" />
+    <PackageReference Include="Hexa.NET.Utilities" Version="2.2.2" />
+    <PackageReference Include="NativeFileDialogSharp" Version="0.5.0" />
+    <PackageReference Include="Octokit" Version="14.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileTypeRegisterService\FileTypeRegisterService.csproj" />
+    <ProjectReference Include="..\hkrybase\HekonrayBase\HekonrayBase.csproj" />
+    <ProjectReference Include="..\libfco\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj" />
+    <ProjectReference Include="..\libfco\Source\libfco.csproj" />
+    <ProjectReference Include="..\settings-system\SpettroSettings.csproj" />
+    <ProjectReference Include="..\StbTrueTypeSharp\src\StbTrueTypeSharp.csproj" />
+  </ItemGroup>
+<ItemGroup>
+   <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+</ItemGroup>
+<ItemGroup>
+  <None Update="Resources\fa-regular-400.ttf">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+  <None Update="Resources\RobotoVariable.ttf">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+  <None Update="Resources\Shaders\basic.frag">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+  <None Update="Resources\Shaders\basic.vert">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+	<PropertyGroup>
+		<SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss:fffZ"))</SourceRevisionId>
+	</PropertyGroup>
+</Project>

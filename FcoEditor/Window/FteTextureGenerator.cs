@@ -1,4 +1,4 @@
-﻿using ConverseEditor.ShurikenRenderer;
+﻿using Converse.ShurikenRenderer;
 using DirectXTexNet;
 using Hexa.NET.ImGui;
 using SixLabors.ImageSharp;
@@ -11,7 +11,7 @@ using System.IO;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
 
-namespace ConverseEditor
+namespace Converse
 {
     public static class FteTextureGenerator
     {
@@ -22,7 +22,7 @@ namespace ConverseEditor
             ImGui.PushStyleColor(ImGuiCol.Text, ImGui.ColorConvertFloat4ToU32(new Vector4(1, 0.7f, 0, 1)));
             ImGui.TextWrapped("WARNING: This tool is EXPERIMENTAL. It might save the FTE file incorrectly and cause crashes in-game!");
             ImGui.PopStyleColor();
-            ImGui.BeginDisabled(!FcoViewerWindow.Instance.tablePresent);
+            ImGui.BeginDisabled(!in_Renderer.IsTableLoaded());
             ImGui.InputFloat("Font Size", ref Settings.FontSize);
             ImGui.InputFloat("Kerning (Character Spacing)", ref Settings.Kerning);
             ImGui.InputFloat2("Character Texture Spacing", ref Settings.InterCharacterSpacing, "%.0f");
@@ -38,12 +38,12 @@ namespace ConverseEditor
             var size = ImGui.GetContentRegionAvail().X;
             if(ImGui.Button("Generate", new System.Numerics.Vector2(size, 32)))
             {
-                Settings.FtePath = ConverseProject.config.WorkFilePathFTE;
+                Settings.FtePath = in_Renderer.config.ftePath;
                 try
                 {
-                    var atlasStream = FontAtlasGenerator.TryCreateFteTexture(Settings, FcoViewerWindow.Instance.GetTranslationTableEntries(), in_Renderer.fteFile);
+                    var atlasStream = FontAtlasGenerator.TryCreateFteTexture(Settings, in_Renderer.config.translationTable, in_Renderer.config.fteFile);
 
-                    var texturePath = Path.Combine(Directory.GetParent(Settings.FtePath).FullName, in_Renderer.fteFile.Textures[2].Name + ".dds");
+                    var texturePath = Path.Combine(Directory.GetParent(Settings.FtePath).FullName, in_Renderer.config.fteFile.Textures[2].Name + ".dds");
                     if(File.Exists(texturePath))
                     {
                         File.Move(texturePath, Path.ChangeExtension(texturePath, ".old.dds"));
@@ -71,6 +71,7 @@ namespace ConverseEditor
                 in_Renderer.ShowMessageBoxCross("Converse", "A new font atlas and FTE file have been generated in the same folder as the FCO file.\nThe new FTE file is called \"fte_ConverseMain_Generated.fte\".");
             }
             ImGui.EndDisabled();
+            ImGui.EndTabItem();
         }
     }
 }

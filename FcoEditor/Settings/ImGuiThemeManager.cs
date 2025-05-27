@@ -1,7 +1,7 @@
 ﻿using Hexa.NET.ImGui;
 using System.Numerics;
 
-namespace ConverseEditor.Settings
+namespace Converse.Settings
 {
     public static class ImGuiThemeManager
     {
@@ -36,7 +36,7 @@ namespace ConverseEditor.Settings
             style.GrabRounding = 20.0f;
             style.TabRounding = 4.0f;
             style.TabBorderSize = 1.0f;
-            style.TabMinWidthForCloseButton = 0.0f;
+            //style.TabMinWidthForCloseButton = 0.0f;
             style.ColorButtonPosition = ImGuiDir.Right;
             style.ButtonTextAlign = new Vector2(0.5f, 0.5f);
             style.SelectableTextAlign = new Vector2(0.0f, 0.0f);
@@ -126,7 +126,7 @@ namespace ConverseEditor.Settings
             style.GrabRounding = 20.0f;
             style.TabRounding = 4.0f;
             style.TabBorderSize = 1.0f;
-            style.TabMinWidthForCloseButton = 0.0f;
+            //style.TabMinWidthForCloseButton = 0.0f;
             style.ColorButtonPosition = ImGuiDir.Right;
             style.ButtonTextAlign = new Vector2(0.5f, 0.5f);
             style.SelectableTextAlign = new Vector2(0.0f, 0.0f);

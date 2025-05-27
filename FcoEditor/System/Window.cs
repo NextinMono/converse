@@ -1,6 +1,6 @@
-﻿using ConverseEditor.ShurikenRenderer;
+﻿using Converse.ShurikenRenderer;
 
-namespace ConverseEditor
+namespace Converse
 {
     public class Window
     {
