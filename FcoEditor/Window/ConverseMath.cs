@@ -44,7 +44,7 @@ namespace Converse
             float cross1 = ab.X * ac.Y - ab.Y * ac.X;
             float cross2 = ab.X * ap.Y - ab.Y * ap.X;
 
-            return Math.Sign(cross1) == Math.Sign(cross2);
+            return cross1 * cross2 >= 0f;
         }
 
         public static Vector2 CenterOfRect(Vector2 in_TopLeft, Vector2 in_TopRight, Vector2 in_BtmRight, Vector2 in_BtmLeft)
