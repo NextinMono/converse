@@ -72,18 +72,29 @@ namespace Converse
                                     continue;
                                 var letter = translationTableNew[i];
 
+                                ImGui.TableSetColumnIndex(1);
+                                Vector2 spriteSize = Vector2.Zero;
+                                if (spr.Value.sprite.Texture.GlTex != null)
+                                {
+                                    ImConverse.DrawConverseCharacter(spr.Value, renderer.config.fteFile, new Vector4(1, 1, 1, 1), 0, 1);
+                                    spriteSize = ImGui.GetItemRectSize();
+                                }
+                                else
+                                {
+                                    ImGui.Text($"[Missing Texture (ID: {letter.ConverseID})]");
+                                    spriteSize = ImGui.GetItemRectSize();
+                                }
+
                                 ImGui.TableSetColumnIndex(0);
+                                float inputHeight = ImGui.GetFrameHeight();
+                                float offsetY = (spriteSize.Y - inputHeight) / 2;
+                                if (offsetY > 0)
+                                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + offsetY);
                                 ImGui.SetNextItemWidth(-1);
                                 ImGui.InputText($"##input{letter.ConverseID}", ref letter.Letter, 256);
                                 if (ImGui.IsItemActive())
                                     selectedBox = i;
-                                ImGui.TableSetColumnIndex(1);
-                                if (spr.Value.sprite.Texture.GlTex != null)
-                                    ImConverse.DrawConverseCharacter(spr.Value, renderer.config.fteFile, new Vector4(1, 1, 1, 1), 0, 1);
-                                else
-                                {
-                                    ImGui.Text($"[Missing Texture (ID: {letter.ConverseID})]");
-                                }
+
                                 ImGui.TableNextRow();
                                 translationTableNew[i] = letter;
                             }
